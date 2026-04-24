@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Metadonnees generales de la page -->
+  <meta lang="fr">
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>Food-Command</title>
+  <!-- Chargement de la police utilisee par l'interface -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <!-- Chargement de la feuille de style principale -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Barre superieure avec la recherche -->
+  <div class="navbar">
+    <input type="search" id="bar-de-recherche" onkeyup="searchMenu()" placeholder="rechercher">
+  </div>
+
+  <!-- Zone d'affichage de la localisation -->
+  <div class="location">
+    <span>&#128205;</span>
+    <p>9 West 46th Street, New York City</p>
+  </div>
+  <br>
+
+  <!-- Liste des types de produits proposes -->
+  <div class="type-food">
+    <a href="#" alt="boissons"><img src="Assets/ice-drink.svg" alt=""></a>
+    <p>Boissons</p>
+    <a href="#" alt="nourritures"><img src="Assets/food.svg" alt=""></a>
+    <p>Nourritures</p>
+    <a href="#" alt="gateaux"><img src="Assets/cakes.svg" alt=""></a>
+    <p>Gateaux</p>
+    <a href="#" alt="snack"><img src="Assets/snack.svg" alt=""></a>
+    <p>Snack</p>
+  </div>
+
+  <!-- Galerie du menu principal -->
+  <div class="food-menu">
+    <div class="section-header">
+      <h2>Menu de Nourritures</h2>
+      <a href="#">Explorer</a>
+    </div>
+
+    <div class="food-grid">
+      <article class="food-card">
+        <img src="Assets/Pizza.png" alt="Pizza">
+        <div class="food-card-body">
+          <p class="food-tag">Italien</p>
+          <h3>Pizza Maison</h3>
+          <div class="food-card-bottom">
+            <span>Cheese & basilic</span>
+            <strong>$12</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="food-card">
+        <img src="Assets/Burger.png" alt="Burger">
+        <div class="food-card-body">
+          <p class="food-tag">Fast food</p>
+          <h3>Burger Classic</h3>
+          <div class="food-card-bottom">
+            <span>Steak grille</span>
+            <strong>$10</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="food-card">
+        <img src="Assets/BBQ.png" alt="BBQ">
+        <div class="food-card-body">
+          <p class="food-tag">Grillade</p>
+          <h3>BBQ Box</h3>
+          <div class="food-card-bottom">
+            <span>Sauce fumee</span>
+            <strong>$14</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="food-card">
+        <img src="Assets/Fruits.png" alt="Fruits">
+        <div class="food-card-body">
+          <p class="food-tag">Healthy</p>
+          <h3>Fruit Bowl</h3>
+          <div class="food-card-bottom">
+            <span>Mix tropical</span>
+            <strong>$9</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="food-card">
+        <img src="Assets/Suchis.png" alt="Suchis">
+        <div class="food-card-body">
+          <p class="food-tag">Japonais</p>
+          <h3>Sushi Set</h3>
+          <div class="food-card-bottom">
+            <span>Selection fraiche</span>
+            <strong>$16</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="food-card">
+        <img src="Assets/Nouilles.png" alt="nouilles">
+        <div class="food-card-body">
+          <p class="food-tag">Asiatique</p>
+          <h3>Nouilles Epicées</h3>
+          <div class="food-card-bottom">
+            <span>Saveur maison</span>
+            <strong>$11</strong>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <!-- Bloc reserve aux suggestions proches -->
+  <div class="pres-de-moi">
+    <div class="pres-header">
+      <h2>Pres de vous</h2>
+      <a href="#">Voir tout</a>
+    </div>
+
+    <div class="restaurant-card">
+      <img src="Assets/Fruits.png" alt="Awesome Fruit Restaurant">
+      <div class="restaurant-info">
+        <h3>Awesome Fruit Restaurant</h3>
+        <p class="restaurant-address">13th Street, 47 W 13th St, NY</p>
+        <p class="restaurant-meta">3 min &bull; 1.1 km</p>
+        <p class="restaurant-rating">&#9733; &#9733; &#9733; &#9733; &#9734; <span>(4.6)</span></p>
+      </div>
+    </div>
+
+    <div class="restaurant-card">
+      <img src="Assets/Pizza.png" alt="Pizza Lover Company">
+      <div class="restaurant-info">
+        <h3>Pizza Lover Company</h3>
+        <p class="restaurant-address">78th Street, 88 W 21th St, NY</p>
+        <p class="restaurant-meta">4 min &bull; 1.5 km</p>
+        <p class="restaurant-rating">&#9733; &#9733; &#9733; &#9733; &#9733; <span>(4.9)</span></p>
+      </div>
+    </div>
+
+    <div class="restaurant-card">
+      <img src="Assets/BBQ.png" alt="Chicken Fried Restaurant">
+      <div class="restaurant-info">
+        <h3>Chicken Fried Restaurant</h3>
+        <p class="restaurant-address">132th Street, 41 W 10th St, NY</p>
+        <p class="restaurant-meta">5 min &bull; 1.7 km</p>
+        <p class="restaurant-rating">&#9733; &#9733; &#9733; &#9733; &#9734; <span>(4.9)</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Carrousel de mise en avant -->
+  <div class="carousel-section">
+    <div class="carousel-header">
+      <h2>Offres du moment</h2>
+      <p>Des plats populaires a decouvrir</p>
+    </div>
+
+    <div class="carousel-container">
+      <div class="carousel-slide">
+        <article class="carousel-item">
+          <img src="Assets/Plat1.jpg" alt="Plat gourmand 1">
+          <div class="carousel-overlay">
+            <span class="carousel-badge">-20%</span>
+            <h3>Menu special du chef</h3>
+            <p>Saveurs fraiches et assiette genereuse</p>
+          </div>
+        </article>
+        <article class="carousel-item">
+          <img src="Assets/Plat2.jpg" alt="Plat gourmand 2">
+          <div class="carousel-overlay">
+            <span class="carousel-badge">Nouveau</span>
+            <h3>Assiette maison</h3>
+            <p>Une presentation simple et elegante</p>
+          </div>
+        </article>
+        <article class="carousel-item">
+          <img src="Assets/Plat3.jpg" alt="Plat gourmand 3">
+          <div class="carousel-overlay">
+            <span class="carousel-badge">Populaire</span>
+            <h3>Selection gourmande</h3>
+            <p>Le bon choix pour un repas complet</p>
+          </div>
+        </article>
+        <article class="carousel-item">
+          <img src="Assets/Plat4.jpg" alt="Plat gourmand 4">
+          <div class="carousel-overlay">
+            <span class="carousel-badge">Promo</span>
+            <h3>Plat signature</h3>
+            <p>Une texture riche et un visuel propre</p>
+          </div>
+        </article>
+        <article class="carousel-item">
+          <img src="Assets/Plat5.jpg" alt="Plat gourmand 5">
+          <div class="carousel-overlay">
+            <span class="carousel-badge">Fresh</span>
+            <h3>Pause fraicheur</h3>
+            <p>Un plat leger et bien presente</p>
+          </div>
+        </article>
+        <article class="carousel-item">
+          <img src="Assets/Plat6.jpg" alt="Plat gourmand 6">
+          <div class="carousel-overlay">
+            <span class="carousel-badge">Top</span>
+            <h3>Recette tendance</h3>
+            <p>Parfait pour attirer le regard</p>
+          </div>
+        </article>
+        <article class="carousel-item">
+          <img src="Assets/Plat7.jpg" alt="Plat gourmand 7">
+          <div class="carousel-overlay">
+            <span class="carousel-badge">Maison</span>
+            <h3>Inspiration du jour</h3>
+            <p>Une mise en avant propre et moderne</p>
+          </div>
+        </article>
+        <article class="carousel-item">
+          <img src="Assets/Plat8.jpg" alt="Plat gourmand 8">
+          <div class="carousel-overlay">
+            <span class="carousel-badge">Choix</span>
+            <h3>Best seller</h3>
+            <p>Une option appetissante et premium</p>
+          </div>
+        </article>
+      </div>
+
+      <button id="prevBtn" class="carousel-btn" aria-label="Image precedente">&#10094;</button>
+      <button id="nextBtn" class="carousel-btn" aria-label="Image suivante">&#10095;</button>
+      <div class="carousel-dots"></div>
+    </div>
+  </div>
+
+  <!-- Section consacre au petit dejeuner -->
+  <div class="petit-dejeuner">
+    <div class="section-header">
+      <h2>Petit dejeuner</h2>
+      <a href="#">Voir plus</a>
+    </div>
+
+    <div class="food-grid breakfast-grid">
+      <article class="food-card breakfast-card">
+        <img src="Assets/Fruits.png" alt="Fruits">
+        <div class="food-card-body">
+          <p class="food-tag">Matin</p>
+          <h3>Bowl vitamine</h3>
+          <div class="food-card-bottom">
+            <span>Fruits frais</span>
+            <strong>$8</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="food-card breakfast-card">
+        <img src="Assets/Burger.png" alt="Burger">
+        <div class="food-card-body">
+          <p class="food-tag">Brunch</p>
+          <h3>Mini burger egg</h3>
+          <div class="food-card-bottom">
+            <span>Oeuf & pain chaud</span>
+            <strong>$9</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="food-card breakfast-card">
+        <img src="Assets/Pizza.png" alt="Pizza">
+        <div class="food-card-body">
+          <p class="food-tag">Morning</p>
+          <h3>Toast pizza</h3>
+          <div class="food-card-bottom">
+            <span>Leger et fondant</span>
+            <strong>$7</strong>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+  <br>
+
+  <!-- Barre de navigation fixe en bas de page -->
+  <div class="footer-bar">
+    <a href="#" alt="Acceuil"><img src="Assets/home.svg" alt="Acceuil">Acceuil</a>
+    <a href="#" alt="Commande"><img src="Assets/order.svg" alt="Commande">Commande</a>
+    <a href="#" alt="Ma liste"><img src="Assets/favorite.svg" alt="Ma liste">Ma liste</a>
+    <a href="#" alt="Profile"><img src="Assets/profile-bold.svg" alt="Mon Profile">Profile</a>
+  </div>
+
+  <script>
+    const slide = document.querySelector('.carousel-slide');
+    const items = document.querySelectorAll('.carousel-item');
+    const prevBtn = document.querySelector('#prevBtn');
+    const nextBtn = document.querySelector('#nextBtn');
+    const dotsContainer = document.querySelector('.carousel-dots');
+
+    let counter = 0;
+
+    items.forEach((_, index) => {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot';
+      dot.setAttribute('aria-label', `Aller a la slide ${index + 1}`);
+      dot.addEventListener('click', () => {
+        counter = index;
+        updateCarousel();
+      });
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.carousel-dot');
+
+    function updateCarousel() {
+      slide.style.transform = `translateX(-${counter * 100}%)`;
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === counter);
+      });
+      prevBtn.disabled = counter === 0;
+      nextBtn.disabled = counter === items.length - 1;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (counter < items.length - 1) {
+        counter++;
+        updateCarousel();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (counter > 0) {
+        counter--;
+        updateCarousel();
+      }
+    });
+
+    updateCarousel();
+  </script>
+</body>
+</html>
