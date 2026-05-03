@@ -5,20 +5,43 @@
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     initNavbarScroller();
+    initUserProfile();
     renderCategories();
     renderRestaurants();
     simulateAIGeneration();
 
     const btnSearch = document.getElementById('btn-search');
-    if (btnSearch) {
+    const searchInput = document.getElementById('search-input');
+    
+    if (btnSearch && searchInput) {
         btnSearch.addEventListener('click', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            filterRestaurants(searchTerm);
+            
             const restSection = document.querySelector('.restaurants-section');
             if(restSection) {
                 restSection.scrollIntoView({behavior: 'smooth'});
             }
         });
+
+        // Recherche en temps réel en tapant
+        searchInput.addEventListener('input', (e) => {
+            filterRestaurants(e.target.value.toLowerCase());
+        });
     }
 });
+
+function filterRestaurants(term) {
+    const cards = document.querySelectorAll('.restaurant-card');
+    cards.forEach(card => {
+        const title = card.querySelector('.rest-title').textContent.toLowerCase();
+        if (title.includes(term)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
 
 function initNavbarScroller() {
     const navbar = document.querySelector('.navbar');
@@ -115,5 +138,62 @@ function simulateAIGeneration() {
                 imgContainer.innerHTML = '<img src="assets/ai_food_demo.png" onerror="this.src=\\'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?q=80&w=400&auto=format&fit=crop\\'" alt="Generated Food" style="animation: fadeIn 0.5s ease; width:100%; height:100%; object-fit:cover;">';
             }, 2000);
         });
+    }
+}
+
+async function initUserProfile() {
+    const userProfileContainer = document.getElementById('user-profile-container');
+    const btnLogin = document.getElementById('btn-login');
+    const userNameNav = document.getElementById('user-name-nav');
+    const userAvatar = document.getElementById('user-avatar');
+    const dropdownFullName = document.getElementById('dropdown-full-name');
+    const dropdownEmail = document.getElementById('dropdown-email');
+    const userProfileTrigger = document.getElementById('user-profile-trigger');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    const btnLogout = document.getElementById('btn-logout');
+
+    const token = localStorage.getItem('user_token');
+
+    if (token) {
+        try {
+            const user = await api.getCurrentUser();
+            
+            if (user) {
+                // Update UI
+                if(userNameNav) userNameNav.textContent = user.fullName ? user.fullName.split(' ')[0] : 'Profil';
+                if(dropdownFullName) dropdownFullName.textContent = user.fullName || 'Utilisateur';
+                if(dropdownEmail) dropdownEmail.textContent = user.email;
+                if(userAvatar) userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || 'User')}&background=FF5A5F&color=fff`;
+                
+                if(userProfileContainer) userProfileContainer.style.display = 'flex';
+                if(btnLogin) btnLogin.style.display = 'none';
+
+                // Toggle dropdown
+                if(userProfileTrigger) {
+                    userProfileTrigger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if(profileDropdown) profileDropdown.classList.toggle('active');
+                    });
+                }
+
+                // Close dropdown
+                document.addEventListener('click', () => {
+                    if(profileDropdown) profileDropdown.classList.remove('active');
+                });
+
+                // Logout
+                if(btnLogout) {
+                    btnLogout.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        localStorage.removeItem('user_token');
+                        localStorage.removeItem('user_role');
+                        localStorage.removeItem('user_email');
+                        window.location.href = 'index.html';
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load profile:', error);
+        }
     }
 }

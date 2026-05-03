@@ -21,7 +21,30 @@
             <a href="pages/offers.html">Offres</a>
         </div>
         <div class="nav-actions">
+            <!-- Bouton Connexion (affiché par défaut) -->
             <button class="btn btn-outline hide-mobile" id="btn-login" onclick="window.location.href='pages/auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
+            
+            <!-- Bloc Profil (caché par défaut, activé par JS) -->
+            <div id="user-profile-container" class="user-profile-nav" style="display: none;">
+                <div class="user-info" id="user-profile-trigger">
+                    <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=FF5A5F&color=fff" alt="Profile" class="nav-avatar">
+                    <span id="user-name-nav" class="hide-mobile">Chargement...</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <!-- Menu déroulant profil -->
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="dropdown-header">
+                        <strong id="dropdown-full-name">Utilisateur</strong>
+                        <span id="dropdown-email">email@exemple.com</span>
+                    </div>
+                    <hr>
+                    <a href="pages/profile.html"><i class="fa-solid fa-user-gear"></i> Mon Profil</a>
+                    <a href="#"><i class="fa-solid fa-box"></i> Mes Commandes</a>
+                    <hr>
+                    <a href="#" id="btn-logout" class="text-primary"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+                </div>
+            </div>
+
             <button class="btn btn-cart">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span class="cart-badge">0</span>

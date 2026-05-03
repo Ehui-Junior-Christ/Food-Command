@@ -64,6 +64,20 @@ const api = {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         return await response.json();
+    },
+
+    async getCurrentUser() {
+        const token = localStorage.getItem('user_token');
+        if (!token) return null;
+        
+        const response = await fetch(`${API_BASE_URL}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) {
+            if (response.status === 401) localStorage.removeItem('user_token');
+            return null;
+        }
+        return await response.json();
     }
 };
 
@@ -77,10 +91,9 @@ const api = {
         localStorage.setItem('user_token', token);
         localStorage.setItem('user_role', 'CLIENT');
         
-        // 2. Nettoyer l'URL (enlever le ?token=... sans recharger la page)
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
-        
         console.log("Connecté avec succès via Google !");
+        
+        // 2. Rediriger vers la page d'accueil (pour activer le script de profil)
+        window.location.href = '/index.html';
     }
 })();

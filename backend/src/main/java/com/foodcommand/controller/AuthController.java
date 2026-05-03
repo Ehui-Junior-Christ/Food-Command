@@ -71,4 +71,33 @@ public class AuthController {
 
         return ResponseEntity.ok("User registered successfully!");
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Not authenticated");
+        }
+        
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .map(user -> ResponseEntity.ok(user))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<?> updateProfile(@RequestBody User updateData) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        
+        return userRepository.findByEmail(email)
+                .map(user -> {
+                    if (updateData.getFullName() != null) user.setFullName(updateData.getFullName());
+                    // Note: Dans un vrai projet, on stockerait l'image sur un serveur (S3/Cloudinary)
+                    // Ici on accepte une URL de photo pour la démonstration
+                    userRepository.save(user);
+                    return ResponseEntity.ok(user);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
