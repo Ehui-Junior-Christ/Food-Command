@@ -3,321 +3,1063 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portail Partenaire | Food-Command</title>
+    <title>Dashboard Resto | Food-Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/styles.css">
     <style>
-        body { background-color: #F1F5F9; }
-        .admin-layout {
+        :root {
+            --sidebar-width: 280px;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --accent-gradient: linear-gradient(135deg, #FF5A5F, #FF8A5F);
+            --bg-color: #f0f2f5;
+        }
+
+        body {
+            background: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 90, 95, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(255, 138, 95, 0.05) 0px, transparent 50%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .admin-wrapper {
             display: flex;
             min-height: 100vh;
         }
+
+        /* SIDEBAR Glassmorphism */
         .sidebar {
-            width: 260px;
-            background: white;
-            box-shadow: var(--shadow-md);
+            width: var(--sidebar-width);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
             padding: 2rem 0;
             display: flex;
             flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .sidebar-logo {
-            padding: 0 2rem 2rem;
-            border-bottom: 1px solid #E2E8F0;
-            margin-bottom: 1rem;
+            padding: 0 2rem 2.5rem;
+            text-align: center;
         }
+
+        .sidebar-logo .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Outfit';
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
+            flex: 1;
+        }
+
         .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 1rem 2rem;
-            color: var(--text-muted);
+            padding: 1rem 1.5rem;
+            color: #64748b;
+            text-decoration: none;
+            border-radius: 12px;
             font-weight: 500;
-            transition: var(--transition);
-            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
-        .nav-item:hover, .nav-item.active {
-            background: #F8FAFC;
+
+        .nav-link i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 90, 95, 0.05);
             color: var(--primary);
-            border-left-color: var(--primary);
+            transform: translateX(5px);
         }
-        .main-content {
+
+        .nav-link.active {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 10px 20px rgba(255, 90, 95, 0.2);
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* MAIN CONTENT AREA */
+        .main-container {
+            margin-left: var(--sidebar-width);
             flex: 1;
             padding: 2rem 3rem;
-            overflow-y: auto;
         }
-        .dashboard-header {
+
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+        .user-greeting h1 {
+            font-size: 1.5rem;
+            font-family: 'Outfit';
+            color: #1e293b;
+        }
+
+        .user-greeting p {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* STAT CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-info .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .stat-info .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Outfit';
+            color: #1e293b;
+            margin-top: 5px;
+        }
+
+        /* PANELS */
+        .panel-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .admin-section {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
         }
-        .stat-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 3rem;
+
+        /* TABLES */
+        .modern-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
         }
-        .stat-card {
+
+        .modern-table th {
+            padding: 1rem 1.5rem;
+            color: #64748b;
+            font-weight: 600;
+            text-align: left;
+            border: none;
+        }
+
+        .modern-table tr {
             background: white;
-            padding: 1.5rem;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
+            transition: 0.3s;
         }
-        .stat-title { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
-        .stat-value { font-size: 2rem; font-weight: 700; font-family: 'Outfit'; }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+
+        .modern-table td {
+            padding: 1.2rem 1.5rem;
+            border-top: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
         }
-        .panel {
-            background: white;
-            border-radius: var(--radius-md);
-            padding: 2rem;
-            box-shadow: var(--shadow-sm);
+
+        .modern-table tr td:first-child { border-left: 1px solid #f1f5f9; border-radius: 15px 0 0 15px; }
+        .modern-table tr td:last-child { border-right: 1px solid #f1f5f9; border-radius: 0 15px 15px 0; }
+
+        .modern-table tr:hover {
+            transform: scale(1.01);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
         }
-        .panel-title {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border-bottom: 1px solid #E2E8F0;
-            padding-bottom: 0.75rem;
+
+        .dish-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-right: 10px;
         }
-        
-        /* Upload Area */
-        .upload-area {
-            border: 2px dashed #CBD5E0;
-            border-radius: var(--radius-md);
-            padding: 3rem 2rem;
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            background: #F8FAFC;
+
+        /* BADGES */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
         }
-        .upload-area:hover {
+
+        .badge-success { background: #dcfce7; color: #15803d; }
+        .badge-warning { background: #fef9c3; color: #a16207; }
+        .badge-info { background: #e0f2fe; color: #0369a1; }
+
+        /* MODALS */
+        .glass-modal {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.2);
+            width: 550px;
+            max-width: 95%;
+            animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.8) translateY(40px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            transition: 0.3s;
+            width: 100%;
+            background: #f8fafc;
+        }
+
+        .form-control:focus {
             border-color: var(--primary);
-            background: rgba(255, 90, 95, 0.05);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(255, 90, 95, 0.1);
+            outline: none;
         }
-        .upload-icon {
-            font-size: 3rem;
-            color: #A0AEC0;
-            margin-bottom: 1rem;
-        }
-        
-        /* AI Generator */
-        .ai-prompt-area {
-            background: linear-gradient(135deg, #1A1C23, #2D3748);
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            color: white;
-            margin-bottom: 1.5rem;
-        }
-        .ai-input {
-            width: 100%;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 1rem;
-            border-radius: var(--radius-sm);
-            margin-bottom: 1rem;
-            font-family: inherit;
-        }
-        .ai-input::placeholder { color: rgba(255,255,255,0.5); }
-        .ai-preview {
-            width: 100%;
-            height: 250px;
-            background: #E2E8F0;
-            border-radius: var(--radius-sm);
-            display: flex;
+
+        /* ACTIONS */
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            background: #f1f5f9;
+            color: #64748b;
         }
-        .ai-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+
+        .action-btn:hover { background: var(--primary); color: white; }
+        .action-btn.delete:hover { background: #ef4444; color: white; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body>
-    <div class="admin-layout">
+    <div class="admin-wrapper">
+        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-logo">
-                <a href="../index.html" class="logo"><i class="fa-solid fa-utensils"></i> Food-Command</a>
+                <a href="../index.html" class="logo">
+                    <i class="fa-solid fa-fire-flame-curved"></i> Food-Command
+                </a>
             </div>
-            <a href="#" class="nav-item active" onclick="showSection('dashboard', this)"><i class="fa-solid fa-chart-line"></i> Tableau de bord</a>
-            <a href="#" class="nav-item" onclick="showSection('menu', this)"><i class="fa-solid fa-book-open"></i> Gestion du Menu</a>
-            <a href="#" class="nav-item" onclick="showSection('photos', this)"><i class="fa-solid fa-image"></i> Photos & IA</a>
-            <a href="#" class="nav-item" onclick="showSection('orders', this)"><i class="fa-solid fa-motorcycle"></i> Commandes</a>
-            <a href="#" class="nav-item" onclick="showSection('settings', this)"><i class="fa-solid fa-gear"></i> Paramètres</a>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a class="nav-link active" onclick="showSection('dashboard', this)">
+                        <i class="fa-solid fa-house-chimney"></i> Tableau de bord
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" onclick="showSection('menu', this)">
+                        <i class="fa-solid fa-utensils"></i> Gestion de la Carte
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" onclick="showSection('orders', this)">
+                        <i class="fa-solid fa-receipt"></i> Commandes
+                        <span id="badge-orders" class="badge" style="background:var(--primary); color:white; font-size:0.6rem; margin-left:auto; display:none;">0</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" onclick="showSection('photos', this)">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Studio Photo IA
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" onclick="showSection('settings', this)">
+                        <i class="fa-solid fa-sliders"></i> Paramètres
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="../index.html" class="nav-link" style="color:#ef4444">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Retour au site
+                </a>
+            </div>
         </aside>
-        
-        <main class="main-content">
-            <div class="dashboard-header">
-                <div>
-                    <h1 id="admin-welcome">Bienvenue, Partenaire</h1>
-                    <p class="text-muted">Voici l'aperçu de votre activité aujourd'hui.</p>
-                </div>
-                <button class="btn btn-outline" onclick="window.location.href='restaurant.html'"><i class="fa-solid fa-store"></i> Voir mon restaurant</button>
-            </div>
 
-            <div id="section-dashboard" class="admin-section">
-                <div class="stat-cards">
-                    <div class="stat-card">
-                        <div class="stat-title">Commandes du jour</div>
-                        <div class="stat-value text-primary">24</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Revenus (FCFA)</div>
-                        <div class="stat-value" style="color:var(--secondary)">145 000</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Note moyenne</div>
-                        <div class="stat-value">4.8 <i class="fa-solid fa-star" style="color:#FFD700; font-size:1.2rem;"></i></div>
-                    </div>
+        <!-- MAIN CONTENT -->
+        <main class="main-container">
+            <!-- TOP BAR -->
+            <header class="top-header">
+                <div class="user-greeting">
+                    <h1 id="admin-welcome">Chargement...</h1>
+                    <p id="current-date">Aujourd'hui, 3 Mai 2026</p>
                 </div>
-
-                <div class="dashboard-grid">
-                    <div class="panel">
-                        <h2 class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i> Activité récente</h2>
-                        <ul style="list-style:none; padding:0;">
-                            <li style="padding:1rem 0; border-bottom:1px solid #eee;">Nouveau client : Jean D. a commandé un Smash Burger</li>
-                            <li style="padding:1rem 0; border-bottom:1px solid #eee;">Avis 5 étoiles de Marie K.</li>
-                            <li style="padding:1rem 0;">Paiement reçu : 12 500 FCFA</li>
-                        </ul>
+                <div class="top-actions" style="display:flex; gap:1.5rem; align-items:center; position:relative;">
+                    <!-- Notifications -->
+                    <div style="position:relative;">
+                        <div id="notif-trigger" style="cursor:pointer; position:relative;">
+                            <i class="fa-solid fa-bell" style="font-size:1.3rem; color:#64748b;"></i>
+                            <span id="notif-badge" style="position:absolute; top:-5px; right:-5px; width:10px; height:10px; background:var(--primary); border-radius:50%; border:2px solid white; display:none;"></span>
+                        </div>
+                        <div id="notif-dropdown" class="glass-card" style="display:none; position:absolute; top:45px; right:0; width:320px; z-index:1000; padding:1.5rem; border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,0.15);">
+                            <h4 style="margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+                                Notifications
+                                <span id="notif-count" style="font-size:0.7rem; background:var(--primary); color:white; padding:2px 8px; border-radius:10px;">0</span>
+                            </h4>
+                            <div id="notif-list" style="max-height:300px; overflow-y:auto;">
+                                <p class="text-muted" style="font-size:0.9rem; text-align:center; padding:1rem;">Aucune nouvelle notification</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="panel">
-                        <h2 class="panel-title"><i class="fa-solid fa-chart-simple"></i> Performance</h2>
-                        <p class="text-muted">Vos ventes ont augmenté de 15% cette semaine.</p>
-                        <div style="height:150px; background:#f8fafc; border-radius:8px; margin-top:1rem; display:flex; align-items:flex-end; gap:5px; padding:10px;">
-                            <div style="flex:1; background:var(--primary); height:40%;"></div>
-                            <div style="flex:1; background:var(--primary); height:60%;"></div>
-                            <div style="flex:1; background:var(--primary); height:55%;"></div>
-                            <div style="flex:1; background:var(--primary); height:80%;"></div>
-                            <div style="flex:1; background:var(--primary); height:70%;"></div>
-                            <div style="flex:1; background:var(--primary); height:90%;"></div>
-                            <div style="flex:1; background:var(--primary); height:100%;"></div>
+
+                    <button class="btn btn-primary btn-sm" id="btn-view-restaurant" style="border-radius:12px; padding:0.6rem 1.2rem;">
+                        <i class="fa-solid fa-eye"></i> Aperçu Boutique
+                    </button>
+
+                    <!-- Profil Admin -->
+                    <div style="position:relative;">
+                        <img id="admin-avatar" src="https://ui-avatars.com/api/?name=Partner&background=FF5A5F&color=fff" style="width:40px; height:40px; border-radius:12px; cursor:pointer; border:2px solid transparent; transition:0.3s;">
+                        <div id="profile-dropdown" class="glass-card" style="display:none; position:absolute; top:50px; right:0; width:200px; z-index:1000; padding:1rem; border-radius:15px; box-shadow:0 20px 50px rgba(0,0,0,0.1);">
+                            <a href="#" onclick="showSection('settings')" style="display:flex; align-items:center; gap:10px; padding:0.8rem; color:#1e293b; text-decoration:none; border-radius:10px; transition:0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                                <i class="fa-solid fa-user-gear"></i> Paramètres
+                            </a>
+                            <a href="#" onclick="logout()" style="display:flex; align-items:center; gap:10px; padding:0.8rem; color:#ef4444; text-decoration:none; border-radius:10px; transition:0.2s;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='transparent'">
+                                <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+                            </a>
                         </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div id="section-menu" class="admin-section" style="display:none;">
-                <div class="panel">
-                    <h2 class="panel-title">Gestion de la Carte</h2>
-                    <button class="btn btn-primary btn-sm mb-2" style="margin-bottom: 1rem;"><i class="fa-solid fa-plus"></i> Ajouter un plat</button>
-                    <table style="width:100%; border-collapse:collapse;">
+            <!-- SECTION DASHBOARD -->
+            <section id="section-dashboard" class="admin-section active">
+                <div class="stats-grid">
+                    <div class="glass-card">
+                        <div class="stat-icon" style="background:#fff1f2; color:#f43f5e;"><i class="fa-solid fa-basket-shopping"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Ventes du jour</span>
+                            <div class="stat-value" id="stat-orders">0</div>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <div class="stat-icon" style="background:#f0fdf4; color:#22c55e;"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Chiffre d'Affaires</span>
+                            <div class="stat-value" id="stat-revenue">0 FCFA</div>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <div class="stat-icon" style="background:#fffbeb; color:#f59e0b;"><i class="fa-solid fa-star"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-label">Note Client</span>
+                            <div class="stat-value">4.8 <span style="font-size:0.9rem; color:#94a3b8; font-weight:400;">/5</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-container">
+                    <div class="glass-card" style="grid-column: 1 / 2;">
+                        <h3 class="panel-title" style="border:none; margin-bottom:1.5rem; display:flex; justify-content:space-between;">
+                            Commandes Récentes
+                            <a href="#" onclick="showSection('orders')" style="font-size:0.8rem; color:var(--primary); font-weight:600;">Voir tout</a>
+                        </h3>
+                        <div id="dashboard-orders-preview">
+                            <p class="text-muted">Chargement des activités...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card">
+                        <h3 class="panel-title" style="border:none;">Performance Mensuelle</h3>
+                        <div style="height:200px; display:flex; align-items:flex-end; gap:8px; padding-top:2rem;">
+                            <div style="flex:1; background:var(--primary); height:40%; border-radius:5px 5px 0 0; opacity:0.6;"></div>
+                            <div style="flex:1; background:var(--primary); height:65%; border-radius:5px 5px 0 0; opacity:0.8;"></div>
+                            <div style="flex:1; background:var(--primary); height:55%; border-radius:5px 5px 0 0; opacity:0.7;"></div>
+                            <div style="flex:1; background:var(--primary); height:90%; border-radius:5px 5px 0 0;"></div>
+                            <div style="flex:1; background:var(--primary); height:75%; border-radius:5px 5px 0 0; opacity:0.9;"></div>
+                        </div>
+                        <p style="text-align:center; font-size:0.8rem; color:#64748b; margin-top:1rem;">Croissance de +12% vs mois dernier</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION MENU -->
+            <section id="section-menu" class="admin-section">
+                <div class="section-header">
+                    <h2>Gestion de la Carte</h2>
+                    <button class="btn btn-primary" onclick="addMenuItem()">
+                        <i class="fa-solid fa-plus"></i> Ajouter un plat
+                    </button>
+                </div>
+                
+                <div class="glass-card" style="padding:0; overflow:hidden;">
+                    <table class="modern-table">
                         <thead>
-                            <tr style="text-align:left; border-bottom:2px solid #eee;">
-                                <th style="padding:1rem;">Plat</th>
-                                <th style="padding:1rem;">Prix</th>
-                                <th style="padding:1rem;">Statut</th>
-                                <th style="padding:1rem;">Actions</th>
+                            <tr>
+                                <th>Plat</th>
+                                <th>Catégorie</th>
+                                <th>Prix</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr style="border-bottom:1px solid #eee;">
-                                <td style="padding:1rem;">Le Smash Classic</td>
-                                <td style="padding:1rem;">4 500 FCFA</td>
-                                <td style="padding:1rem;"><span class="order-status" style="background:#e6fffa; color:#2c7a7b; padding:2px 8px; border-radius:10px; font-size:0.8rem;">En vente</span></td>
-                                <td style="padding:1rem;"><i class="fa-solid fa-pen-to-square" style="cursor:pointer; margin-right:10px;"></i> <i class="fa-solid fa-trash" style="color:var(--primary); cursor:pointer;"></i></td>
-                            </tr>
+                        <tbody id="menu-table-body">
+                            <!-- Dynamic items -->
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </section>
 
-            <div id="section-photos" class="admin-section" style="display:none;">
-                <div class="dashboard-grid">
-                    <div class="panel">
-                        <h2 class="panel-title"><i class="fa-solid fa-cloud-arrow-up text-primary"></i> Uploader des Photos</h2>
-                        <div class="upload-area">
-                            <i class="fa-solid fa-images upload-icon"></i>
-                            <h3>Glissez vos images ici</h3>
-                            <button class="btn btn-outline btn-sm mt-2">Parcourir</button>
+            <!-- SECTION ORDERS -->
+            <section id="section-orders" class="admin-section">
+                <div class="section-header">
+                    <h2>Suivi des Commandes</h2>
+                    <div style="display:flex; gap:1rem;" id="order-filters">
+                        <button class="btn btn-outline btn-sm active" onclick="filterOrders('ALL', this)">Toutes</button>
+                        <button class="btn btn-outline btn-sm" onclick="filterOrders('PENDING', this)">En attente</button>
+                        <button class="btn btn-outline btn-sm" onclick="filterOrders('DELIVERED', this)">Terminées</button>
+                    </div>
+                </div>
+                <div id="orders-list">
+                    <!-- Dynamic orders cards -->
+                </div>
+            </section>
+
+            <!-- SECTION STUDIO IA -->
+            <section id="section-photos" class="admin-section">
+                <div class="section-header">
+                    <h2>Studio Photo IA</h2>
+                    <p class="text-muted">Transformez vos photos de plats avec notre intelligence artificielle.</p>
+                </div>
+                <div class="panel-container">
+                    <div class="glass-card">
+                        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border-radius:20px; padding:2rem; color:white;">
+                            <h4 style="margin-bottom:1rem;"><i class="fa-solid fa-microchip"></i> Assistant Créatif IA</h4>
+                            <textarea id="ai-prompt" class="form-control" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; margin-bottom:1.5rem;" rows="4" placeholder="Ex: Un burger gourmet sur une planche de bois avec un éclairage cinématographique chaud..."></textarea>
+                            <button class="btn btn-primary btn-block" onclick="generateAI()">
+                                <i class="fa-solid fa-bolt"></i> Générer l'image
+                            </button>
                         </div>
                     </div>
-                    <div class="panel">
-                        <h2 class="panel-title"><i class="fa-solid fa-wand-magic-sparkles" style="color:#805AD5;"></i> Studio Photo IA</h2>
-                        <div class="ai-prompt-area">
-                            <textarea class="ai-input" rows="3" placeholder="Décrivez votre plat..."></textarea>
-                            <button class="btn btn-primary btn-block" onclick="generateAI()"><i class="fa-solid fa-bolt"></i> Générer</button>
+                    <div class="glass-card" style="display:flex; align-items:center; justify-content:center; min-height:300px;">
+                        <div id="ai-result" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1rem;">
+                            <i class="fa-solid fa-wand-sparkles" style="font-size:3rem; color:#e2e8f0;"></i>
+                            <p style="color:#94a3b8;">L'image générée s'affichera ici</p>
                         </div>
-                        <div class="ai-preview" id="ai-result">L'image apparaîtra ici</div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div id="section-orders" class="admin-section" style="display:none;">
-                <div class="panel">
-                    <h2 class="panel-title">Commandes en cours</h2>
-                    <div style="background:#fffaf0; border-left:4px solid #ed8936; padding:1rem; margin-bottom:1rem;">
-                        <strong>Commande #FS-9021</strong> - 2x Burger Smash - <span style="color:#ed8936;">En préparation</span>
-                    </div>
-                    <div style="background:#f0fff4; border-left:4px solid #48bb78; padding:1rem;">
-                        <strong>Commande #FS-8998</strong> - 1x Pizza Regina - <span style="color:#48bb78;">Prête pour livraison</span>
-                    </div>
+            <!-- SECTION SETTINGS -->
+            <section id="section-settings" class="admin-section">
+                <div class="section-header">
+                    <h2>Paramètres du Restaurant</h2>
                 </div>
-            </div>
-
-            <div id="section-settings" class="admin-section" style="display:none;">
-                <div class="panel">
-                    <h2 class="panel-title">Paramètres du restaurant</h2>
-                    <div class="form-group">
-                        <label class="form-label">Nom d'affichage</label>
-                        <input type="text" class="form-control" id="settings-name" value="Burger Palace">
+                <div class="glass-card" style="max-width:800px;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2rem;">
+                        <div class="form-group">
+                            <label>Nom du Restaurant</label>
+                            <input type="text" id="settings-name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>URL du Logo / Image</label>
+                            <input type="text" id="settings-image" class="form-control" placeholder="https://...">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Horaires d'ouverture</label>
-                        <input type="text" class="form-control" value="10:00 - 22:00">
+                        <label>Adresse Complète</label>
+                        <input type="text" id="settings-address" class="form-control">
                     </div>
-                    <button class="btn btn-primary btn-sm">Enregistrer les modifications</button>
+                    <div class="form-group" style="margin-top:1.5rem;">
+                        <label>Description (Bio)</label>
+                        <textarea id="settings-desc" class="form-control" rows="4"></textarea>
+                    </div>
+                    <div style="margin-top:2.5rem; display:flex; justify-content:flex-end;">
+                        <button class="btn btn-primary" onclick="updateSettings()">
+                            <i class="fa-solid fa-save"></i> Enregistrer les changements
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </section>
         </main>
     </div>
 
+    <!-- MODAL -->
+    <div id="menu-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); backdrop-filter:blur(5px); z-index:10000; align-items:center; justify-content:center;">
+        <div class="glass-modal">
+            <h2 id="modal-title" style="margin-bottom:2rem; font-family:'Outfit';">Ajouter un Plat</h2>
+            <form id="menu-form" onsubmit="handleMenuSubmit(event)">
+                <input type="hidden" id="menu-item-id">
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    <label>Nom du plat</label>
+                    <input type="text" id="menu-name" class="form-control" required>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+                    <div class="form-group">
+                        <label>Prix (FCFA)</label>
+                        <input type="number" id="menu-price" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Catégorie</label>
+                        <select id="menu-category" class="form-control">
+                            <option value="Entrée">Entrée</option>
+                            <option value="Plat Principal" selected>Plat Principal</option>
+                            <option value="Dessert">Dessert</option>
+                            <option value="Boisson">Boisson</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:1.5rem;">
+                    <label>Description</label>
+                    <textarea id="menu-description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>URL de l'image</label>
+                    <input type="text" id="menu-image" class="form-control" placeholder="https://...">
+                </div>
+                <div style="margin-top:3rem; display:flex; gap:1rem;">
+                    <button type="button" class="btn btn-outline btn-block" onclick="closeMenuModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primary btn-block">Confirmer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- WebSocket Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    
+    <script src="../js/api.js"></script>
     <script>
+        let currentRestaurant = null;
+        let notifications = [];
+
+        // UI Toggles
+        document.addEventListener('click', (e) => {
+            const notifDropdown = document.getElementById('notif-dropdown');
+            const profileDropdown = document.getElementById('profile-dropdown');
+            
+            if (!document.getElementById('notif-trigger').contains(e.target)) {
+                notifDropdown.style.display = 'none';
+            }
+            if (!document.getElementById('admin-avatar').contains(e.target)) {
+                profileDropdown.style.display = 'none';
+            }
+        });
+
+        document.getElementById('notif-trigger').onclick = () => {
+            const dropdown = document.getElementById('notif-dropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            if(dropdown.style.display === 'block') {
+                document.getElementById('notif-badge').style.display = 'none';
+            }
+        };
+
+        document.getElementById('admin-avatar').onclick = () => {
+            const dropdown = document.getElementById('profile-dropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        };
+
+        function logout() {
+            api.clearAuthSession();
+            window.location.href = 'auth.html';
+        }
+
+        // Translation helper
+        function translateStatus(status) {
+            const map = {
+                'PENDING': 'En attente',
+                'ACCEPTED': 'Acceptée',
+                'PREPARING': 'En cuisine',
+                'OUT_FOR_DELIVERY': 'En livraison',
+                'DELIVERED': 'Livrée'
+            };
+            return map[status] || status;
+        }
+
+        // WebSocket Notifications
+        function initNotifications(restaurantId) {
+            const socket = new SockJS('http://localhost:8080/ws-tracking');
+            const stompClient = Stomp.over(socket);
+            stompClient.debug = null; // Disable logging
+            
+            stompClient.connect({}, function (frame) {
+                // Subscribe to orders for this restaurant
+                // Note: You'd typically have a restaurant-specific topic
+                stompClient.subscribe('/topic/orders/' + restaurantId, function (message) {
+                    const order = JSON.parse(message.body);
+                    addNotification(order);
+                    loadDashboard();
+                    loadOrders();
+                });
+            });
+        }
+
+        function addNotification(order) {
+            notifications.unshift(order);
+            updateNotifUI();
+            showSuccess(`Nouvelle commande #FS-${order.id} !`);
+            
+            // Audio alert
+            const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3');
+            audio.play().catch(e => {});
+        }
+
+        function updateNotifUI() {
+            const list = document.getElementById('notif-list');
+            const badge = document.getElementById('notif-badge');
+            const count = document.getElementById('notif-count');
+            
+            if(notifications.length > 0) {
+                badge.style.display = 'block';
+                count.innerText = notifications.length;
+                list.innerHTML = notifications.map(n => `
+                    <div style="padding:0.8rem; border-bottom:1px solid #f1f5f9; cursor:pointer;" onclick="showSection('orders')">
+                        <div style="font-weight:600; font-size:0.85rem;">Commande #FS-${n.id}</div>
+                        <div style="font-size:0.75rem; color:#64748b;">Nouveau client • ${new Date().toLocaleTimeString()}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // SECTIONS NAVIGATION
+        function showSection(sectionId, element) {
+            document.querySelectorAll('.nav-link').forEach(item => item.classList.remove('active'));
+            if(element) {
+                element.classList.add('active');
+            } else {
+                const links = document.querySelectorAll('.nav-link');
+                links.forEach(l => {
+                    if(l.innerText.toLowerCase().includes(sectionId.toLowerCase())) l.classList.add('active');
+                });
+            }
+
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            const target = document.getElementById('section-' + sectionId);
+            if(target) target.classList.add('active');
+
+            if(sectionId === 'menu') loadMenu();
+            if(sectionId === 'orders') loadOrders();
+        }
+
+        // LOADERS
+        async function loadDashboard() {
+            if(!currentRestaurant) return;
+            try {
+                const stats = await api.getRestaurantStats(currentRestaurant.id);
+                document.getElementById('stat-orders').innerText = stats.dailyOrders;
+                document.getElementById('stat-revenue').innerText = stats.dailyRevenue.toLocaleString() + ' FCFA';
+
+                const orders = await api.getOrdersByRestaurant(currentRestaurant.id);
+                const preview = document.getElementById('dashboard-orders-preview');
+                if(orders.length === 0) {
+                    preview.innerHTML = '<p class="text-muted">Aucune activité récente.</p>';
+                    return;
+                }
+
+                preview.innerHTML = orders.slice(0, 3).map(o => `
+                    <div style="display:flex; align-items:center; gap:1rem; padding:1rem; background:#f8fafc; border-radius:15px; margin-bottom:1rem;">
+                        <div style="background:#fff; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--primary);">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size:0.9rem;">Commande #FS-${o.id}</div>
+                            <div style="font-size:0.75rem; color:#64748b;">${new Date(o.orderDate).toLocaleTimeString()} • ${o.items.length} articles</div>
+                        </div>
+                        <div class="badge ${o.status === 'PENDING' ? 'badge-warning' : 'badge-success'}">${translateStatus(o.status)}</div>
+                    </div>
+                `).join('');
+            } catch (e) { console.error("Dashboard load error:", e); }
+        }
+
+        async function loadMenu() {
+            if(!currentRestaurant) return;
+            try {
+                const items = await api.getMenuItemsByRestaurant(currentRestaurant.id);
+                const tbody = document.getElementById('menu-table-body');
+                tbody.innerHTML = items.map(item => `
+                    <tr>
+                        <td>
+                            <div style="display:flex; align-items:center;">
+                                <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'}" class="dish-thumb">
+                                <div>
+                                    <div style="font-weight:600; color:#1e293b;">${item.name}</div>
+                                    <div style="font-size:0.75rem; color:#94a3b8; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.description || 'Aucune description'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge badge-info">${item.category || 'Plat'}</span></td>
+                        <td><div style="font-weight:700; color:#1e293b;">${item.price.toLocaleString()} FCFA</div></td>
+                        <td><span class="badge badge-success">En Vente</span></td>
+                        <td>
+                            <div style="display:flex; gap:0.5rem;">
+                                <button class="action-btn" onclick="editItem(${item.id})"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-btn delete" onclick="deleteItem(${item.id})"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('') || '<tr><td colspan="5" style="text-align:center; padding:3rem;">Aucun plat au menu</td></tr>';
+            } catch (e) { console.error(e); }
+        }
+
+        let allOrders = [];
+
+        async function loadOrders() {
+            if(!currentRestaurant) return;
+            try {
+                allOrders = await api.getOrdersByRestaurant(currentRestaurant.id);
+                renderOrders(allOrders);
+                
+                // Update badge
+                const pendingCount = allOrders.filter(o => o.status === 'PENDING').length;
+                const badge = document.getElementById('badge-orders');
+                if(pendingCount > 0) {
+                    badge.innerText = pendingCount;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function filterOrders(status, btn) {
+            // Update UI buttons
+            document.querySelectorAll('#order-filters .btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if(status === 'ALL') {
+                renderOrders(allOrders);
+            } else {
+                const filtered = allOrders.filter(o => o.status === status);
+                renderOrders(filtered);
+            }
+        }
+
+        function renderOrders(orders) {
+            const container = document.getElementById('orders-list');
+            
+            if(orders.length === 0) {
+                container.innerHTML = '<div class="glass-card" style="text-align:center; padding:4rem;"><i class="fa-solid fa-box-open" style="font-size:3rem; color:#e2e8f0; margin-bottom:1rem;"></i><p>Aucune commande dans cette catégorie</p></div>';
+                return;
+            }
+
+            container.innerHTML = orders.map(o => `
+                <div class="glass-card" style="margin-bottom:1.5rem; display:flex; gap:2rem; align-items:center; animation: fadeIn 0.3s ease;">
+                    <div style="background:var(--primary); color:white; width:60px; height:60px; border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">
+                        <i class="fa-solid fa-shopping-bag"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                            <h4 style="font-family:\'Outfit\'; color:#1e293b;">Commande #FS-${o.id}</h4>
+                            <span class="badge" style="background:#f1f5f9; color:#64748b;">${new Date(o.orderDate).toLocaleString()}</span>
+                        </div>
+                        <div style="color:#64748b; font-size:0.9rem; margin-bottom:1rem;">
+                            ${o.items.map(i => `${i.quantity}x ${i.menuItem?.name}`).join(', ')}
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div style="font-weight:700; color:var(--primary); font-size:1.1rem;">${o.totalAmount.toLocaleString()} FCFA</div>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span class="badge ${o.status === 'PENDING' ? 'badge-warning' : 'badge-info'}">${translateStatus(o.status)}</span>
+                                ${getNextStatusButton(o.id, o.status)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getNextStatusButton(id, status) {
+            if(status === 'PENDING') return `<button class="btn btn-primary btn-sm" onclick="changeStatus(${id}, 'ACCEPTED')">Accepter</button>`;
+            if(status === 'ACCEPTED') return `<button class="btn btn-primary btn-sm" onclick="changeStatus(${id}, 'PREPARING')">Cuisiner</button>`;
+            if(status === 'PREPARING') return `<button class="btn btn-primary btn-sm" onclick="changeStatus(${id}, 'OUT_FOR_DELIVERY')">Prêt !</button>`;
+            if(status === 'OUT_FOR_DELIVERY') return `<button class="btn btn-outline btn-sm" onclick="changeStatus(${id}, 'DELIVERED')">Marquer Livré</button>`;
+            return '';
+        }
+
+        async function changeStatus(id, status) {
+            try {
+                await api.updateOrderStatus(id, status);
+                loadOrders();
+                loadDashboard();
+                showSuccess('Statut mis à jour');
+            } catch (e) { alert("Erreur"); }
+        }
+
+        // MENU MANAGEMENT
+        async function deleteItem(id) {
+            if(confirm('Supprimer ce plat définitivement ?')) {
+                await api.deleteMenuItem(id);
+                loadMenu();
+                showSuccess('Plat supprimé');
+            }
+        }
+
+        function openMenuModal(item = null) {
+            const modal = document.getElementById('menu-modal');
+            const form = document.getElementById('menu-form');
+            form.reset();
+            document.getElementById('menu-item-id').value = '';
+            document.getElementById('modal-title').innerText = item ? 'Modifier le Plat' : 'Ajouter un Plat';
+
+            if(item) {
+                document.getElementById('menu-item-id').value = item.id;
+                document.getElementById('menu-name').value = item.name;
+                document.getElementById('menu-price').value = item.price;
+                document.getElementById('menu-category').value = item.category;
+                document.getElementById('menu-description').value = item.description;
+                document.getElementById('menu-image').value = item.imageUrl;
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeMenuModal() {
+            document.getElementById('menu-modal').style.display = 'none';
+        }
+
+        async function handleMenuSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('menu-item-id').value;
+            const data = {
+                name: document.getElementById('menu-name').value,
+                price: parseFloat(document.getElementById('menu-price').value),
+                category: document.getElementById('menu-category').value,
+                description: document.getElementById('menu-description').value,
+                imageUrl: document.getElementById('menu-image').value
+            };
+
+            try {
+                if(id) await api.updateMenuItem(id, data);
+                else await api.createMenuItem(currentRestaurant.id, data);
+                
+                closeMenuModal();
+                loadMenu();
+                showSuccess(id ? 'Modifié !' : 'Ajouté !');
+            } catch (err) { alert("Erreur lors de l'enregistrement"); }
+        }
+
+        async function addMenuItem() { openMenuModal(); }
+        async function editItem(id) {
+            const items = await api.getMenuItemsByRestaurant(currentRestaurant.id);
+            const item = items.find(i => i.id === id);
+            if(item) openMenuModal(item);
+        }
+
+        // SETTINGS
+        async function updateSettings() {
+            if(!currentRestaurant) return;
+            const data = {
+                name: document.getElementById('settings-name').value,
+                address: document.getElementById('settings-address').value,
+                description: document.getElementById('settings-desc').value,
+                imageUrl: document.getElementById('settings-image').value
+            };
+            try {
+                const updated = await api.updateRestaurant(currentRestaurant.id, data);
+                currentRestaurant = updated;
+                if(updated.imageUrl) document.getElementById('admin-avatar').src = updated.imageUrl;
+                // Update greeting
+                const userStr = localStorage.getItem('currentUser');
+                const user = JSON.parse(userStr);
+                document.getElementById('admin-welcome').innerText = 'Salut, ' + (user.fullName || user.email.split('@')[0]) + ' | ' + updated.name;
+                
+                showSuccess('Paramètres sauvegardés');
+            } catch (e) { alert("Erreur"); }
+        }
+
+        // IA GENERATOR
         function generateAI() {
+            const prompt = document.getElementById('ai-prompt').value;
+            if(!prompt) return alert("Veuillez décrire votre plat");
+            
             const resultBox = document.getElementById('ai-result');
-            resultBox.innerHTML = '<div style="color:var(--primary); text-align:center;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem; margin-bottom:1rem; display:block;"></i> Génération en cours...</div>';
+            resultBox.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:3rem; color:var(--primary);"></i><p style="margin-top:1rem;">L\'IA cuisine votre image...</p>';
             
             setTimeout(() => {
-                resultBox.innerHTML = '<img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop" style="animation: fadeIn 0.5s ease; width:100%; height:100%; object-fit:cover;">';
-                const btn = document.createElement('button');
-                btn.className = 'btn btn-secondary btn-sm';
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Utiliser';
-                btn.style.position = 'absolute'; btn.style.bottom = '1rem'; btn.style.right = '1rem';
-                resultBox.appendChild(btn);
-            }, 2500);
+                const imgUrl = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800";
+                resultBox.innerHTML = `
+                    <div style="position:relative; width:100%; height:100%;">
+                        <img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:20px; animation:fadeIn 1s ease;">
+                        <button class="btn btn-primary btn-sm" style="position:absolute; bottom:20px; right:20px;" onclick="useAIImage('${imgUrl}')">Utiliser cette photo</button>
+                    </div>
+                `;
+                showSuccess('Image générée !');
+            }, 3000);
         }
 
-        function showSection(sectionId, element) {
-            // Update sidebar links
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            element.classList.add('active');
-
-            // Show corresponding section
-            document.querySelectorAll('.admin-section').forEach(section => section.style.display = 'none');
-            document.getElementById('section-' + sectionId).style.display = 'block';
+        function useAIImage(url) {
+            showSection('menu');
+            addMenuItem();
+            document.getElementById('menu-image').value = url;
         }
 
-        // Initialize with user data
-        document.addEventListener('DOMContentLoaded', () => {
+        function showSuccess(msg) {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '30px';
+            toast.style.right = '30px';
+            toast.style.background = '#1e293b';
+            toast.style.color = 'white';
+            toast.style.padding = '1rem 2rem';
+            toast.style.borderRadius = '15px';
+            toast.style.boxShadow = '0 20px 40px rgba(0,0,0,0.2)';
+            toast.style.zIndex = '99999';
+            toast.style.display = 'flex';
+            toast.style.alignItems = 'center';
+            toast.style.gap = '10px';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#22c55e;"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                toast.style.transition = '0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', async () => {
             const userStr = localStorage.getItem('currentUser');
-            if(userStr) {
-                const user = JSON.parse(userStr);
-                if(user.role === 'restaurant') {
-                    document.getElementById('admin-welcome').innerText = 'Bienvenue, ' + (user.name || 'Partenaire');
-                    document.getElementById('settings-name').value = user.name || 'Burger Palace';
+            if(!userStr) { window.location.href = 'auth.html'; return; }
+
+            const user = JSON.parse(userStr);
+            const baseGreeting = 'Salut, ' + (user.fullName || user.email.split('@')[0]);
+            document.getElementById('admin-welcome').innerText = baseGreeting;
+            
+            try {
+                currentRestaurant = await api.getRestaurantByOwner(user.id || localStorage.getItem('user_id'));
+                if(currentRestaurant) {
+                    // Update greeting with restaurant name
+                    document.getElementById('admin-welcome').innerText = baseGreeting + ' | ' + currentRestaurant.name;
+
+                    // Setup UI actions
+                    document.getElementById('btn-view-restaurant').onclick = () => {
+                        window.open(`restaurant.html?id=${currentRestaurant.id}`, '_blank');
+                    };
+                    
+                    document.getElementById('settings-name').value = currentRestaurant.name || '';
+                    document.getElementById('settings-address').value = currentRestaurant.address || '';
+                    document.getElementById('settings-desc').value = currentRestaurant.description || '';
+                    document.getElementById('settings-image').value = currentRestaurant.imageUrl || '';
+                    
+                    if(currentRestaurant.imageUrl) {
+                        document.getElementById('admin-avatar').src = currentRestaurant.imageUrl;
+                    }
+                    
+                    // Start services
+                    loadDashboard();
+                    initNotifications(currentRestaurant.id);
+                } else {
+                    console.error("No restaurant found");
+                }
+            } catch (e) { 
+                console.error("Initialization error:", e);
+                if(e.message && (e.message.includes('401') || e.message.includes('Unauthorized'))) {
+                    api.clearAuthSession();
+                    window.location.href = 'auth.html';
                 }
             }
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('fr-FR', options);
         });
     </script>
 </body>

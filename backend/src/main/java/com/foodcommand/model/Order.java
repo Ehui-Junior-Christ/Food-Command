@@ -31,6 +31,13 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
 
+    @ManyToOne
+    @JoinColumn(name = "courier_id")
+    private User courier;
+
+    private Double courierLat;
+    private Double courierLng;
+
     private Double totalAmount;
     private String status; // PENDING, ACCEPTED, PREPARING, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
     private LocalDateTime orderDate;

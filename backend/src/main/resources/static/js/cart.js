@@ -34,7 +34,6 @@ function addToCart(id, name, price, image) {
     saveCart();
     updateCartUI();
     
-    // Auto open sidebar
     const sidebar = document.getElementById('cart-sidebar');
     const overlay = document.getElementById('overlay');
     if(sidebar && !sidebar.classList.contains('open')) {
@@ -42,7 +41,6 @@ function addToCart(id, name, price, image) {
         if(overlay) overlay.classList.add('active');
     }
     
-    // Show toast
     showToast(`${name} ajouté au panier`);
 }
 
@@ -67,11 +65,11 @@ function updateCartUI() {
     const cartBadges = document.querySelectorAll('.cart-badge');
     const cartSubtotal = document.getElementById('cart-subtotal');
     const cartTotal = document.getElementById('cart-total');
+    const checkoutBtn = document.querySelector('#cart-sidebar .btn-primary');
     
     let totalItems = 0;
     let subtotal = 0;
     
-    // Calculate totals
     cart.forEach(item => {
         totalItems += item.quantity;
         subtotal += item.price * item.quantity;
@@ -104,27 +102,66 @@ function updateCartUI() {
     }
     
     if(cartSubtotal) cartSubtotal.textContent = `${subtotal.toLocaleString()} FCFA`;
-    if(cartTotal) cartTotal.textContent = `${subtotal > 0 ? (subtotal + 1000).toLocaleString() : 0} FCFA`;
+    
+    // Checkout Button Logic
+    if(checkoutBtn) {
+        checkoutBtn.onclick = () => {
+            if(cart.length === 0) return alert('Votre panier est vide !');
+            const path = window.location.pathname.includes('/pages/') ? 'checkout.html' : 'pages/checkout.html';
+            window.location.href = path;
+        };
+    }
+
+    // Loyalty Discount logic
+    let discount = 0;
+    const token = localStorage.getItem('user_token');
+    
+    if (token && subtotal > 0) {
+        api.getCurrentUser().then(user => {
+            if (user && user.loyaltyPoints >= 100) {
+                const reductionPercent = Math.floor(user.loyaltyPoints / 100) * 2;
+                discount = Math.round(subtotal * (reductionPercent / 100));
+                
+                let discountRow = document.getElementById('cart-discount-row');
+                if (!discountRow) {
+                    const totalRow = document.getElementById('cart-total').parentElement;
+                    discountRow = document.createElement('div');
+                    discountRow.id = 'cart-discount-row';
+                    discountRow.className = 'summary-row';
+                    discountRow.style.color = '#00a699';
+                    discountRow.style.fontWeight = '700';
+                    totalRow.parentNode.insertBefore(discountRow, totalRow);
+                }
+                
+                discountRow.innerHTML = `<span>Réduction Fidélité (${reductionPercent}%)</span> <span>-${discount.toLocaleString()} FCFA</span>`;
+                const finalTotal = subtotal - discount + 1000;
+                if(cartTotal) cartTotal.textContent = `${finalTotal.toLocaleString()} FCFA`;
+            } else {
+                if(cartTotal) cartTotal.textContent = `${(subtotal + 1000).toLocaleString()} FCFA`;
+            }
+        });
+    } else {
+        if(cartTotal) cartTotal.textContent = `${subtotal > 0 ? (subtotal + 1000).toLocaleString() : 0} FCFA`;
+    }
 }
 
 function showToast(message) {
     const toast = document.createElement('div');
+    toast.className = 'toast-notification';
     toast.style.position = 'fixed';
     toast.style.bottom = '20px';
     toast.style.left = '50%';
     toast.style.transform = 'translateX(-50%)';
-    toast.style.background = 'var(--text-main)';
+    toast.style.background = '#2D3748';
     toast.style.color = 'white';
     toast.style.padding = '1rem 2rem';
     toast.style.borderRadius = '30px';
-    toast.style.boxShadow = 'var(--shadow-lg)';
+    toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
     toast.style.zIndex = '9999';
     toast.style.fontWeight = '500';
-    toast.style.animation = 'float 0.3s ease-out';
-    toast.innerHTML = `<i class="fa-solid fa-check-circle" style="color:var(--secondary); margin-right:0.5rem;"></i> ${message}`;
+    toast.innerHTML = `<i class="fa-solid fa-check-circle" style="color:#FF5A5F; margin-right:0.5rem;"></i> ${message}`;
     
     document.body.appendChild(toast);
-    
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transition = 'opacity 0.3s ease';

@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -60,9 +61,12 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**").permitAll()
+                        auth.requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
+                                .requestMatchers(HttpMethod.PUT, "/api/auth/me").authenticated()
+                                .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
                                 .requestMatchers("/api/restaurants/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/menu-items/**").permitAll()
                                 .requestMatchers("/api/categories/**").permitAll()
                                 .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/assets/**", "/pages/**").permitAll()
                                 .requestMatchers("/favicon.ico").permitAll()

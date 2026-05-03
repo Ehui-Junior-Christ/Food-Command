@@ -3,72 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Profil - Food-Command</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700&display=swap" rel="stylesheet">
+    <title>Mon Espace Premium - Food-Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/styles.css">
     <style>
-        .profile-container { max-width: 600px; margin: 100px auto; padding: 2rem; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .profile-header { text-align: center; margin-bottom: 2rem; }
-        .profile-pic-edit { position: relative; width: 120px; height: 120px; margin: 0 auto 1rem; }
-        .profile-pic-edit img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary); }
-        .edit-badge { position: absolute; bottom: 0; right: 0; background: var(--primary); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid white; }
+        body { background: #f0f2f5; min-height: 100vh; font-family: 'Inter', sans-serif; }
+        .profile-wrapper { padding: 120px 5% 50px; display: flex; justify-content: center; }
+        
+        .dashboard-container { 
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Sidebar Style */
+        .sidebar-card {
+            background: white;
+            border-radius: 25px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            height: fit-content;
+            text-align: center;
+        }
+
+        .avatar-section { position: relative; width: 150px; height: 150px; margin: 0 auto 1.5rem; }
+        .avatar-section img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary); }
+        .edit-overlay { position: absolute; bottom: 5px; right: 5px; background: var(--primary); color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid white; transition: 0.3s; }
+        .edit-overlay:hover { transform: scale(1.1); }
+
+        .user-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee; }
+        .stat-item { text-align: center; }
+        .stat-value { display: block; font-size: 1.2rem; font-weight: 800; color: var(--primary); font-family: 'Outfit'; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+
+        /* Main Content Style */
+        .main-card {
+            background: white;
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .tabs-nav { display: flex; gap: 2rem; border-bottom: 2px solid #f0f2f5; margin-bottom: 2.5rem; }
+        .tab-link { padding: 1rem 0; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; transition: 0.3s; }
+        .tab-link.active { color: var(--primary); }
+        .tab-link.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: var(--primary); border-radius: 10px; }
+
+        .section-title { font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: var(--primary); background: #fff5f5; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        
+        /* Addresses & Orders Mockup */
+        .address-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 15px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .order-row { padding: 1rem 0; border-bottom: 1px solid #f0f2f5; display: flex; justify-content: space-between; align-items: center; }
+        .status-badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: #e6fffa; color: #00a699; }
+
+        @media (max-width: 992px) {
+            .dashboard-container { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
-<body style="background-color: #f7f9fc;">
+<body>
     <nav class="navbar">
         <div class="logo" onclick="window.location.href='../index.html'" style="cursor:pointer">
             <i class="fa-solid fa-utensils"></i> Food-Command
         </div>
-        <a href="../index.html" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Retour</a>
+        <a href="../index.html" class="btn btn-outline"><i class="fa-solid fa-house"></i> Accueil</a>
     </nav>
 
-    <div class="profile-container">
-        <div class="profile-header">
-            <div class="profile-pic-edit">
-                <img id="profile-preview" src="https://ui-avatars.com/api/?name=User&background=FF5A5F&color=fff" alt="Profile">
-                <label for="pic-upload" class="edit-badge">
-                    <i class="fa-solid fa-camera"></i>
-                </label>
-                <input type="file" id="pic-upload" style="display:none" accept="image/*">
-            </div>
-            <h2 id="display-name">Chargement...</h2>
-            <p id="display-email" style="color: var(--text-muted);"></p>
-        </div>
+    <div class="profile-wrapper">
+        <div class="dashboard-container">
+            <!-- Sidebar -->
+            <div class="sidebar-card">
+                <div class="avatar-section">
+                    <img id="profile-preview" src="https://ui-avatars.com/api/?name=User&background=FF5A5F&color=fff" alt="Profile">
+                    <label for="avatar-input" class="edit-overlay"><i class="fa-solid fa-camera"></i></label>
+                    <input type="file" id="avatar-input" hidden accept="image/*">
+                </div>
+                <h2 id="sidebar-name" style="font-family:'Outfit'; margin-bottom: 0.5rem;">Utilisateur</h2>
+                <p id="sidebar-email" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:0.5rem;"></p>
+                <p id="sidebar-address" style="color:var(--primary); font-size:0.8rem; font-weight:600; margin-bottom:1.5rem;"></p>
+                
+                <button class="btn btn-primary btn-sm btn-block" style="border-radius:12px;" onclick="document.getElementById('avatar-input').click()">Changer la photo</button>
 
-        <form id="profile-form">
-            <div class="form-group">
-                <label class="form-label">Nom Complet</label>
-                <input type="text" id="input-fullname" class="form-control" placeholder="Votre nom">
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">12</span>
+                        <span class="stat-label">Commandes</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="loyalty-points">0</span>
+                        <span class="stat-label">Points</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="loyalty-reduction">0%</span>
+                        <span class="stat-label">Remise</span>
+                    </div>
+                </div>
+
+                <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
+                <button class="btn btn-outline btn-sm btn-block" style="color:red; border-color:rgba(255,0,0,0.2)" onclick="handleLogout()">
+                    <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+                </button>
             </div>
-            <div class="form-group">
-                <label class="form-label">Numéro de Téléphone</label>
-                <input type="text" id="input-phone" class="form-control" placeholder="Votre téléphone">
+
+            <!-- Main Content -->
+            <div class="main-card">
+                <div class="tabs-nav">
+                    <div class="tab-link active" onclick="switchTab('info')">Informations</div>
+                    <div class="tab-link" onclick="switchTab('orders')">Commandes</div>
+                    <div class="tab-link" onclick="switchTab('address')">Adresses</div>
+                </div>
+
+                <!-- Tab: Personal Info -->
+                <div id="tab-info" class="tab-content">
+                    <h3 class="section-title"><i class="fa-solid fa-user"></i> Mon Profil</h3>
+                    <form id="profile-form">
+                        <div class="info-grid">
+                            <div class="input-group-custom">
+                                <label>Nom Complet</label>
+                                <input type="text" id="fullname" class="form-control" required>
+                            </div>
+                            <div class="input-group-custom">
+                                <label>Téléphone</label>
+                                <input type="tel" id="phone" class="form-control">
+                            </div>
+                        </div>
+                        <div class="input-group-custom" style="margin-top: 1rem;">
+                            <label>Email (Non modifiable)</label>
+                            <input type="email" id="email" class="form-control" disabled>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="save-btn" style="margin-top: 2rem;">
+                            <i class="fa-solid fa-check"></i> Enregistrer les modifications
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tab: Orders (Mock) -->
+                <div id="tab-orders" class="tab-content" style="display:none;">
+                    <h3 class="section-title"><i class="fa-solid fa-bag-shopping"></i> Dernières Commandes</h3>
+                    <div class="order-row">
+                        <div>
+                            <strong>#FC-9842</strong><br>
+                            <span style="font-size:0.85rem; color:var(--text-muted);">Aujourd'hui, 12:45 • Burger King</span>
+                        </div>
+                        <span class="status-badge">Livré</span>
+                        <span style="font-weight:700;">8 500 FCFA</span>
+                    </div>
+                    <div class="order-row">
+                        <div>
+                            <strong>#FC-9831</strong><br>
+                            <span style="font-size:0.85rem; color:var(--text-muted);">Hier, 20:15 • Pizza Hut</span>
+                        </div>
+                        <span class="status-badge">Livré</span>
+                        <span style="font-weight:700;">12 000 FCFA</span>
+                    </div>
+                </div>
+
+                <!-- Tab: Addresses -->
+                <div id="tab-address" class="tab-content" style="display:none;">
+                    <h3 class="section-title"><i class="fa-solid fa-location-dot"></i> Mes Adresses de Livraison</h3>
+                    
+                    <!-- Liste des adresses -->
+                    <div id="address-list"></div>
+
+                    <hr style="margin: 2rem 0;">
+
+                    <!-- Formulaire d'ajout -->
+                    <h4 style="margin-bottom:1rem; font-family:'Outfit';">Ajouter une nouvelle adresse</h4>
+                    <form id="address-form" style="background:#f8fafc; padding:1.5rem; border-radius:15px;">
+                        <div class="info-grid">
+                            <div class="input-group-custom">
+                                <label>Label (Ex: Maison, Travail)</label>
+                                <input type="text" id="addr-label" class="form-control" placeholder="Maison" required>
+                            </div>
+                            <div class="input-group-custom">
+                                <label>Ville</label>
+                                <input type="text" id="addr-city" class="form-control" placeholder="Abidjan" required>
+                            </div>
+                        </div>
+                        <div class="input-group-custom">
+                            <label>Adresse complète</label>
+                            <input type="text" id="addr-full" class="form-control" placeholder="Rue, Quartier, Bâtiment..." required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary btn-sm">
+                            <i class="fa-solid fa-plus"></i> Enregistrer cette adresse
+                        </button>
+                    </form>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Enregistrer les modifications</button>
-        </form>
+        </div>
     </div>
 
     <script src="../js/api.js"></script>
     <script>
+        let base64Image = null;
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('tab-' + tab).style.display = 'block';
+            event.target.classList.add('active');
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const user = await api.getCurrentUser();
-            if (!user) {
-                window.location.href = 'auth.html';
-                return;
-            }
+            if (!user) { window.location.href = 'auth.html'; return; }
 
-            document.getElementById('display-name').textContent = user.fullName;
-            document.getElementById('display-email').textContent = user.email;
-            document.getElementById('input-fullname').value = user.fullName || '';
-            document.getElementById('input-phone').value = user.phone || '';
-            document.getElementById('profile-preview').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=FF5A5F&color=fff`;
+            document.getElementById('fullname').value = user.fullName || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('phone').value = user.phone || '';
+            document.getElementById('sidebar-name').textContent = user.fullName || 'Utilisateur';
+            document.getElementById('sidebar-email').textContent = user.email;
+            
+            // Mise à jour des points et de la réduction
+            const points = user.loyaltyPoints || 0;
+            const reduction = Math.floor(points / 100) * 2;
+            document.getElementById('loyalty-points').textContent = points;
+            document.getElementById('loyalty-reduction').textContent = reduction + "%";
+            
+            // Affichage de l'adresse principale dans la sidebar
+            const sidebarAddr = document.getElementById('sidebar-address');
+            if (sidebarAddr) sidebarAddr.textContent = user.address || "Aucune adresse définie";
+            
+            const avatarImg = user.profileImageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName || 'U')}&background=FF5A5F&color=fff&size=160`;
+            document.getElementById('profile-preview').src = avatarImg;
 
-            document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            // CHARGEMENT ULTRA-RAPIDE (En parallèle)
+            Promise.all([loadUserOrders(), loadUserAddresses()]);
+
+            document.getElementById('avatar-input').onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        base64Image = ev.target.result;
+                        document.getElementById('profile-preview').src = base64Image;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            document.getElementById('profile-form').onsubmit = async (e) => {
                 e.preventDefault();
+                const btn = document.getElementById('save-btn');
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>...';
+                
                 const updatedData = {
-                    fullName: document.getElementById('input-fullname').value,
-                    phone: document.getElementById('input-phone').value
+                    fullName: document.getElementById('fullname').value,
+                    phone: document.getElementById('phone').value,
+                    profileImageUrl: base64Image
                 };
 
                 try {
@@ -80,16 +268,139 @@
                         },
                         body: JSON.stringify(updatedData)
                     });
-
-                    if (response.ok) {
-                        alert('Profil mis à jour avec succès !');
-                        window.location.reload();
-                    }
-                } catch (error) {
-                    alert('Erreur lors de la mise à jour');
-                }
-            });
+                    if (response.ok) { alert('Profil mis à jour !'); window.location.reload(); }
+                } catch (error) { alert('Erreur'); }
+                finally { btn.innerHTML = '<i class="fa-solid fa-check"></i> Enregistrer les modifications'; }
+            };
         });
+
+        async function loadUserOrders() {
+            const orderListContainer = document.getElementById('tab-orders');
+            const ordersCountSpan = document.querySelector('.stat-value'); // Le premier .stat-value est celui des commandes
+            
+            try {
+                const orders = await api.getMyOrders();
+                
+                // Mettre à jour le compteur dans la sidebar
+                if(ordersCountSpan) ordersCountSpan.textContent = orders.length;
+
+                // Générer la liste HTML (On garde le titre h3)
+                let html = '<h3 class="section-title"><i class="fa-solid fa-bag-shopping"></i> Mes Commandes Réelles</h3>';
+                
+                if (orders.length === 0) {
+                    html += '<p style="color:var(--text-muted); text-align:center; padding:2rem;">Vous n\'avez pas encore passé de commande.</p>';
+                } else {
+                    orders.forEach(order => {
+                        const date = new Date(order.orderDate).toLocaleDateString('fr-FR', {
+                            day: 'numeric', month: 'long', year: 'numeric'
+                        });
+                        html += `
+                            <div class="order-row">
+                                <div>
+                                    <strong>Commande #${order.id}</strong><br>
+                                    <span style="font-size:0.85rem; color:var(--text-muted);">${date}</span>
+                                </div>
+                                <span class="status-badge" style="background:${getStatusColor(order.status)}; color:white;">${order.status}</span>
+                                <span style="font-weight:700;">${order.totalAmount || 0} FCFA</span>
+                            </div>
+                        `;
+                    });
+                }
+                orderListContainer.innerHTML = html;
+            } catch (error) {
+                console.error("Erreur lors du chargement des commandes:", error);
+            }
+        }
+
+        async function loadUserAddresses() {
+            const list = document.getElementById('address-list');
+            try {
+                const addresses = await api.getAddresses();
+                
+                const sidebarAddr = document.getElementById('sidebar-address');
+                if (sidebarAddr) {
+                    sidebarAddr.textContent = addresses.length > 0 ? addresses[0].address : "Aucune adresse définie";
+                }
+
+                const form = document.getElementById('address-form');
+                if (addresses.length >= 2) {
+                    form.style.display = 'none';
+                    list.innerHTML = addresses.map(addr => renderAddressItem(addr)).join('') + 
+                        '<p style="color:var(--primary); font-weight:600; text-align:center; margin-top:1rem;">Limite de 2 adresses atteinte.</p>';
+                } else {
+                    form.style.display = 'block';
+                    list.innerHTML = addresses.length === 0 ? 
+                        '<p style="text-align:center; color:var(--text-muted);">Aucune adresse enregistrée.</p>' : 
+                        addresses.map(addr => renderAddressItem(addr)).join('');
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderAddressItem(addr) {
+            return `
+                <div class="address-card">
+                    <div>
+                        <i class="fa-solid ${addr.label === 'Maison' ? 'fa-house' : 'fa-briefcase'}" style="color:var(--primary); margin-right:10px;"></i>
+                        <strong>${addr.label}</strong><br>
+                        <span style="font-size:0.9rem; color:var(--text-muted);">${addr.address}, ${addr.city}</span>
+                    </div>
+                    <button class="btn btn-sm btn-outline" style="color:red; border-color:red" onclick="deleteAddress(${addr.id})">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        document.getElementById('address-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const saveBtn = e.target.querySelector('button');
+            const originalText = saveBtn.innerHTML;
+            
+            try {
+                const newAddr = {
+                    label: document.getElementById('addr-label').value,
+                    city: document.getElementById('addr-city').value,
+                    address: document.getElementById('addr-full').value
+                };
+
+                await api.addAddress(newAddr);
+                
+                saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Enregistré !';
+                saveBtn.style.background = '#00a699';
+                
+                document.getElementById('address-form').reset();
+                loadUserAddresses();
+
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.style.background = '';
+                }, 2000);
+            } catch (error) {
+                alert(error.message);
+            }
+        };
+
+        async function deleteAddress(id) {
+            if (confirm('Supprimer cette adresse ?')) {
+                try {
+                    await api.deleteAddress(id);
+                    loadUserAddresses();
+                } catch (e) { alert(e.message); }
+            }
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'DELIVERED': return '#00a699';
+                case 'PENDING': return '#f6ad55';
+                case 'CANCELLED': return '#e53e3e';
+                default: return '#718096';
+            }
+        }
+        function handleLogout() {
+            api.clearAuthSession();
+            window.location.href = '../index.html';
+        }
     </script>
 </body>
 </html>

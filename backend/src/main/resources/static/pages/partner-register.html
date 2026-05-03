@@ -71,7 +71,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Type de cuisine</label>
-                        <select class="form-control" required>
+                        <select class="form-control" id="rest-cuisine" required>
                             <option value="">Sélectionnez...</option>
                             <option>Africain</option>
                             <option>Fast Food</option>
@@ -83,31 +83,39 @@
 
                 <div class="form-group">
                     <label class="form-label">Adresse du restaurant</label>
-                    <input type="text" class="form-control" placeholder="Ex: Cocody Angré, Rue des banques" required>
+                    <input type="text" class="form-control" id="rest-address" placeholder="Ex: Cocody Angré, Rue des banques" required>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group">
                         <label class="form-label">Nom du responsable</label>
-                        <input type="text" class="form-control" placeholder="Nom complet" required>
+                        <input type="text" class="form-control" id="owner-name" placeholder="Nom complet" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Numéro de téléphone</label>
-                        <input type="tel" class="form-control" placeholder="+225 0000000000" required>
+                        <input type="tel" class="form-control" id="owner-phone" placeholder="+225 0000000000" required>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Email professionnel</label>
-                    <input type="email" class="form-control" placeholder="contact@restaurant.com" required>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Email professionnel</label>
+                        <input type="email" class="form-control" id="owner-email" placeholder="contact@restaurant.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe pour votre compte</label>
+                        <input type="password" class="form-control" id="owner-pass" placeholder="••••••••" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Documents officiels (Registre de commerce, etc.)</label>
-                    <div class="upload-box">
-                        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
-                        <p>Cliquez ou glissez vos fichiers ici</p>
+                    <input type="file" id="file-input" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="upload-box" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                        <p id="upload-text" style="font-weight: 500;">Cliquez pour envoyer vos documents</p>
                         <small class="text-muted">PDF, JPG, PNG (Max 10MB)</small>
+                        <div id="file-list" style="margin-top: 1rem; text-align: left; font-size: 0.85rem; color: #00A699;"></div>
                     </div>
                 </div>
 
@@ -118,18 +126,71 @@
         </div>
     </div>
 
+    <script src="../js/api.js"></script>
     <script>
-        function handleSubmit(e) {
+        // Sécurité au cas où api.js ne chargerait pas assez vite
+        const BASE_URL = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : 'http://localhost:8080/api';
+
+        document.getElementById('file-input').onchange = function(e) {
+            const list = document.getElementById('file-list');
+            const text = document.getElementById('upload-text');
+            const files = e.target.files;
+            
+            if (files.length > 0) {
+                list.innerHTML = Array.from(files).map(f => 
+                    `<div style="display:flex; align-items:center; gap:5px; margin-bottom:5px;">
+                        <i class="fa-solid fa-file-circle-check"></i> ${f.name}
+                    </div>`
+                ).join('');
+                text.innerText = files.length + " fichier(s) sélectionné(s)";
+                document.getElementById('drop-zone').style.borderColor = "#00A699";
+                document.getElementById('drop-zone').style.background = "rgba(0, 166, 153, 0.05)";
+            }
+        };
+
+        async function handleSubmit(e) {
             e.preventDefault();
-            const restName = document.getElementById('rest-name').value;
-            const userData = {
-                name: restName,
-                role: 'restaurant',
-                email: 'admin@' + restName.toLowerCase().replace(/\s/g, '') + '.com'
+            const btn = e.target.querySelector('button');
+            const files = document.getElementById('file-input').files;
+
+            if (files.length === 0) {
+                alert('Veuillez joindre au moins un document officiel.');
+                return;
+            }
+
+            const payload = {
+                name: document.getElementById('rest-name').value,
+                address: document.getElementById('rest-address').value,
+                cuisineType: document.getElementById('rest-cuisine').value,
+                ownerName: document.getElementById('owner-name').value,
+                phone: document.getElementById('owner-phone').value,
+                email: document.getElementById('owner-email').value,
+                password: document.getElementById('owner-pass').value
             };
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-            alert('Votre demande a été envoyée avec succès ! Vous pouvez maintenant accéder à votre tableau de bord.');
-            window.location.href = 'admin.html';
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement en cours...';
+
+            try {
+                const response = await fetch(`${BASE_URL}/restaurants/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert('Félicitations ! Votre restaurant a été enregistré dans la base de données. Vous pouvez maintenant vous connecter.');
+                    window.location.href = 'auth.html';
+                } else {
+                    const error = await response.text();
+                    alert('Erreur : ' + error);
+                }
+            } catch (error) {
+                alert('Erreur de connexion au serveur');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Soumettre ma demande';
+            }
         }
     </script>
 </body>

@@ -26,6 +26,11 @@ public class User {
     private String fullName;
     private String phone;
     private String address;
+    private Integer loyaltyPoints = 0;
+
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
     private Role role;

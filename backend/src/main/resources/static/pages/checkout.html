@@ -192,6 +192,10 @@
                         <span>Frais de livraison</span>
                         <span>1 000 FCFA</span>
                     </div>
+                    <div id="checkout-discount-row" class="total-row" style="color:#00a699; font-weight:700; display:none;">
+                        <span>Réduction Fidélité</span>
+                        <span id="checkout-discount-val">0 FCFA</span>
+                    </div>
                     <div class="total-row grand-total">
                         <span>Total à Payer</span>
                         <span class="text-primary" id="checkout-total">0 FCFA</span>
@@ -205,9 +209,10 @@
         </div>
     </div>
     
+    <script src="../js/api.js"></script>
     <script src="../js/cart.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const checkoutItemsContainer = document.getElementById('checkout-items');
             const subTotalEl = document.getElementById('checkout-subtotal');
             const totalEl = document.getElementById('checkout-total');
@@ -231,7 +236,22 @@
             }
             
             subTotalEl.textContent = `${subtotal.toLocaleString()} FCFA`;
-            totalEl.textContent = `${subtotal > 0 ? (subtotal + 1000).toLocaleString() : 0} FCFA`;
+            
+            // Calcul réduction
+            let discount = 0;
+            try {
+                const user = await api.getCurrentUser();
+                if (user && user.loyaltyPoints >= 100 && subtotal > 0) {
+                    const reductionPercent = Math.floor(user.loyaltyPoints / 100) * 2;
+                    discount = Math.round(subtotal * (reductionPercent / 100));
+                    
+                    document.getElementById('checkout-discount-row').style.display = 'flex';
+                    document.getElementById('checkout-discount-val').textContent = `-${discount.toLocaleString()} FCFA`;
+                    document.getElementById('checkout-discount-row').querySelector('span').textContent = `Réduction Fidélité (${reductionPercent}%)`;
+                }
+            } catch (e) {}
+
+            totalEl.textContent = `${subtotal > 0 ? (subtotal + 1000 - discount).toLocaleString() : 0} FCFA`;
         });
     </script>
 </body>

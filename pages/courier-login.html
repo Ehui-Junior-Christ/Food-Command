@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification Livreur | Food-Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            background: var(--bg-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-page::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(255,159,67,0.15) 0%, transparent 70%);
+            z-index: 0;
+        }
+        .auth-page::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            left: -10%;
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, rgba(255,90,95,0.15) 0%, transparent 70%);
+            z-index: 0;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #f1f3f5;
+        }
+        .auth-tab {
+            padding: 0.75rem 0;
+            flex: 1;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .auth-tab.active {
+            color: var(--secondary);
+        }
+        .auth-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--secondary);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #f1f3f5;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+        .courier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,159,67,0.1);
+            color: var(--secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-card">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <a href="../index.html" class="logo" style="justify-content: center; margin-bottom: 1rem;">
+                    <i class="fa-solid fa-utensils"></i> Food-Command
+                </a>
+                <div class="courier-badge">
+                    <i class="fa-solid fa-motorcycle"></i> Espace Livreur
+                </div>
+                <h2 id="auth-title">Connexion Livreur</h2>
+            </div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('login')">Connexion</div>
+                <div class="auth-tab" onclick="switchTab('register')">Inscription</div>
+            </div>
+
+            <form id="courier-form" onsubmit="handleCourierAuth(event)">
+                <div id="register-fields" style="display: none;">
+                    <div class="form-group">
+                        <label>Nom Complet</label>
+                        <input type="text" id="courier-name" class="form-control" placeholder="Ex: Jean Kouassi">
+                    </div>
+                    <div class="form-group">
+                        <label>Numéro de Téléphone</label>
+                        <input type="tel" id="courier-phone" class="form-control" placeholder="+225 00 00 00 00 00">
+                    </div>
+                    <div class="form-group">
+                        <label>Type de véhicule</label>
+                        <select id="courier-vehicle" class="form-control">
+                            <option value="MOTORCYCLE">Moto / Scooter</option>
+                            <option value="BICYCLE">Vélo</option>
+                            <option value="CAR">Voiture</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="courier-email" class="form-control" placeholder="votre@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="courier-pass" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn btn-secondary btn-block" id="submit-btn" style="padding: 0.8rem;">
+                    Se Connecter
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <a href="auth.html" style="color: var(--text-muted); font-size: 0.9rem;">Retour à l'espace client</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth-check.js"></script>
+    <script>
+        let currentMode = 'login';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.innerText.toLowerCase().includes(mode === 'login' ? 'connexion' : 'inscription'));
+            });
+
+            document.getElementById('auth-title').innerText = mode === 'login' ? 'Connexion Livreur' : 'Devenir Livreur';
+            document.getElementById('register-fields').style.display = mode === 'register' ? 'block' : 'none';
+            document.getElementById('submit-btn').innerText = mode === 'login' ? 'Se Connecter' : 'Créer mon compte';
+        }
+
+        async function handleCourierAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('courier-email').value;
+            const password = document.getElementById('courier-pass').value;
+            
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            try {
+                if (currentMode === 'register') {
+                    const fullName = document.getElementById('courier-name').value;
+                    const phone = document.getElementById('courier-phone').value;
+                    const vehicle = document.getElementById('courier-vehicle').value;
+
+                    await api.register({
+                        email, password, fullName, phone,
+                        role: 'COURIER',
+                        metadata: { vehicleType: vehicle }
+                    });
+                    alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                    switchTab('login');
+                } else {
+                    const data = await api.login(email, password);
+                    if (data.role !== 'COURIER') {
+                        api.clearAuthSession();
+                        throw new Error('Ce compte n\'est pas un compte livreur.');
+                    }
+                    alert('Connexion réussie !');
+                    window.location.href = 'courier-dashboard.html';
+                }
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = currentMode === 'login' ? 'Se Connecter' : 'Créer mon compte';
+            }
+        }
+    </script>
+</body>
+</html>

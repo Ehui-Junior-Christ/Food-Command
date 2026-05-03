@@ -127,11 +127,32 @@
         </a>
         <div class="nav-links">
             <a href="../index.html">Accueil</a>
-            <a href="restaurant.html" class="active">Restaurants</a>
+            <a href="restaurants.html" class="active">Restaurants</a>
             <a href="offers.html">Offres</a>
         </div>
         <div class="nav-actions">
-            <button class="btn btn-outline hide-mobile" onclick="window.location.href='auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
+            <button class="btn btn-outline hide-mobile" id="btn-login" onclick="window.location.href='auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
+            
+            <!-- Bloc Profil -->
+            <div id="user-profile-container" class="user-profile-nav" style="display: none;">
+                <div class="user-info" id="user-profile-trigger" role="button" tabindex="0">
+                    <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=FF5A5F&color=fff" alt="Profile" class="nav-avatar">
+                    <span id="user-name-nav" class="hide-mobile">Mon Profil</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="dropdown-header">
+                        <strong id="dropdown-full-name">Utilisateur</strong>
+                        <span id="dropdown-email">email@exemple.com</span>
+                    </div>
+                    <hr>
+                    <a href="profile.html"><i class="fa-solid fa-user-gear"></i> Mon Profil</a>
+                    <a href="#"><i class="fa-solid fa-box"></i> Mes Commandes</a>
+                    <hr>
+                    <a href="#" id="btn-logout" class="text-primary"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+                </div>
+            </div>
+
             <button class="btn btn-cart">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span class="cart-badge">0</span>
@@ -142,11 +163,11 @@
 
     <div class="rest-hero">
         <div class="rest-hero-info">
-            <h1>Burger Palace</h1>
+            <h1 id="rest-name-display">Chargement...</h1>
             <div class="rest-meta" style="color:white; font-size:1.1rem;">
-                <span><i class="fa-solid fa-star" style="color:#FFD700"></i> 4.8 (245 avis)</span>
-                <span style="margin-left:1rem;"><i class="fa-regular fa-clock"></i> 20-30 min</span>
-                <span style="margin-left:1rem;"><i class="fa-solid fa-motorcycle"></i> Livraison: 500 FCFA</span>
+                <span id="rest-rating-display"><i class="fa-solid fa-star" style="color:#FFD700"></i> --</span>
+                <span style="margin-left:1rem;"><i class="fa-regular fa-clock"></i> -- min</span>
+                <span style="margin-left:1rem;"><i class="fa-solid fa-motorcycle"></i> Livraison: -- FCFA</span>
             </div>
         </div>
     </div>
@@ -234,6 +255,102 @@
     </div>
     <div class="overlay" id="overlay"></div>
 
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo" style="margin-bottom: 1.5rem;">
+                    <i class="fa-solid fa-utensils"></i> Food-Command
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">La meilleure plateforme de livraison de repas à Abidjan. Qualité premium et rapidité garantie.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Explorer</h3>
+                <a href="../index.html">Accueil</a>
+                <a href="restaurants.html">Restaurants</a>
+                <a href="offers.html">Offres Spéciales</a>
+                <a href="about.html">À Propos</a>
+            </div>
+            <div class="footer-col">
+                <h3>Partenariat</h3>
+                <a href="partner-register.html">Devenir Partenaire</a>
+                <a href="courier.html">Devenir Livreur</a>
+                <a href="admin.html">Espace Admin</a>
+                <a href="#">Solutions Entreprise</a>
+            </div>
+            <div class="footer-col">
+                <h3>Aide & Support</h3>
+                <a href="#">Centre d'aide</a>
+                <a href="#">Nous contacter</a>
+                <a href="#">FAQ</a>
+                <a href="#">Confidentialité</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Food-Command. Tous droits réservés. Design by EHUI Junior Christ</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth-check.js"></script>
     <script src="../js/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('id');
+            
+            if (!restaurantId) {
+                console.log("Mode démo statique");
+                return;
+            }
+            
+            try {
+                const rest = await api.getRestaurant(restaurantId);
+                if (!rest) return;
+                
+                // Mise à jour de l'en-tête
+                document.getElementById('rest-name-display').innerText = rest.name;
+                document.title = `Menu - ${rest.name} | Food-Command`;
+                if(rest.imageUrl) {
+                    document.querySelector('.rest-hero').style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('${rest.imageUrl}')`;
+                }
+                
+                document.getElementById('rest-rating-display').innerHTML = `<i class="fa-solid fa-star" style="color:#FFD700"></i> ${rest.rating || '4.5'} (Nouvel établissement)`;
+                
+                // Rendu du menu
+                const menuContent = document.querySelector('.menu-content');
+                if (rest.menu && rest.menu.length > 0) {
+                    menuContent.innerHTML = `
+                        <div class="menu-section">
+                            <h2 class="menu-section-title">Notre Carte</h2>
+                            ${rest.menu.map(item => `
+                                <div class="dish-card">
+                                    <div class="dish-info">
+                                        <h3 class="dish-title">${item.name}</h3>
+                                        <p class="dish-desc">${item.description || 'Préparé avec des ingrédients frais et locaux.'}</p>
+                                        <div class="dish-price-row">
+                                            <span class="dish-price">${item.price.toLocaleString()} FCFA</span>
+                                            <button class="btn btn-outline btn-sm" onclick="addToCart('${item.id}', '${item.name}', ${item.price}, '${item.imageUrl || ''}', ${rest.id}, '${rest.name.replace(/'/g, "\\'")}')"><i class="fa-solid fa-plus"></i> Ajouter</button>
+                                        </div>
+                                    </div>
+                                    ${item.imageUrl ? `<img src="${item.imageUrl}" class="dish-img" alt="${item.name}">` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    menuContent.innerHTML = '<p class="text-muted" style="text-align:center; padding:5rem;">Ce restaurant n\'a pas encore de menu en ligne.</p>';
+                }
+                
+            } catch (error) {
+                console.error("Error loading restaurant:", error);
+            }
+        });
+    </script>
 </body>
 </html>
