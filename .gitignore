@@ -1,0 +1,19 @@
+# Java
+*.class
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Configuration sensible (Optionnel mais recommandé)
+# backend/src/main/resources/application.properties

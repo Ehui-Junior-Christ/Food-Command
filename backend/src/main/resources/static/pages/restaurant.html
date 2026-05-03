@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - Burger Palace | Food-Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .rest-hero {
+            height: 350px;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1200&auto=format&fit=crop') center/cover;
+            display: flex;
+            align-items: flex-end;
+            padding: 3rem 5%;
+            color: white;
+            margin-top: 70px;
+        }
+        .rest-hero-info h1 {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        .menu-layout {
+            display: flex;
+            gap: 3rem;
+            padding: 3rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .menu-categories {
+            width: 250px;
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+        }
+        .cat-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: var(--transition);
+        }
+        .cat-link:hover, .cat-link.active {
+            color: var(--primary);
+            border-left-color: var(--primary);
+            background: var(--bg-light);
+        }
+        .menu-content {
+            flex: 1;
+        }
+        .menu-section {
+            margin-bottom: 3rem;
+        }
+        .menu-section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .dish-card {
+            display: flex;
+            gap: 1.5rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+        .dish-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        .dish-info {
+            flex: 1;
+        }
+        .dish-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .dish-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .dish-price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dish-price {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        .dish-img {
+            width: 140px;
+            height: 140px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+        }
+        @media (max-width: 768px) {
+            .menu-layout { flex-direction: column; }
+            .menu-categories { width: 100%; position: static; display: flex; overflow-x: auto; padding: 0;}
+            .cat-link { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
+            .cat-link.active { border-bottom-color: var(--primary); }
+            .dish-card { flex-direction: column-reverse; }
+            .dish-img { width: 100%; height: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar scrolled">
+        <a href="../index.html" class="logo">
+            <i class="fa-solid fa-utensils"></i> Food-Command
+        </a>
+        <div class="nav-links">
+            <a href="../index.html">Accueil</a>
+            <a href="restaurant.html" class="active">Restaurants</a>
+            <a href="offers.html">Offres</a>
+        </div>
+        <div class="nav-actions">
+            <button class="btn btn-outline hide-mobile" onclick="window.location.href='auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
+            <button class="btn btn-cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-badge">0</span>
+            </button>
+            <button class="btn btn-outline mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('active')"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <div class="rest-hero">
+        <div class="rest-hero-info">
+            <h1>Burger Palace</h1>
+            <div class="rest-meta" style="color:white; font-size:1.1rem;">
+                <span><i class="fa-solid fa-star" style="color:#FFD700"></i> 4.8 (245 avis)</span>
+                <span style="margin-left:1rem;"><i class="fa-regular fa-clock"></i> 20-30 min</span>
+                <span style="margin-left:1rem;"><i class="fa-solid fa-motorcycle"></i> Livraison: 500 FCFA</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="menu-layout">
+        <aside class="menu-categories">
+            <a href="#populaire" class="cat-link active">Populaire</a>
+            <a href="#burgers" class="cat-link">Burgers Premium</a>
+            <a href="#accompagnements" class="cat-link">Accompagnements</a>
+        </aside>
+        
+        <main class="menu-content">
+            <div id="populaire" class="menu-section">
+                <h2 class="menu-section-title">Populaire</h2>
+                
+                <div class="dish-card">
+                    <div class="dish-info">
+                        <h3 class="dish-title">Le Smash Classic</h3>
+                        <p class="dish-desc">Double steak haché de bœuf premium, double cheddar affiné, cornichons, oignons caramélisés, sauce secrète, pain brioché artisanal toasté.</p>
+                        <div class="dish-price-row">
+                            <span class="dish-price">4 500 FCFA</span>
+                            <button class="btn btn-outline btn-sm" onclick="addToCart('d1', 'Le Smash Classic', 4500, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400&auto=format&fit=crop')"><i class="fa-solid fa-plus"></i> Ajouter</button>
+                        </div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400&auto=format&fit=crop" class="dish-img" alt="Smash Classic">
+                </div>
+
+                <div class="dish-card">
+                    <div class="dish-info">
+                        <h3 class="dish-title">Frites Truffées Parmesan</h3>
+                        <p class="dish-desc">Frites croustillantes maison, huile de truffe noire, parmesan fraîchement râpé et persil. Servies avec sauce aïoli.</p>
+                        <div class="dish-price-row">
+                            <span class="dish-price">2 500 FCFA</span>
+                            <button class="btn btn-outline btn-sm" onclick="addToCart('d2', 'Frites Truffées Parmesan', 2500, 'https://images.unsplash.com/photo-1576107232684-1279f390859f?q=80&w=400&auto=format&fit=crop')"><i class="fa-solid fa-plus"></i> Ajouter</button>
+                        </div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1576107232684-1279f390859f?q=80&w=400&auto=format&fit=crop" class="dish-img" alt="Frites">
+                </div>
+            </div>
+
+            <div id="burgers" class="menu-section">
+                <h2 class="menu-section-title">Burgers Premium</h2>
+                
+                <div class="dish-card">
+                    <div class="dish-info">
+                        <h3 class="dish-title">Le BBQ Bacon</h3>
+                        <p class="dish-desc">Steak de bœuf, bacon croustillant, onion rings, cheddar fondu, sauce barbecue maison, salade.</p>
+                        <div class="dish-price-row">
+                            <span class="dish-price">5 500 FCFA</span>
+                            <button class="btn btn-outline btn-sm" onclick="addToCart('d3', 'Le BBQ Bacon', 5500, 'https://images.unsplash.com/photo-1594212691516-724f74d083e9?q=80&w=400&auto=format&fit=crop')"><i class="fa-solid fa-plus"></i> Ajouter</button>
+                        </div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1594212691516-724f74d083e9?q=80&w=400&auto=format&fit=crop" class="dish-img" alt="BBQ Bacon">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h2>Votre Panier</h2>
+            <button class="close-btn" id="close-cart"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <!-- Items injected via JS -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-summary" style="margin-bottom: 1rem;">
+                <div class="summary-row">
+                    <span>Sous-total</span>
+                    <span id="cart-subtotal">0 FCFA</span>
+                </div>
+                <div class="summary-row">
+                    <span>Frais de livraison estimé</span>
+                    <span>1 000 FCFA</span>
+                </div>
+                <div class="summary-row total" style="display:flex; justify-content:space-between; font-weight:bold; margin-top:0.5rem; padding-top:0.5rem; border-top:1px dashed #CBD5E0;">
+                    <span>Total</span>
+                    <span id="cart-total">0 FCFA</span>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-block" id="btn-checkout" onclick="window.location.href='checkout.html'">Commander</button>
+        </div>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <script src="../js/cart.js"></script>
+</body>
+</html>
