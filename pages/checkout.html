@@ -285,37 +285,48 @@
         async function confirmOrder() {
             if (cart.length === 0) return alert('Votre panier est vide !');
             
+            const token = localStorage.getItem('user_token');
+            if (!token) {
+                alert('Veuillez vous connecter pour passer commande.');
+                window.location.href = 'auth.html';
+                return;
+            }
+
             const btn = document.querySelector('.btn-primary');
             const originalText = btn.innerText;
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement de la commande...';
             
             try {
-                // Pour la démo, on cherche l'ID du restaurant dans le premier item ou par défaut 1
-                const restaurantId = cart[0].restaurantId || 1;
+                // On récupère le restaurant ID du premier élément du panier
+                const restaurantId = cart[0].restaurantId;
 
                 const orderData = {
-                    restaurant: { id: restaurantId },
+                    restaurant: { id: parseInt(restaurantId) },
                     totalAmount: subtotal + 1000 - discount,
+                    status: 'PENDING',
                     items: cart.map(item => ({
-                        menuItem: { id: parseInt(item.id.toString().replace(/\D/g, '')) || 1 },
-                        quantity: item.quantity
+                        menuItem: { id: parseInt(item.id) },
+                        quantity: item.quantity,
+                        price: item.price
                     }))
                 };
                 
+                console.log("Sending order data:", orderData);
                 const savedOrder = await api.placeOrder(orderData);
+                
+                // Vider le panier après succès
                 localStorage.removeItem('food_saas_cart');
                 
-                // Petite animation de succès
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
-                btn.style.background = '#48bb78';
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Commande validée !';
+                btn.style.background = '#059669';
                 
                 setTimeout(() => {
                     window.location.href = `tracking.html?id=${savedOrder.id}`;
-                }, 1000);
+                }, 1500);
             } catch (error) {
                 console.error("Order error:", error);
-                alert('Erreur : ' + error.message);
+                alert('Désolé, une erreur est survenue : ' + error.message);
                 btn.disabled = false;
                 btn.innerText = originalText;
                 btn.style.background = '';

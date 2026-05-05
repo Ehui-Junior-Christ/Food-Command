@@ -275,6 +275,13 @@
             // CHARGEMENT ULTRA-RAPIDE (En parallèle)
             Promise.all([loadUserOrders(), loadUserAddresses()]);
 
+            // Gestion de l'onglet via URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            if (tab) {
+                switchTab(tab);
+            }
+
             document.getElementById('avatar-input').onchange = (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -315,42 +322,65 @@
 
         async function loadUserOrders() {
             const orderListContainer = document.getElementById('tab-orders');
-            const ordersCountSpan = document.querySelector('.stat-value'); // Le premier .stat-value est celui des commandes
+            const ordersCountSpan = document.querySelector('.stat-value');
             
             try {
-                const orders = await api.getMyOrders();
-                
-                // Mettre à jour le compteur dans la sidebar
+                const orders = await api.getClientOrders();
                 if(ordersCountSpan) ordersCountSpan.textContent = orders.length;
 
-                // Générer la liste HTML (On garde le titre h3)
-                let html = '<h3 class="section-title"><i class="fa-solid fa-bag-shopping"></i> Mes Commandes Réelles</h3>';
+                let html = '<h3 class="section-title"><i class="fa-solid fa-bag-shopping"></i> Historique des Commandes</h3>';
                 
                 if (orders.length === 0) {
                     html += '<p style="color:var(--text-muted); text-align:center; padding:2rem;">Vous n\'avez pas encore passé de commande.</p>';
                 } else {
+                    // Trier par date décroissante
+                    orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+
                     orders.forEach(order => {
                         const date = new Date(order.orderDate).toLocaleDateString('fr-FR', {
-                            day: 'numeric', month: 'long', year: 'numeric'
+                            day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
                         });
+                        const statusInfo = getStatusInfo(order.status);
+                        
                         html += `
-                            <div class="order-row">
+                            <div class="order-row" style="border-left: 4px solid ${statusInfo.color}; padding-left: 15px; margin-bottom: 1rem; background: #fbfcfd; border-radius: 0 12px 12px 0;">
                                 <div>
-                                    <strong>Commande #${order.id}</strong><br>
-                                    <span style="font-size:0.85rem; color:var(--text-muted);">${date}</span>
+                                    <strong style="font-family:'Outfit';">Commande #${order.id}</strong><br>
+                                    <span style="font-size:0.85rem; color:var(--text-muted);">${date} • ${order.restaurant ? order.restaurant.name : 'Restaurant'}</span>
                                 </div>
-                                <span class="status-badge" style="background:${getStatusColor(order.status)}; color:white;">${order.status}</span>
-                                <span style="font-weight:700;">${order.totalAmount || 0} FCFA</span>
+                                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+                                    <span class="status-badge" style="background:${statusInfo.bg}; color:${statusInfo.color}; border: 1px solid ${statusInfo.color}22;">
+                                        ${statusInfo.label}
+                                    </span>
+                                    <span style="font-weight:800; color:var(--text-main);">${order.totalAmount.toLocaleString()} FCFA</span>
+                                </div>
                             </div>
                         `;
                     });
                 }
                 orderListContainer.innerHTML = html;
             } catch (error) {
-                console.error("Erreur lors du chargement des commandes:", error);
+                console.error("Erreur commandes:", error);
             }
         }
 
+        function getStatusInfo(status) {
+            switch(status) {
+                case 'PENDING': 
+                    return { label: 'EN ATTENTE', color: '#b45309', bg: '#fffbeb' };
+                case 'ACCEPTED':
+                case 'PREPARING':
+                    return { label: 'EN PRÉPARATION', color: '#059669', bg: '#ecfdf5' };
+                case 'OUT_FOR_DELIVERY':
+                    return { label: 'EN LIVRAISON', color: '#2563eb', bg: '#eff6ff' };
+                case 'DELIVERED':
+                    return { label: 'LIVRÉE', color: '#15803d', bg: '#f0fdf4' };
+                case 'CANCELLED':
+                    return { label: 'ANNULÉE', color: '#dc2626', bg: '#fef2f2' };
+                default:
+                    return { label: 'STATUT INCONNU', color: '#64748b', bg: '#f1f5f9' };
+            }
+        }
         async function loadUserAddresses() {
             const list = document.getElementById('address-list');
             try {
@@ -428,14 +458,6 @@
             }
         }
 
-        function getStatusColor(status) {
-            switch(status) {
-                case 'DELIVERED': return '#00a699';
-                case 'PENDING': return '#f6ad55';
-                case 'CANCELLED': return '#e53e3e';
-                default: return '#718096';
-            }
-        }
         function handleLogout() {
             api.clearAuthSession();
             window.location.href = '../index.html';

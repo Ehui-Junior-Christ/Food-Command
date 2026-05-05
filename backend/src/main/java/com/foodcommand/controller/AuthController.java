@@ -71,6 +71,14 @@ public class AuthController {
                     .body("Error: Email is already in use!");
         }
 
+        // SECURITY: Check for ADMIN role
+        if (signUpRequest.getRole() == com.foodcommand.model.Role.ADMIN) {
+            String secretKey = "FOOD_ADMIN_2026"; // À mettre dans application.properties en production
+            if (signUpRequest.getAdminSecretKey() == null || !signUpRequest.getAdminSecretKey().equals(secretKey)) {
+                return ResponseEntity.badRequest().body("Erreur: Clé secrète invalide pour le rôle ADMIN.");
+            }
+        }
+
         User user = User.builder()
                 .email(signUpRequest.getEmail())
                 .password(encoder.encode(signUpRequest.getPassword()))

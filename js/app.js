@@ -9,10 +9,24 @@ document.addEventListener('DOMContentLoaded', () => {
     simulateAIGeneration();
 });
 
+let userCoords = null;
+
 function initSearchSuggestions() {
     const searchInput = document.getElementById('search-input');
     const suggestionBox = document.getElementById('search-suggestions');
     if (!searchInput || !suggestionBox) return;
+
+    // Demander la géolocalisation dès le début
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            userCoords = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            console.log("Position détectée:", userCoords);
+            renderRestaurants(); // Rafraîchir pour afficher les distances
+        });
+    }
 
     let debounceTimer;
 
@@ -20,24 +34,26 @@ function initSearchSuggestions() {
         const query = e.target.value.trim();
         clearTimeout(debounceTimer);
 
-        if (query.length < 2) {
+        if (query.length < 1) {
             suggestionBox.style.display = 'none';
             return;
         }
 
         debounceTimer = setTimeout(async () => {
             try {
-                const response = await fetch(`${resolveApiBaseUrl()}/menu-items/search?query=${encodeURIComponent(query)}`);
-                const items = await response.json();
+                const results = await api.smartSearch(query, userCoords?.lat, userCoords?.lng);
                 
-                if (items.length > 0) {
-                    suggestionBox.innerHTML = items.map(item => `
-                        <div class="suggestion-item" onclick="window.location.href='pages/restaurant.html?id=${item.restaurantId || item.restaurant?.id}'">
-                            <div class="suggestion-icon"><i class="fa-solid fa-utensils"></i></div>
+                if (results.length > 0) {
+                    suggestionBox.innerHTML = results.slice(0, 8).map(item => `
+                        <div class="suggestion-item" onclick="handleSearchClick(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                            <div class="suggestion-icon">
+                                <i class="fa-solid ${item.type === 'RESTAURANT' ? 'fa-shop' : 'fa-utensils'}"></i>
+                            </div>
                             <div class="suggestion-info">
                                 <h4>${item.name}</h4>
-                                <p>${item.description || 'Plat délicieux'}</p>
+                                <p>${item.type === 'RESTAURANT' ? (item.description || 'Restaurant partenaire') : ('Plat chez ' + item.restaurantName)}</p>
                             </div>
+                            ${item.distance ? `<div class="suggestion-meta">${item.distance} km</div>` : ''}
                         </div>
                     `).join('');
                     suggestionBox.style.display = 'block';
@@ -50,12 +66,19 @@ function initSearchSuggestions() {
         }, 300);
     });
 
-    // Fermer si clic ailleurs
     document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !suggestionBox.contains(e.target)) {
             suggestionBox.style.display = 'none';
         }
     });
+}
+
+function handleSearchClick(item) {
+    if (item.type === 'RESTAURANT') {
+        window.location.href = `pages/restaurant.html?id=${item.id}`;
+    } else {
+        window.location.href = `pages/restaurant.html?id=${item.restaurantId}`;
+    }
 }
 
 function initNavbarScroller() {
@@ -68,44 +91,58 @@ function initNavbarScroller() {
 
 function initSearchLogic() {
     const searchInput = document.getElementById('search-input');
-    const locationInput = document.getElementById('location-input');
     const searchBtn = document.getElementById('btn-search');
 
-    const filterAction = () => {
-        const term = (searchInput?.value || '').toLowerCase().trim();
-        const loc = (locationInput?.value || '').toLowerCase().trim();
-        
-        document.querySelectorAll('.restaurant-card').forEach(card => {
-            const title = card.querySelector('.rest-title').textContent.toLowerCase();
-            const address = card.dataset.address?.toLowerCase() || '';
-            
-            const matchTitle = !term || title.includes(term);
-            const matchLoc = !loc || address.includes(loc);
-            
-            card.style.display = (matchTitle && matchLoc) ? 'block' : 'none';
-        });
-
-        // Show empty message if nothing found
+    const triggerSearch = async () => {
+        const query = (searchInput?.value || '').trim();
         const grid = document.getElementById('restaurants-grid');
-        const visibleCards = grid.querySelectorAll('.restaurant-card[style="display: block;"]').length;
-        const noResults = document.getElementById('no-results-msg');
-        
-        if (visibleCards === 0 && (term || loc)) {
-            if (!noResults) {
-                const msg = document.createElement('div');
-                msg.id = 'no-results-msg';
-                msg.style.cssText = 'grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);';
-                msg.innerHTML = '<i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.2;"></i><p>Aucun restaurant ne correspond à votre recherche.</p>';
-                grid.appendChild(msg);
+        if (!grid) return;
+
+        try {
+            const results = await api.smartSearch(query, userCoords?.lat, userCoords?.lng);
+            
+            if (results.length === 0) {
+                grid.innerHTML = `
+                    <div id="no-results-msg" style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.2;"></i>
+                        <p>Aucun résultat pour "${query}". Essayez un autre mot-clé.</p>
+                    </div>
+                `;
+                return;
             }
-        } else if (noResults) {
-            noResults.remove();
+
+            grid.innerHTML = results.map(item => `
+                <div class="restaurant-card" onclick="handleSearchClick(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                    <div class="rest-img">
+                        <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836'}" alt="${item.name}">
+                        ${item.type === 'PLATE' ? '<div class="badge-plate">PLAT</div>' : ''}
+                    </div>
+                    <div class="rest-info">
+                        <div class="rest-header">
+                            <h3 class="rest-title">${item.name}</h3>
+                            ${item.price ? `<span class="price-tag">${item.price} FCFA</span>` : ''}
+                        </div>
+                        <div class="rest-meta">
+                            ${item.type === 'RESTAURANT' ? `<span><i class="fa-solid fa-star"></i> ${item.rating || '4.5'}</span>` : `<span><i class="fa-solid fa-shop"></i> ${item.restaurantName}</span>`}
+                            ${item.distance ? `<span style="margin-left: 10px; color: var(--primary); font-weight: 600;"><i class="fa-solid fa-location-arrow"></i> ${item.distance} km</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+        } catch (e) {
+            console.error("Search error:", e);
         }
     };
 
-    if (searchInput) searchInput.addEventListener('input', filterAction);
-    if (locationInput) locationInput.addEventListener('input', filterAction);
-    if (searchBtn) searchBtn.addEventListener('click', filterAction);
+    if (searchInput) {
+        let timer;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(timer);
+            timer = setTimeout(triggerSearch, 500);
+        });
+    }
+    if (searchBtn) searchBtn.addEventListener('click', triggerSearch);
 }
 
 
@@ -128,20 +165,25 @@ async function renderRestaurants() {
     const grid = document.getElementById('restaurants-grid');
     if (!grid) return;
     try {
-        const restaurants = await api.getRestaurants();
-        grid.innerHTML = restaurants.map(rest => `
-            <div class="restaurant-card" data-address="${rest.address || ''}" onclick="window.location.href='pages/restaurant.html?id=${rest.id}'">
-                <div class="rest-img"><img src="${rest.imageUrl || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836'}"></div>
+        // Au chargement initial, on utilise le smart search sans keyword pour avoir le tri par distance
+        const restaurants = await api.smartSearch('', userCoords?.lat, userCoords?.lng);
+        grid.innerHTML = restaurants.map(item => `
+            <div class="restaurant-card" onclick="handleSearchClick(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                <div class="rest-img">
+                    <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836'}" alt="${item.name}">
+                </div>
                 <div class="rest-info">
-                    <div class="rest-header"><h3 class="rest-title">${rest.name}</h3></div>
+                    <div class="rest-header"><h3 class="rest-title">${item.name}</h3></div>
                     <div class="rest-meta">
-                        <span><i class="fa-solid fa-star"></i> ${rest.rating || '4.5'}</span>
-                        <span style="margin-left: 10px;"><i class="fa-solid fa-location-dot"></i> ${rest.address || 'Abidjan'}</span>
+                        <span><i class="fa-solid fa-star"></i> ${item.rating || '4.5'}</span>
+                        ${item.distance ? `<span style="margin-left: 10px; color: var(--primary); font-weight: 600;"><i class="fa-solid fa-location-arrow"></i> ${item.distance} km</span>` : ''}
                     </div>
                 </div>
             </div>
         `).join('');
-    } catch (e) {}
+    } catch (e) {
+        console.error("Render restaurants error:", e);
+    }
 }
 
 function runAIDemo() {
@@ -182,5 +224,89 @@ function simulateAIGeneration() {
                 img.innerHTML = '<img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d" style="width:100%; height:100%; object-fit:cover;">';
             }, 1000);
         };
+    }
+}
+
+function toggleMobileMenu() {
+    const navLinks = document.querySelector('.nav-links');
+    const overlay = document.getElementById('overlay');
+    if (navLinks) navLinks.classList.toggle('active');
+    if (overlay) overlay.classList.toggle('active');
+}
+
+// Close mobile menu when clicking overlay
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('overlay');
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        });
+    }
+});
+// Scroll Reveal Animation
+function initScrollReveal() {
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    reveals.forEach(reveal => observer.observe(reveal));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initScrollReveal();
+    renderActiveOrders();
+});
+
+async function renderActiveOrders() {
+    const section = document.getElementById('active-orders-section');
+    const grid = document.getElementById('active-orders-grid');
+    if (!section || !grid) return;
+
+    const token = localStorage.getItem('user_token');
+    if (!token) return;
+
+    try {
+        const orders = await api.getActiveOrders();
+        if (orders && orders.length > 0) {
+            section.style.display = 'block';
+            grid.innerHTML = orders.map(order => {
+                let statusLabel = "En attente";
+                let statusClass = "status-pending";
+
+                switch(order.status) {
+                    case 'ACCEPTED': statusLabel = "Acceptée"; break;
+                    case 'PREPARING': statusLabel = "En préparation"; statusClass = "status-preparing"; break;
+                    case 'OUT_FOR_DELIVERY': statusLabel = "En livraison"; statusClass = "status-delivery"; break;
+                    case 'DELIVERED': statusLabel = "Livrée"; statusClass = "status-delivered"; break;
+                }
+
+                return `
+                    <div class="order-active-card">
+                        <div class="order-active-info">
+                            <h4>Commande #${order.id}</h4>
+                            <p>${order.restaurant ? order.restaurant.name : 'Restaurant'}</p>
+                            <p>Total: ${order.totalAmount.toLocaleString()} FCFA</p>
+                        </div>
+                        <div class="order-status-badge ${statusClass}">
+                            ${statusLabel}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            section.style.display = 'none';
+        }
+    } catch (e) {
+        console.error("Active orders error:", e);
+        section.style.display = 'none';
     }
 }

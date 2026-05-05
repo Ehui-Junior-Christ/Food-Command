@@ -25,9 +25,12 @@ public class Restaurant {
     private String imageUrl;
     private Double rating;
     private String deliveryTime;
+    private Double latitude;
+    private Double longitude;
 
     @OneToOne
     @JoinColumn(name = "owner_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private User owner;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)

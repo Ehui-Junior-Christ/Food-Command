@@ -30,15 +30,35 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken authToken = 
+                (org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) authentication;
+        String registrationId = authToken.getAuthorizedClientRegistrationId();
+        
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+        
         String email = oAuth2User.getAttribute("email");
         String name = oAuth2User.getAttribute("name");
         String picture = oAuth2User.getAttribute("picture");
+        String providerId = oAuth2User.getName(); // Usually the sub or id
+
+        // Specific mapping for Facebook
+        if ("facebook".equals(registrationId)) {
+            email = oAuth2User.getAttribute("email");
+            name = oAuth2User.getAttribute("name");
+            picture = getFacebookPicture(oAuth2User);
+        } else if ("apple".equals(registrationId)) {
+            // Apple mapping is different
+            email = oAuth2User.getAttribute("email");
+            name = oAuth2User.getAttribute("name");
+            // Apple doesn't provide picture easily
+        }
 
         if (email == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Email not found from Google");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Email not found from " + registrationId);
             return;
         }
+
+        com.foodcommand.model.AuthProvider provider = com.foodcommand.model.AuthProvider.valueOf(registrationId.toUpperCase());
 
         User user = userRepository.findByEmail(email).orElse(null);
         if (user == null) {
@@ -46,8 +66,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                     .email(email)
                     .fullName(name)
                     .profileImageUrl(picture)
-                    .password("")
+                    .password("") // Social users don't have a local password
                     .role(Role.CLIENT)
+                    .provider(provider)
+                    .providerId(providerId)
                     .build();
             userRepository.save(user);
         } else {
@@ -58,6 +80,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             }
             if ((user.getProfileImageUrl() == null || user.getProfileImageUrl().isBlank()) && picture != null) {
                 user.setProfileImageUrl(picture);
+                changed = true;
+            }
+            // Update provider if it was local or different (optional policy)
+            if (user.getProvider() == com.foodcommand.model.AuthProvider.LOCAL) {
+                user.setProvider(provider);
+                user.setProviderId(providerId);
                 changed = true;
             }
             if (changed) {
@@ -75,5 +103,18 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 .build().toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    }
+
+    private String getFacebookPicture(OAuth2User user) {
+        if (user.getAttribute("picture") instanceof java.util.Map) {
+            java.util.Map<String, Object> pictureObj = user.getAttribute("picture");
+            if (pictureObj.containsKey("data")) {
+                java.util.Map<String, Object> dataObj = (java.util.Map<String, Object>) pictureObj.get("data");
+                if (dataObj.containsKey("url")) {
+                    return (String) dataObj.get("url");
+                }
+            }
+        }
+        return null;
     }
 }

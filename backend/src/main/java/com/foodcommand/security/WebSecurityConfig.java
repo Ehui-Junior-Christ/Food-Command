@@ -71,6 +71,9 @@ public class WebSecurityConfig {
                                 .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/assets/**", "/pages/**").permitAll()
                                 .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/client/search").permitAll()
+                                .requestMatchers("/api/client/**").hasRole("CLIENT")
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

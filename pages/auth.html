@@ -3,365 +3,544 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion | Food-Command</title>
+    <title>Connexion & Inscription | Food-Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/styles.css">
     <style>
-        .auth-container {
+        :root {
+            --auth-primary: #FF5A5F;
+            --auth-secondary: #00A699;
+            --auth-dark: #1e293b;
+            --auth-glass: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .auth-wrapper {
             min-height: 100vh;
             display: flex;
-        }
-        .auth-left {
-            flex: 1;
-            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop') center/cover;
-            display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            padding: 3rem;
+            padding: 2rem;
+            background: radial-gradient(circle at top right, rgba(255, 90, 95, 0.1), transparent),
+                        radial-gradient(circle at bottom left, rgba(0, 166, 153, 0.1), transparent);
         }
-        .auth-right {
-            width: 500px;
+
+        .auth-card {
+            display: flex;
+            width: 1000px;
+            max-width: 100%;
             background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            min-height: 650px;
+        }
+
+        .auth-image {
+            flex: 1.2;
+            background: linear-gradient(rgba(30, 41, 59, 0.6), rgba(30, 41, 59, 0.8)), 
+                        url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop') center/cover;
+            padding: 4rem;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
+            flex-direction: column;
+            justify-content: space-between;
+            color: white;
+        }
+
+        .auth-image h2 {
+            font-family: 'Outfit';
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.1;
+        }
+
+        .auth-image p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        .auth-content {
+            flex: 1;
+            padding: 3rem 4rem;
+            display: flex;
+            flex-direction: column;
             position: relative;
         }
-        .auth-box {
-            width: 100%;
-            max-width: 400px;
-        }
-        .auth-header {
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        .auth-header h2 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
+
+        .back-home {
+            position: absolute;
+            top: 2rem;
+            right: 3rem;
+            color: #64748b;
+            text-decoration: none;
             font-weight: 500;
-        }
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #CBD5E0;
-            border-radius: var(--radius-sm);
-            font-family: inherit;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(255, 90, 95, 0.1);
-        }
-        .role-selector {
-            display: flex;
-            background: #F1F5F9;
-            padding: 0.3rem;
-            border-radius: var(--radius-md);
-            margin-bottom: 2rem;
-        }
-        .role-btn {
-            flex: 1;
-            padding: 0.6rem;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            text-align: center;
-            font-weight: 600;
             font-size: 0.9rem;
-            transition: var(--transition);
+            transition: 0.3s;
         }
-        .role-btn.active {
-            background: white;
-            box-shadow: var(--shadow-sm);
-            color: var(--primary);
+
+        .back-home:hover {
+            color: var(--auth-primary);
         }
-        .auth-tabs {
+
+        .role-tabs {
             display: flex;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #E2E8F0;
+            gap: 10px;
+            margin-bottom: 2.5rem;
+            background: #f8fafc;
+            padding: 5px;
+            border-radius: 16px;
         }
-        .auth-tab {
+
+        .role-tab {
             flex: 1;
-            text-align: center;
-            padding: 1rem;
+            padding: 10px;
+            border-radius: 12px;
             cursor: pointer;
+            text-align: center;
             font-weight: 600;
-            color: var(--text-muted);
-            border-bottom: 2px solid transparent;
-            transition: var(--transition);
-        }
-        .auth-tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-        .social-login {
-            display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        .social-btn {
-            flex: 1;
+            font-size: 0.85rem;
+            transition: 0.3s;
+            color: #64748b;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 8px;
+        }
+
+        .role-tab.active {
+            background: white;
+            color: var(--auth-primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .auth-toggle {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .toggle-btn {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #94a3b8;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .toggle-btn.active {
+            color: var(--auth-dark);
+        }
+
+        .toggle-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--auth-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.8rem;
+            border: 2px solid #f1f5f9;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--auth-primary);
+            background: white;
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 1rem;
+            background: var(--auth-primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 1rem;
+            box-shadow: 0 10px 20px rgba(255, 90, 95, 0.2);
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255, 90, 95, 0.3);
+        }
+
+        .social-divider {
+            margin: 2rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .social-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: #f1f5f9;
+            z-index: 1;
+        }
+
+        .social-divider span {
+            background: white;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 2;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .social-btns {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-btn {
+            flex: 1;
             padding: 0.75rem;
-            border: 1px solid #CBD5E0;
-            border-radius: var(--radius-sm);
+            border: 2px solid #f1f5f9;
+            border-radius: 12px;
             background: white;
             cursor: pointer;
-            transition: var(--transition);
-            font-weight: 500;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
+
         .social-btn:hover {
-            background: #F8FAFC;
-            border-color: var(--text-main);
+            background: #f8fafc;
+            border-color: #e2e8f0;
         }
-        @media (max-width: 768px) {
-            .auth-left { display: none; }
-            .auth-right { width: 100%; }
+
+        @media (max-width: 900px) {
+            .auth-image { display: none; }
+            .auth-card { width: 450px; }
+            .auth-content { padding: 3rem 2rem; }
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-left">
-            <div style="text-align:center;">
-                <h1 style="font-size:3.5rem; font-family:'Outfit'; background: linear-gradient(135deg, #FFD700, #FF5A5F); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Food-Command</h1>
-                <p style="font-size:1.2rem; max-width:400px; margin:0 auto; opacity:0.9;">Rejoignez la meilleure plateforme de livraison de repas à Abidjan. Rapide, frais et délicieux.</p>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-image">
+                <div class="logo-white" style="font-family:'Outfit'; font-size:1.8rem; font-weight:700;">
+                    <i class="fa-solid fa-utensils"></i> Food-Command
+                </div>
+                <div>
+                    <h2>Saveurs d'Abidjan à votre portée.</h2>
+                    <p>Découvrez les meilleurs restaurants de la ville et faites-vous livrer en un éclair.</p>
+                </div>
+                <div style="font-size: 0.9rem; opacity: 0.7;">
+                    &copy; 2026 Food-Command Platform
+                </div>
             </div>
-        </div>
-        <div class="auth-right">
-            <a href="../index.html" style="position:absolute; top:2rem; left:2rem; color:var(--text-muted);">
-                <i class="fa-solid fa-arrow-left"></i> Retour
-            </a>
-            
-            <div class="auth-box">
-                <div class="role-selector">
-                    <div class="role-btn active" onclick="setRole('client', this)">Je suis un Client</div>
-                    <div class="role-btn" onclick="setRole('restaurant', this)">Je suis un Restaurant</div>
+
+            <div class="auth-content">
+                <a href="../index.html" class="back-home">
+                    <i class="fa-solid fa-house"></i> Accueil
+                </a>
+
+                <div class="auth-toggle">
+                    <div class="toggle-btn active" id="mode-login" onclick="setMode('login')">Connexion</div>
+                    <div class="toggle-btn" id="mode-register" onclick="setMode('register')">Inscription</div>
                 </div>
 
-                <div class="auth-tabs">
-                    <div class="auth-tab active" onclick="switchTab(this)">Connexion</div>
-                    <div class="auth-tab" onclick="switchTab(this)">Inscription</div>
+                <div class="role-tabs" id="role-selector">
+                    <div class="role-tab active" onclick="setRole('CLIENT', this)">
+                        <i class="fa-solid fa-user"></i> Client
+                    </div>
+                    <div class="role-tab" onclick="setRole('RESTAURANT', this)">
+                        <i class="fa-solid fa-shop"></i> Restaurant
+                    </div>
+                    <div class="role-tab" onclick="setRole('ADMIN', this)" style="display: none;" id="admin-role-tab">
+                        <i class="fa-solid fa-shield"></i> Admin
+                    </div>
                 </div>
 
-                <div class="auth-header">
-                    <h2>Bienvenue !</h2>
-                    <p class="text-muted" id="auth-subtext">Connectez-vous pour continuer</p>
-                </div>
+                <h3 id="auth-title" style="font-family:'Outfit'; font-size:1.5rem; margin-bottom:1.5rem;">Bon retour !</h3>
 
                 <form id="auth-form">
-                    <div id="name-field" class="form-group" style="display:none;">
-                        <label class="form-label">Nom complet</label>
-                        <input type="text" class="form-control" id="reg-name" placeholder="Jean Dupont">
+                    <div id="name-group" class="form-group" style="display: none;">
+                        <label>Nom complet</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-signature"></i>
+                            <input type="text" id="reg-name" class="form-input" placeholder="Jean Dupont">
+                        </div>
                     </div>
+
                     <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="auth-email" placeholder="votre@email.com" required>
+                        <label>Adresse Email</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-envelope"></i>
+                            <input type="email" id="auth-email" class="form-input" placeholder="nom@exemple.com" required>
+                        </div>
                     </div>
+
                     <div class="form-group">
-                        <label class="form-label" style="display:flex; justify-content:space-between;">
+                        <label style="display: flex; justify-content: space-between;">
                             Mot de passe
-                            <a href="#" style="color:var(--primary); font-size:0.85rem;" id="forgot-link" onclick="forgotPassword(event)">Oublié ?</a>
+                            <span id="forgot-pass" style="color:var(--auth-primary); cursor:pointer; font-size:0.8rem;" onclick="handleForgot()">Oublié ?</span>
                         </label>
-                        <input type="password" class="form-control" id="auth-pass" placeholder="••••••••" required>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="auth-pass" class="form-input" placeholder="••••••••" required>
+                        </div>
                     </div>
-                    
-                    <button type="button" class="btn btn-primary btn-block mt-2" onclick="handleAuth()" id="submit-btn">
-                        Se Connecter
+
+                    <div id="admin-secret-group" class="form-group" style="display: none;">
+                        <label style="color:var(--auth-primary);"><i class="fa-solid fa-key"></i> Code Secret Admin</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <input type="password" id="admin-secret" class="form-input" placeholder="Entrez le code secret">
+                        </div>
+                    </div>
+
+                    <div id="restaurant-fields" style="display: none; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1rem; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Nom de votre Restaurant</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-shop"></i>
+                                <input type="text" id="rest-name" class="form-input" placeholder="Ex: Maquis de la Joie">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Adresse du Restaurant</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <input type="text" id="rest-address" class="form-input" placeholder="Ex: Cocody Angré...">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 1rem;">
+                            <label>Type de cuisine</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-utensils"></i>
+                                <input type="text" id="rest-cuisine" class="form-input" placeholder="Ex: Africain, Pizza...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-auth" id="btn-submit">
+                        Se connecter
                     </button>
                 </form>
 
-                <div style="text-align:center; margin: 2rem 0; color:var(--text-muted); position:relative;">
-                    <hr style="border:none; border-top:1px solid #E2E8F0; position:absolute; width:100%; top:50%; z-index:1;">
-                    <span style="background:white; padding:0 1rem; position:relative; z-index:2;">ou continuer avec</span>
+                <div class="social-divider">
+                    <span>ou continuer avec</span>
                 </div>
 
-                <div class="social-login">
-                    <button type="button" class="social-btn" onclick="handleSocialLogin('Google')">
-                        <i class="fa-brands fa-google" style="color: #4285F4; font-size: 1.2rem;"></i>
-                        Google
+                <div class="social-btns">
+                    <button class="social-btn" onclick="handleSocial('Google')">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Google
                     </button>
-                    <button type="button" class="social-btn" onclick="handleSocialLogin('Facebook')">
-                        <i class="fa-brands fa-facebook" style="color:#1877F2; font-size:1.3rem;"></i> 
-                        Facebook
+                    <button class="social-btn" onclick="handleSocial('Facebook')">
+                        <i class="fa-brands fa-facebook" style="color:#1877F2; font-size:1.2rem;"></i> Facebook
+                    </button>
+                    <button class="social-btn" onclick="handleSocial('Apple')">
+                        <i class="fa-brands fa-apple" style="font-size:1.1rem;"></i> Apple
                     </button>
                 </div>
+
+                <p id="auth-switch-text" style="text-align:center; margin-top:2rem; font-size:0.9rem; color:#64748b;">
+                    Pas encore de compte ? <span style="color:var(--auth-primary); cursor:pointer; font-weight:600;" onclick="setMode('register')">Créer un compte</span>
+                </p>
                 
-                <div style="text-align:center; margin-top:2rem;">
-                    <a href="partner-register.html" style="color:var(--secondary); font-weight:500;"><i class="fa-solid fa-store"></i> Je suis un restaurateur / Devenir Partenaire</a>
+                <div style="text-align:center; margin-top:1rem; font-size:0.75rem; color:#cbd5e1;">
+                    Accès admin discret ? Appuyez sur <span style="cursor:pointer;" onclick="toggleAdminTab()">Shift+A</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="footer-grid">
-            <div class="footer-col">
-                <div class="logo" style="margin-bottom: 1.5rem;">
-                    <i class="fa-solid fa-utensils"></i> Food-Command
-                </div>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">La meilleure plateforme de livraison de repas à Abidjan. Qualité premium et rapidité garantie.</p>
-                <div class="social-links">
-                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
-                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h3>Explorer</h3>
-                <a href="../index.html">Accueil</a>
-                <a href="restaurant.html">Restaurants</a>
-                <a href="offers.html">Offres Spéciales</a>
-                <a href="about.html">À Propos</a>
-            </div>
-            <div class="footer-col">
-                <h3>Partenariat</h3>
-                <a href="partner-register.html">Devenir Partenaire</a>
-                <a href="courier.html">Devenir Livreur</a>
-                <a href="admin.html">Espace Admin</a>
-                <a href="#">Solutions Entreprise</a>
-            </div>
-            <div class="footer-col">
-                <h3>Aide & Support</h3>
-                <a href="#">Centre d'aide</a>
-                <a href="mailto:contact@foodcommand.ci">Nous contacter</a>
-                <a href="#">FAQ</a>
-                <a href="#">Confidentialité</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Food-Command. Tous droits réservés. Design by EHUI Junior Christ</p>
-        </div>
-    </footer>
-
-    <script src="../js/api.js?v=1.1"></script>
+    <script src="../js/api.js"></script>
     <script>
-        let currentRole = 'client';
+        let currentRole = 'CLIENT';
         let currentMode = 'login';
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('mode-' + mode).classList.add('active');
+
+            const isReg = mode === 'register';
+            document.getElementById('auth-title').innerText = isReg ? 'Rejoignez-nous !' : 'Bon retour !';
+            document.getElementById('name-group').style.display = isReg ? 'block' : 'none';
+            document.getElementById('forgot-pass').style.display = isReg ? 'none' : 'block';
+            document.getElementById('btn-submit').innerText = isReg ? "S'inscrire" : "Se connecter";
+            document.getElementById('auth-switch-text').innerHTML = isReg ? 
+                'Déjà un compte ? <span style="color:var(--auth-primary); cursor:pointer; font-weight:600;" onclick="setMode(\'login\')">Se connecter</span>' :
+                'Pas encore de compte ? <span style="color:var(--auth-primary); cursor:pointer; font-weight:600;" onclick="setMode(\'register\')">Créer un compte</span>';
+            
+            // On laisse le sélecteur de rôle activé pour le choix à l'inscription
+            document.getElementById('role-selector').style.opacity = '1';
+            document.getElementById('role-selector').style.pointerEvents = 'all';
+
+            // Cacher le champ secret admin si on change de mode
+            document.getElementById('admin-secret-group').style.display = 'none';
+            document.getElementById('restaurant-fields').style.display = 'none';
+        }
 
         function setRole(role, el) {
             currentRole = role;
-            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.role-tab').forEach(tab => tab.classList.remove('active'));
             el.classList.add('active');
-            updateUI();
-        }
 
-        function switchTab(tab) {
-            currentMode = tab.innerText === 'Connexion' ? 'login' : 'register';
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+            // Afficher le champ secret si Admin + Inscription
+            const secretGroup = document.getElementById('admin-secret-group');
+            const restoGroup = document.getElementById('restaurant-fields');
             
-            if (currentMode === 'register') {
-                currentRole = 'client';
-                document.querySelectorAll('.role-btn').forEach(b => {
-                    b.classList.remove('active');
-                    if (b.innerText.includes('Client')) b.classList.add('active');
-                });
+            if (role === 'ADMIN' && currentMode === 'register') {
+                secretGroup.style.display = 'block';
+            } else {
+                secretGroup.style.display = 'none';
             }
-            updateUI();
+
+            if (role === 'RESTAURANT' && currentMode === 'register') {
+                restoGroup.style.display = 'block';
+            } else {
+                restoGroup.style.display = 'none';
+            }
         }
 
-        function updateUI() {
-            const isLogin = currentMode === 'login';
-            const isRest = currentRole === 'restaurant';
+        function toggleAdminTab() {
+            const tab = document.getElementById('admin-role-tab');
+            tab.style.display = tab.style.display === 'none' ? 'flex' : 'none';
+        }
 
-            document.querySelector('.role-selector').style.display = isLogin ? 'flex' : 'none';
-            document.querySelector('.auth-header h2').innerText = isLogin ? 'Bienvenue !' : 'Créer un compte';
-            document.getElementById('auth-subtext').innerText = isLogin ? 'Connectez-vous pour continuer' : 'Rejoignez-nous aujourd\'hui';
+        document.addEventListener('keydown', (e) => {
+            if(e.shiftKey && e.key === 'A') toggleAdminTab();
+        });
+
+        document.getElementById('auth-form').onsubmit = async (e) => {
+            e.preventDefault();
             
-            document.getElementById('name-field').style.display = !isLogin ? 'block' : 'none';
-            document.getElementById('forgot-link').style.display = isLogin ? 'block' : 'none';
-            document.getElementById('submit-btn').innerText = isLogin ? 'Se Connecter' : 'S\'inscrire';
-        }
-
-        async function handleAuth() {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-pass').value;
-
-            if(!email || !password) return alert('Veuillez remplir tous les champs');
-
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
+            const btn = document.getElementById('btn-submit');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
 
             try {
                 if(currentMode === 'register') {
-                    const fullName = document.getElementById('reg-name').value.trim();
-                    await api.register({
-                        email: email.trim(),
-                        password: password.trim(),
-                        fullName,
-                        role: currentRole.toUpperCase()
-                    });
-                    alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
-                    switchTab(document.querySelectorAll('.auth-tab')[0]);
-                } else {
-                    const data = await api.login(email.trim(), password.trim());
+                    const fullName = document.getElementById('reg-name').value;
+                    const adminSecretKey = document.getElementById('admin-secret').value;
                     
-                    // Vérification stricte du rôle sélectionné
-                    const userRole = (data.role || '').toUpperCase();
-                    const selectedRole = currentRole.toUpperCase(); // 'CLIENT' ou 'RESTAURANT'
+                    if (currentRole === 'RESTAURANT') {
+                        const restName = document.getElementById('rest-name').value;
+                        const restAddress = document.getElementById('rest-address').value;
+                        
+                        if (!restName || !restAddress) {
+                            alert("Veuillez remplir les informations de votre restaurant.");
+                            return;
+                        }
 
-                    if (userRole !== selectedRole) {
+                        const restaurantData = {
+                            name: restName,
+                            address: restAddress,
+                            cuisineType: document.getElementById('rest-cuisine').value,
+                            ownerName: fullName,
+                            email: email,
+                            password: password,
+                            phone: ""
+                        };
+                        await api.registerRestaurant(restaurantData);
+                    } else {
+                        await api.register({ 
+                            email, 
+                            password, 
+                            fullName, 
+                            role: currentRole,
+                            adminSecretKey: currentRole === 'ADMIN' ? adminSecretKey : null
+                        });
+                    }
+                    
+                    alert('Compte créé avec succès en tant que ' + currentRole + ' ! Vous pouvez maintenant vous connecter.');
+                    setMode('login');
+                } else {
+                    const data = await api.login(email, password);
+                    
+                    // Vérification du rôle
+                    if (data.role !== currentRole) {
                         api.clearAuthSession();
-                        const targetLabel = selectedRole === 'RESTAURANT' ? 'un compte Restaurant' : 'un compte Client';
-                        throw new Error(`Accès refusé : Cet identifiant ne correspond pas à ${targetLabel}.`);
+                        throw new Error(`Accès refusé. Ce compte n'a pas le rôle ${currentRole}.`);
                     }
 
-                    // Stockage explicite pour compatibilité
                     localStorage.setItem('currentUser', JSON.stringify(data));
                     
-                    alert('Connexion réussie !');
-                    
-                    // Redirection basée sur le rôle
-                    if (userRole === 'CLIENT') {
-                        window.location.href = 'profile.html';
-                    } else if (userRole === 'RESTAURANT') {
-                        window.location.href = 'admin.html';
-                    } else {
-                        window.location.href = '../index.html';
-                    }
+                    // Redirection
+                    if (data.role === 'CLIENT') window.location.href = 'profile.html';
+                    else if (data.role === 'RESTAURANT') window.location.href = 'admin.html';
+                    else if (data.role === 'ADMIN') window.location.href = 'super-admin.html';
+                    else window.location.href = '../index.html';
                 }
             } catch (error) {
-                console.error("Auth error:", error);
-                alert('Erreur : ' + (error.message || 'Une erreur est survenue lors de l\'authentification.'));
+                alert(error.message || 'Erreur d\'authentification');
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = currentMode === 'login' ? 'Se Connecter' : 'S\'inscrire';
+                btn.disabled = false;
+                btn.innerText = currentMode === 'login' ? "Se connecter" : "S'inscrire";
             }
+        };
+
+        function handleSocial(provider) {
+            const baseUrl = 'http://localhost:8080/oauth2/authorization/';
+            window.location.href = baseUrl + provider.toLowerCase();
         }
 
-        function handleSocialLogin(provider) {
-            if (provider === 'Google') {
-                // Redirection vers le backend Spring Boot pour OAuth2
-                window.location.href = 'http://localhost:8080/oauth2/authorization/google';
-            } else {
-                alert(`Connexion avec ${provider} en cours... (Simulé)`);
-                // ... simulation pour Facebook ...
-            }
-        }
-
-        function forgotPassword(e) {
-            e.preventDefault();
-            const email = document.getElementById('auth-email').value;
-            if(!email) {
-                alert('Veuillez entrer votre adresse email pour réinitialiser le mot de passe.');
-            } else {
-                alert('Un lien de réinitialisation a été envoyé à ' + email);
-            }
+        function handleForgot() {
+            alert("Un lien de réinitialisation vous sera envoyé si l'email existe.");
         }
     </script>
 </body>

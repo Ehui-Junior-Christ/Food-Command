@@ -65,14 +65,16 @@
         </div>
         <div class="nav-actions">
             <!-- Bouton Connexion -->
-            <button class="btn btn-outline hide-mobile" id="btn-login" onclick="window.location.href='pages/auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
+            <button class="btn btn-outline btn-nav hide-mobile" id="btn-login" onclick="window.location.href='pages/auth.html'">
+                <i class="fa-regular fa-user"></i> <span>Connexion</span>
+            </button>
             
             <!-- Bloc Profil -->
             <div id="user-profile-container" class="user-profile-nav" style="display: none;">
-                <div class="user-info" id="user-profile-trigger" role="button" tabindex="0">
+                <div class="user-info" id="user-profile-trigger">
                     <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=FF5A5F&color=fff" alt="Profile" class="nav-avatar">
-                    <span id="user-name-nav" class="hide-mobile">Mon Profil</span>
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <span id="user-name-nav" class="hide-mobile">Profil</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i>
                 </div>
                 <div class="profile-dropdown" id="profile-dropdown">
                     <div class="dropdown-header">
@@ -81,17 +83,22 @@
                     </div>
                     <hr>
                     <a href="pages/profile.html"><i class="fa-solid fa-user-gear"></i> Mon Profil</a>
-                    <a href="#"><i class="fa-solid fa-box"></i> Mes Commandes</a>
+                    <a href="pages/profile.html?tab=orders"><i class="fa-solid fa-box"></i> Mes Commandes</a>
                     <hr>
                     <a href="#" id="btn-logout" class="text-primary"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
                 </div>
             </div>
 
-            <button class="btn btn-cart">
+            <!-- Panier -->
+            <button class="btn btn-cart-nav" id="cart-trigger">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span class="cart-badge">0</span>
             </button>
-            <button class="btn btn-outline mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('active')"><i class="fa-solid fa-bars"></i></button>
+
+            <!-- Menu Mobile -->
+            <button class="btn btn-outline btn-nav mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
     </nav>
 
@@ -135,8 +142,18 @@
         </div>
     </header>
 
+    <!-- Active Orders (Visible if logged in and has orders) -->
+    <section id="active-orders-section" class="active-orders-section" style="display: none; padding: 2rem 5% 0;">
+        <div class="section-header">
+            <h2>Commandes en cours</h2>
+        </div>
+        <div id="active-orders-grid" class="active-orders-grid">
+            <!-- Dynamically populated -->
+        </div>
+    </section>
+
     <!-- Rest of the content -->
-    <section class="categories-section">
+    <section class="categories-section reveal">
         <div class="section-header">
             <h2>Catégories Populaires</h2>
             <a href="pages/restaurant.html" class="view-all">Voir tout <i class="fa-solid fa-arrow-right"></i></a>
@@ -145,7 +162,7 @@
     </section>
 
     <!-- Section Partenaires / SaaS -->
-    <section class="saas-features" style="background: linear-gradient(135deg, #1A202C, #2D3748); padding: 5rem 5%; color: white; border-radius: 40px; margin: 4rem 5%; overflow: hidden;">
+    <section class="saas-features reveal" style="background: linear-gradient(135deg, #1A202C, #2D3748); padding: 5rem 5%; color: white; border-radius: 40px; margin: 4rem 5%; overflow: hidden;">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1400px; margin: 0 auto;">
             <div class="saas-content">
                 <span style="background: rgba(255, 90, 95, 0.2); color: #FF5A5F; padding: 0.5rem 1.2rem; border-radius: 30px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Espace Restaurateur</span>
@@ -169,7 +186,7 @@
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-lg" onclick="window.location.href='pages/partner-register.html'" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;">Devenir Partenaire</button>
+                <button class="btn btn-primary btn-nav" onclick="window.location.href='pages/partner-register.html'">Devenir Partenaire</button>
             </div>
 
             <!-- Démo Visuelle IA -->
@@ -204,7 +221,7 @@
         }
     </style>
 
-    <section class="restaurants-section" id="restaurants">
+    <section class="restaurants-section reveal" id="restaurants">
         <div class="section-header">
             <h2>Restaurants Recommandés</h2>
         </div>
@@ -262,6 +279,7 @@
         <div id="cart-items" class="cart-items"></div>
         <div class="cart-footer">
             <div class="summary-row"><span>Sous-total</span> <span id="cart-subtotal">0 FCFA</span></div>
+            <div class="summary-row"><span>Frais de livraison</span> <span id="cart-delivery">1 000 FCFA</span></div>
             <div class="summary-row total"><span>Total</span> <span id="cart-total">0 FCFA</span></div>
             <button class="btn btn-primary btn-block" style="margin-top:1.5rem">Passer à la caisse</button>
         </div>

@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initCartSidebar() {
-    const cartBtns = document.querySelectorAll('.btn-cart');
+    const cartBtns = document.querySelectorAll('.btn-cart, .btn-cart-nav, #cart-trigger');
     const closeBtn = document.getElementById('close-cart');
     const sidebar = document.getElementById('cart-sidebar');
     const overlay = document.getElementById('overlay');
@@ -120,6 +120,10 @@ function updateCartUI() {
     
     if(cartSubtotal) cartSubtotal.textContent = `${subtotal.toLocaleString()} FCFA`;
     
+    const deliveryEl = document.getElementById('cart-delivery');
+    const deliveryFee = subtotal > 0 ? 1000 : 0;
+    if(deliveryEl) deliveryEl.textContent = `${deliveryFee.toLocaleString()} FCFA`;
+
     // Checkout Button Logic
     if(checkoutBtn) {
         checkoutBtn.onclick = () => {
@@ -151,14 +155,16 @@ function updateCartUI() {
                 }
                 
                 discountRow.innerHTML = `<span>Réduction Fidélité (${reductionPercent}%)</span> <span>-${discount.toLocaleString()} FCFA</span>`;
-                const finalTotal = subtotal - discount + 1000;
+                const finalTotal = subtotal - discount + deliveryFee;
                 if(cartTotal) cartTotal.textContent = `${finalTotal.toLocaleString()} FCFA`;
             } else {
-                if(cartTotal) cartTotal.textContent = `${(subtotal + 1000).toLocaleString()} FCFA`;
+                if(cartTotal) cartTotal.textContent = `${(subtotal + deliveryFee).toLocaleString()} FCFA`;
             }
         });
     } else {
-        if(cartTotal) cartTotal.textContent = `${subtotal > 0 ? (subtotal + 1000).toLocaleString() : 0} FCFA`;
+        if(cartTotal) cartTotal.textContent = `${(subtotal + deliveryFee).toLocaleString()} FCFA`;
+        const discRow = document.getElementById('cart-discount-row');
+        if(discRow) discRow.remove();
     }
 }
 

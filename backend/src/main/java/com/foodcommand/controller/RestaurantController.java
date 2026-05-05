@@ -63,6 +63,18 @@ public class RestaurantController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping
+    public ResponseEntity<Restaurant> createRestaurant(@RequestBody Restaurant restaurant) {
+        org.springframework.security.core.userdetails.UserDetails userDetails = 
+            (org.springframework.security.core.userdetails.UserDetails) org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        
+        restaurant.setOwner(user);
+        if (restaurant.getRating() == null) restaurant.setRating(4.0);
+        
+        return ResponseEntity.ok(restaurantRepository.save(restaurant));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> registerRestaurant(@RequestBody RestaurantRegisterRequest request) {
         try {
@@ -95,15 +107,15 @@ public class RestaurantController {
 
             user = userRepository.save(user);
 
-            // 2. Créer le restaurant
-            Restaurant restaurant = Restaurant.builder()
-                    .name(request.getName())
-                    .address(request.getAddress())
-                    .description(request.getCuisineType())
-                    .rating(4.0)
-                    .deliveryTime("30-45 min")
-                    .owner(user)
-                    .build();
+            // 2. Créer ou mettre à jour le restaurant
+            Restaurant restaurant = restaurantRepository.findByOwnerId(user.getId()).orElse(new Restaurant());
+            restaurant.setName(request.getName());
+            restaurant.setAddress(request.getAddress());
+            restaurant.setDescription(request.getCuisineType());
+            restaurant.setOwner(user);
+            
+            if (restaurant.getRating() == null) restaurant.setRating(4.0);
+            if (restaurant.getDeliveryTime() == null) restaurant.setDeliveryTime("30-45 min");
 
             restaurantRepository.save(restaurant);
             return ResponseEntity.ok("Restaurant enregistré avec succès !");

@@ -48,6 +48,14 @@ async function initUserProfile() {
                     if (dropName) dropName.textContent = user.fullName;
                     if (dropEmail) dropEmail.textContent = user.email;
 
+                    // Update Avatar
+                    const avatarImg = document.getElementById('user-avatar');
+                    if (avatarImg && user.profileImageUrl) {
+                        avatarImg.src = user.profileImageUrl;
+                    } else if (avatarImg) {
+                        avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=FF5A5F&color=fff`;
+                    }
+
                     // Update Navbar links based on role
                     updateNavbarByRole(user.role);
                 }
@@ -116,6 +124,24 @@ function updateNavbarByRole(role) {
             profileDropdown.insertBefore(hr, logoutBtn);
             profileDropdown.insertBefore(courierLink, logoutBtn);
         }
+    } else if (role === 'ADMIN') {
+        if (cartBtn) cartBtn.style.display = 'none';
+        const cartBadges = document.querySelectorAll('.cart-badge');
+        cartBadges.forEach(b => b.style.display = 'none');
+
+        if (profileDropdown) {
+            const hr = document.createElement('hr');
+            const adminLink = document.createElement('a');
+            adminLink.id = 'role-link';
+            adminLink.href = isSubPage ? 'super-admin.html' : 'pages/super-admin.html';
+            adminLink.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Console Admin';
+            adminLink.style.color = '#3b82f6';
+            adminLink.style.fontWeight = 'bold';
+            
+            const logoutBtn = document.getElementById('btn-logout');
+            profileDropdown.insertBefore(hr, logoutBtn);
+            profileDropdown.insertBefore(adminLink, logoutBtn);
+        }
     }
 }
 
@@ -126,16 +152,18 @@ function checkRoleAccess() {
     // Page lists
     const courierPages = ['courier-dashboard.html'];
     const restaurantPages = ['admin.html'];
+    const adminPages = ['super-admin.html'];
     const clientPages = ['checkout.html', 'tracking.html'];
     const authPages = ['auth.html', 'courier-login.html'];
 
     const isCourierPage = courierPages.some(p => path.endsWith(p));
     const isRestaurantPage = restaurantPages.some(p => path.endsWith(p));
+    const isAdminPage = adminPages.some(p => path.endsWith(p));
     const isClientPage = clientPages.some(p => path.endsWith(p));
     const isAuthPage = authPages.some(p => path.endsWith(p));
 
     if (!userRole) {
-        if (isCourierPage || isRestaurantPage || isClientPage) {
+        if (isCourierPage || isRestaurantPage || isClientPage || isAdminPage) {
             window.location.href = path.includes('/pages/') ? 'auth.html' : 'pages/auth.html';
         }
         return;
@@ -147,12 +175,11 @@ function checkRoleAccess() {
         return;
     }
 
-    if (isCourierPage && userRole !== 'COURIER') {
+    if (isAdminPage && userRole !== 'ADMIN') {
         window.location.href = path.includes('/pages/') ? 'auth.html' : 'pages/auth.html';
     } else if (isRestaurantPage && userRole !== 'RESTAURANT') {
         window.location.href = path.includes('/pages/') ? 'auth.html' : 'pages/auth.html';
-    } else if (isClientPage && userRole === 'RESTAURANT') {
-        // Restaurants shouldn't order?
-        // window.location.href = 'admin.html';
+    } else if (isCourierPage && userRole !== 'COURIER') {
+        window.location.href = path.includes('/pages/') ? 'auth.html' : 'pages/auth.html';
     }
 }
