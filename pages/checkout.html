@@ -285,7 +285,7 @@
         async function confirmOrder() {
             if (cart.length === 0) return alert('Votre panier est vide !');
             
-            const token = localStorage.getItem('user_token');
+            const token = sessionStorage.getItem('user_token');
             if (!token) {
                 alert('Veuillez vous connecter pour passer commande.');
                 window.location.href = 'auth.html';
@@ -316,7 +316,7 @@
                 const savedOrder = await api.placeOrder(orderData);
                 
                 // Vider le panier après succès
-                localStorage.removeItem('food_saas_cart');
+                sessionStorage.removeItem('food_saas_cart');
                 
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> Commande validée !';
                 btn.style.background = '#059669';

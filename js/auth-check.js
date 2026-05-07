@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function initUserProfile() {
     const container = document.getElementById('user-profile-container');
     const btnLogin = document.getElementById('btn-login');
-    const token = localStorage.getItem('user_token');
+    const token = sessionStorage.getItem('user_token');
 
     if (token) {
         if (container) container.style.display = 'flex';
@@ -32,7 +32,7 @@ async function initUserProfile() {
             btnLogout.onclick = (e) => {
                 e.preventDefault();
                 api.clearAuthSession();
-                localStorage.removeItem('food_saas_cart');
+                sessionStorage.removeItem('food_saas_cart');
                 const isSubPage = window.location.pathname.includes('/pages/');
                 window.location.href = isSubPage ? '../index.html' : 'index.html';
             };
@@ -147,7 +147,7 @@ function updateNavbarByRole(role) {
 
 function checkRoleAccess() {
     const path = window.location.pathname;
-    const userRole = localStorage.getItem('user_role'); // Assuming role is stored in localStorage after login
+    const userRole = sessionStorage.getItem('user_role'); // Assuming role is stored in sessionStorage after login
 
     // Page lists
     const courierPages = ['courier-dashboard.html'];

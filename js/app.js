@@ -271,7 +271,7 @@ async function renderActiveOrders() {
     const grid = document.getElementById('active-orders-grid');
     if (!section || !grid) return;
 
-    const token = localStorage.getItem('user_token');
+    const token = sessionStorage.getItem('user_token');
     if (!token) return;
 
     try {

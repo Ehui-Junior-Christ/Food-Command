@@ -84,6 +84,11 @@ public class OrderController {
         // Notification WebSocket
         messagingTemplate.convertAndSend("/topic/order/" + id, saved);
         
+        // Si la commande est prête pour livraison, on notifie les livreurs
+        if ("ACCEPTED".equals(status)) {
+            messagingTemplate.convertAndSend("/topic/available-orders", saved);
+        }
+        
         return saved;
     }
 

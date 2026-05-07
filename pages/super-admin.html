@@ -459,7 +459,7 @@
 
         // Initial load
         document.addEventListener('DOMContentLoaded', () => {
-            const role = localStorage.getItem('user_role');
+            const role = sessionStorage.getItem('user_role');
             if(role !== 'ADMIN') {
                 window.location.href = '../index.html';
                 return;

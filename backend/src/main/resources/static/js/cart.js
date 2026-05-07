@@ -1,5 +1,5 @@
-// Cart Logic Management with LocalStorage
-let cart = JSON.parse(localStorage.getItem('food_saas_cart')) || [];
+// Cart Logic Management with SessionStorage
+let cart = JSON.parse(sessionStorage.getItem('food_saas_cart')) || [];
 
 document.addEventListener('DOMContentLoaded', () => {
     initCartSidebar();
@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initCartSidebar() {
-    const cartBtns = document.querySelectorAll('.btn-cart');
+    const cartBtns = document.querySelectorAll('.btn-cart, .btn-cart-nav');
     const closeBtn = document.getElementById('close-cart');
     const sidebar = document.getElementById('cart-sidebar');
     const overlay = document.getElementById('overlay');
@@ -23,12 +23,20 @@ function initCartSidebar() {
     if(overlay) overlay.addEventListener('click', toggleCart);
 }
 
-function addToCart(id, name, price, image) {
+function addToCart(id, name, price, image, restaurantId, restaurantName) {
+    const userStr = sessionStorage.getItem('currentUser');
+    if (userStr) {
+        const user = JSON.parse(userStr);
+        if (user.role && user.role.toUpperCase() === 'RESTAURANT') {
+            return showToast("Les restaurateurs ne peuvent pas commander.");
+        }
+    }
+
     const existingItem = cart.find(i => i.id === id);
     if(existingItem) {
         existingItem.quantity += 1;
     } else {
-        cart.push({ id, name, price, image, quantity: 1 });
+        cart.push({ id, name, price, image, quantity: 1, restaurantId, restaurantName });
     }
     
     saveCart();
@@ -57,7 +65,7 @@ function updateQty(id, delta) {
 }
 
 function saveCart() {
-    localStorage.setItem('food_saas_cart', JSON.stringify(cart));
+    sessionStorage.setItem('food_saas_cart', JSON.stringify(cart));
 }
 
 function updateCartUI() {
@@ -85,15 +93,15 @@ function updateCartUI() {
             cartItemsContainer.innerHTML = '<div style="text-align:center; padding:3rem 1rem; color:var(--text-muted)"><i class="fa-solid fa-basket-shopping" style="font-size:3rem; margin-bottom:1rem; opacity:0.5;"></i><br>Votre panier est vide</div>';
         } else {
             cartItemsContainer.innerHTML = cart.map(item => `
-                <div class="cart-item">
-                    <img src="${item.image}" alt="${item.name}" class="cart-item-img">
-                    <div class="cart-item-info">
-                        <div class="cart-item-title">${item.name}</div>
-                        <div class="cart-item-price">${item.price.toLocaleString()} FCFA</div>
-                        <div class="qty-controls">
-                            <button class="qty-btn" onclick="updateQty('${item.id}', -1)"><i class="fa-solid fa-minus" style="font-size:0.6rem"></i></button>
+                <div class="cart-item" style="display: flex; gap: 15px; margin-bottom: 1.5rem; align-items: center;">
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-img" style="width: 60px; height: 60px; border-radius: 12px; object-fit: cover;">
+                    <div class="cart-item-info" style="flex: 1;">
+                        <div class="cart-item-title" style="font-weight: 600; font-family: 'Outfit';">${item.name}</div>
+                        <div class="cart-item-price" style="font-size: 0.9rem; color: var(--primary);">${item.price.toLocaleString()} FCFA</div>
+                        <div class="qty-controls" style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                            <button class="qty-btn" onclick="updateQty('${item.id}', -1)" style="width: 25px; height: 25px; border-radius: 50%; border: 1px solid #ddd; background: white; cursor: pointer;"><i class="fa-solid fa-minus" style="font-size:0.6rem"></i></button>
                             <span style="min-width: 20px; text-align:center; font-weight:600;">${item.quantity}</span>
-                            <button class="qty-btn" onclick="updateQty('${item.id}', 1)"><i class="fa-solid fa-plus" style="font-size:0.6rem"></i></button>
+                            <button class="qty-btn" onclick="updateQty('${item.id}', 1)" style="width: 25px; height: 25px; border-radius: 50%; border: 1px solid #ddd; background: white; cursor: pointer;"><i class="fa-solid fa-plus" style="font-size:0.6rem"></i></button>
                         </div>
                     </div>
                 </div>
@@ -114,7 +122,7 @@ function updateCartUI() {
 
     // Loyalty Discount logic
     let discount = 0;
-    const token = localStorage.getItem('user_token');
+    const token = sessionStorage.getItem('user_token');
     
     if (token && subtotal > 0) {
         api.getCurrentUser().then(user => {

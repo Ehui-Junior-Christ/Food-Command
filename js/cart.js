@@ -1,5 +1,5 @@
 // Cart Logic Management with LocalStorage
-let cart = JSON.parse(localStorage.getItem('food_saas_cart')) || [];
+let cart = JSON.parse(sessionStorage.getItem('food_saas_cart')) || [];
 
 document.addEventListener('DOMContentLoaded', () => {
     initCartSidebar();
@@ -24,7 +24,7 @@ function initCartSidebar() {
 }
 
 function addToCart(id, name, price, image, restaurantId, restaurantName) {
-    const userStr = localStorage.getItem('currentUser');
+    const userStr = sessionStorage.getItem('currentUser');
     if (userStr) {
         const user = JSON.parse(userStr);
         if (user.role && user.role.toUpperCase() === 'RESTAURANT') {
@@ -74,7 +74,7 @@ function updateQty(id, delta) {
 }
 
 function saveCart() {
-    localStorage.setItem('food_saas_cart', JSON.stringify(cart));
+    sessionStorage.setItem('food_saas_cart', JSON.stringify(cart));
 }
 
 function updateCartUI() {
@@ -135,7 +135,7 @@ function updateCartUI() {
 
     // Loyalty Discount logic
     let discount = 0;
-    const token = localStorage.getItem('user_token');
+    const token = sessionStorage.getItem('user_token');
     
     if (token && subtotal > 0) {
         api.getCurrentUser().then(user => {

@@ -1082,7 +1082,7 @@
 
         // INITIALIZATION
         document.addEventListener('DOMContentLoaded', async () => {
-            const userStr = localStorage.getItem('currentUser');
+            const userStr = sessionStorage.getItem('currentUser');
             if(!userStr) { window.location.href = 'auth.html'; return; }
 
             const user = JSON.parse(userStr);
@@ -1090,7 +1090,7 @@
             document.getElementById('admin-welcome').innerText = baseGreeting;
             
             try {
-                const userId = user.id || localStorage.getItem('user_id');
+                const userId = user.id || sessionStorage.getItem('user_id');
                 if (!userId) throw new Error("ID utilisateur manquant");
 
                 currentRestaurant = await api.getRestaurantByOwner(userId);

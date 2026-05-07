@@ -305,6 +305,9 @@
                     <div class="role-tab" onclick="setRole('RESTAURANT', this)">
                         <i class="fa-solid fa-shop"></i> Restaurant
                     </div>
+                    <div class="role-tab" onclick="setRole('COURIER', this)">
+                        <i class="fa-solid fa-person-biking"></i> Livreur
+                    </div>
                     <div class="role-tab" onclick="setRole('ADMIN', this)" style="display: none;" id="admin-role-tab">
                         <i class="fa-solid fa-shield"></i> Admin
                     </div>
@@ -518,11 +521,12 @@
                         throw new Error(`Accès refusé. Ce compte n'a pas le rôle ${currentRole}.`);
                     }
 
-                    localStorage.setItem('currentUser', JSON.stringify(data));
+                    sessionStorage.setItem('currentUser', JSON.stringify(data));
                     
                     // Redirection
                     if (data.role === 'CLIENT') window.location.href = 'profile.html';
                     else if (data.role === 'RESTAURANT') window.location.href = 'admin.html';
+                    else if (data.role === 'DELIVERY' || data.role === 'COURIER') window.location.href = 'delivery.html';
                     else if (data.role === 'ADMIN') window.location.href = 'super-admin.html';
                     else window.location.href = '../index.html';
                 }

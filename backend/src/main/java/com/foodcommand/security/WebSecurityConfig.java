@@ -57,11 +57,20 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http.cors(cors -> cors.configurationSource(request -> {
+                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfiguration.setAllowedOriginPatterns(java.util.List.of("*"));
+                    corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                    corsConfiguration.setAllowCredentials(true);
+                    return corsConfiguration;
+                }))
+                .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
+                        auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
                                 .requestMatchers(HttpMethod.PUT, "/api/auth/me").authenticated()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/test/**").permitAll()
@@ -70,9 +79,11 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/categories/**").permitAll()
                                 .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/assets/**", "/pages/**").permitAll()
                                 .requestMatchers("/favicon.ico").permitAll()
+                                .requestMatchers("/ws-tracking/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/client/search").permitAll()
-                                .requestMatchers("/api/client/**").hasRole("CLIENT")
+                                 .requestMatchers("/api/client/**").hasRole("CLIENT")
+                                .requestMatchers("/api/delivery/**").hasAnyRole("DELIVERY", "COURIER")
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )

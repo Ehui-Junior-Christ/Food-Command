@@ -310,7 +310,7 @@
                         method: 'PUT',
                         headers: { 
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('user_token')}`
+                            'Authorization': `Bearer ${sessionStorage.getItem('user_token')}`
                         },
                         body: JSON.stringify(updatedData)
                     });

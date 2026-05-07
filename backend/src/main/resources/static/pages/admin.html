@@ -310,7 +310,7 @@
 
         // Initialize with user data
         document.addEventListener('DOMContentLoaded', () => {
-            const userStr = localStorage.getItem('currentUser');
+            const userStr = sessionStorage.getItem('currentUser');
             if(userStr) {
                 const user = JSON.parse(userStr);
                 if(user.role === 'restaurant') {

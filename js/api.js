@@ -27,7 +27,11 @@ const api = {
             ...options.headers
         };
 
-        if (token && token !== 'null' && token !== 'undefined') {
+        // Ne pas envoyer de token pour les routes d'authentification publiques
+        const isAuthRoute = endpoint.includes('/auth/signin') || endpoint.includes('/auth/signup');
+        const isPublicGet = options.method === 'GET' && (endpoint.includes('/restaurants') || endpoint.includes('/menu-items'));
+
+        if (token && !isAuthRoute && !isPublicGet && token !== 'null' && token !== 'undefined') {
             headers['Authorization'] = `Bearer ${token}`;
         }
 
@@ -219,48 +223,48 @@ const api = {
     },
 
     setAuthSession(data) {
-        if (data.token) localStorage.setItem('user_token', data.token);
-        if (data.id) localStorage.setItem('user_id', data.id);
-        if (data.email) localStorage.setItem('user_email', data.email);
-        if (data.role) localStorage.setItem('user_role', data.role);
-        if (data.fullName) localStorage.setItem('user_name', data.fullName);
-        localStorage.setItem('currentUser', JSON.stringify(data));
+        if (data.token) sessionStorage.setItem('user_token', data.token);
+        if (data.id) sessionStorage.setItem('user_id', data.id);
+        if (data.email) sessionStorage.setItem('user_email', data.email);
+        if (data.role) sessionStorage.setItem('user_role', data.role);
+        if (data.fullName) sessionStorage.setItem('user_name', data.fullName);
+        sessionStorage.setItem('currentUser', JSON.stringify(data));
     },
 
     clearAuthSession() {
-        localStorage.removeItem('user_token');
-        localStorage.removeItem('user_email');
-        localStorage.removeItem('user_role');
-        localStorage.removeItem('user_name');
-        localStorage.removeItem('user_avatar');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('currentUser');
+        sessionStorage.removeItem('user_token');
+        sessionStorage.removeItem('user_email');
+        sessionStorage.removeItem('user_role');
+        sessionStorage.removeItem('user_name');
+        sessionStorage.removeItem('user_avatar');
+        sessionStorage.removeItem('user_id');
+        sessionStorage.removeItem('currentUser');
     },
 
     getAuthToken() {
-        return localStorage.getItem('user_token');
+        return sessionStorage.getItem('user_token');
     },
 
     rememberUser(user) {
         if (!user) return;
-        if (user.email) localStorage.setItem('user_email', user.email);
-        if (user.role) localStorage.setItem('user_role', user.role);
-        if (user.fullName) localStorage.setItem('user_name', user.fullName);
-        if (user.profileImageUrl) localStorage.setItem('user_avatar', user.profileImageUrl);
-        if (user.id) localStorage.setItem('user_id', user.id);
+        if (user.email) sessionStorage.setItem('user_email', user.email);
+        if (user.role) sessionStorage.setItem('user_role', user.role);
+        if (user.fullName) sessionStorage.setItem('user_name', user.fullName);
+        if (user.profileImageUrl) sessionStorage.setItem('user_avatar', user.profileImageUrl);
+        if (user.id) sessionStorage.setItem('user_id', user.id);
     },
 
     getProfileImageUrl(user) {
         if (user && user.profileImageUrl) return user.profileImageUrl;
-        const name = (user && (user.fullName || user.email)) || localStorage.getItem('user_name') || 'User';
+        const name = (user && (user.fullName || user.email)) || sessionStorage.getItem('user_name') || 'User';
         return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=FF5A5F&color=fff`;
     },
 
     getLocalUser() {
-        const email = localStorage.getItem('user_email') || '';
-        const fullName = localStorage.getItem('user_name') || email || 'Utilisateur';
-        const role = localStorage.getItem('user_role') || '';
-        const profileImageUrl = localStorage.getItem('user_avatar') || '';
+        const email = sessionStorage.getItem('user_email') || '';
+        const fullName = sessionStorage.getItem('user_name') || email || 'Utilisateur';
+        const role = sessionStorage.getItem('user_role') || '';
+        const profileImageUrl = sessionStorage.getItem('user_avatar') || '';
         return { email, fullName, role, profileImageUrl };
     },
 
@@ -343,6 +347,41 @@ const api = {
         return response.json();
     },
 
+    // --- DELIVERY SPACE ---
+    async getDeliveryAvailableOrders() {
+        const response = await this.request('/delivery/orders/available');
+        if (!response.ok) return [];
+        return response.json();
+    },
+
+    async getMyDeliveries() {
+        const response = await this.request('/delivery/orders/my-deliveries');
+        if (!response.ok) return [];
+        return response.json();
+    },
+
+    async deliveryAcceptOrder(orderId) {
+        const response = await this.request(`/delivery/orders/${orderId}/accept`, {
+            method: 'POST'
+        });
+        if (!response.ok) throw new Error(await readError(response, 'Impossible d accepter cette commande'));
+        return response.json();
+    },
+
+    async deliveryMarkAsDelivered(orderId) {
+        const response = await this.request(`/delivery/orders/${orderId}/deliver`, {
+            method: 'POST'
+        });
+        if (!response.ok) throw new Error(await readError(response, 'Impossible de valider la livraison'));
+        return response.json();
+    },
+
+    async updateDeliveryLocation(orderId, lat, lng) {
+        return this.request(`/delivery/orders/${orderId}/location?lat=${lat}&lng=${lng}`, {
+            method: 'POST'
+        });
+    },
+
     // --- ADMIN SPECIFIC ---
     async getAdminStats() {
         const response = await this.request('/admin/stats');
@@ -384,8 +423,17 @@ const api = {
     url.searchParams.delete('token');
     window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
 
-    const homeUrl = window.location.origin && window.location.origin !== 'null'
-        ? `${window.location.origin}/index.html`
-        : 'index.html';
-    window.location.replace(homeUrl);
+    // If we are not already on index.html or root, redirect
+    if (!window.location.pathname.endsWith('index.html') && window.location.pathname !== '/') {
+        const homeUrl = window.location.origin && window.location.origin !== 'null'
+            ? `${window.location.origin}/index.html`
+            : 'index.html';
+        window.location.replace(homeUrl);
+    } else {
+        // If we are already on index.html, just force auth-check to run if possible,
+        // or let it run naturally since this script is evaluated before DOMContentLoaded
+        if (typeof initUserProfile === 'function') {
+            initUserProfile();
+        }
+    }
 })();

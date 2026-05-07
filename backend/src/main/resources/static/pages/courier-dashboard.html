@@ -237,7 +237,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const user = await api.getCurrentUser();
             if (!user || user.role !== 'COURIER') {
-                window.location.href = 'courier-login.html';
+                window.location.href = 'auth.html'; // Rediriger vers auth.html si pas connecté ou pas livreur
                 return;
             }
 
@@ -253,7 +253,7 @@
             switchBtn.addEventListener('change', (e) => {
                 if (e.target.checked) {
                     statusText.innerText = 'En ligne - Prêt à livrer';
-                    statusText.style.color = 'var(--secondary)';
+                    statusText.style.color = '#00D1C1';
                     liveIndicator.style.display = 'inline-flex';
                     loadOrders();
                     startLocationTracking();
@@ -302,13 +302,13 @@
                 if (!map) {
                     initMap();
                 } else {
-                    map.invalidateSize();
+                    setTimeout(() => map.invalidateSize(), 100);
                 }
             });
         });
 
         function initWebSocket() {
-            const socket = new SockJS('http://localhost:8080/ws-tracking');
+            const socket = new SockJS('/ws-tracking'); // Use relative URL for backend
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
                 console.log('Courier WebSocket Connected');
@@ -320,7 +320,7 @@
             ordersList.innerHTML = '<div style="text-align:center; padding: 2rem;"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><br><br>Recherche de commandes à proximité...</div>';
             
             try {
-                const orders = await api.getAvailableOrders();
+                const orders = await api.getDeliveryAvailableOrders();
                 if (orders.length === 0) {
                     ordersList.innerHTML = `
                         <div class="empty-state" style="text-align: center; padding: 4rem; background: white; border-radius: 20px;">
@@ -335,30 +335,30 @@
                         <div class="order-header">
                             <div>
                                 <span class="text-muted" style="font-size: 0.8rem;">#FS-${order.id}</span>
-                                <h3 style="margin-top: 0.2rem;">${order.restaurant?.name || 'Restaurant'}</h3>
+                                <h3 style="margin-top: 0.2rem; font-family:'Outfit';">${order.restaurant?.name || 'Restaurant'}</h3>
                             </div>
                             <div style="text-align: right;">
-                                <span class="badge" style="background: rgba(72,187,120,0.1); color: #2F855A; padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 700;">${order.totalAmount || 0} FCFA</span>
+                                <span class="badge" style="background: rgba(72,187,120,0.1); color: #2F855A; padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 700;">${order.totalAmount.toLocaleString() || 0} FCFA</span>
                             </div>
                         </div>
                         <div style="margin-bottom: 1.5rem;">
                             <div style="display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 0.8rem;">
                                 <i class="fa-solid fa-shop" style="color: var(--secondary); margin-top: 0.3rem;"></i>
                                 <div>
-                                    <p style="font-weight: 600; font-size: 0.9rem;">Restaurant</p>
-                                    <p class="text-muted" style="font-size: 0.85rem;">${order.restaurant?.address || 'Adresse restaurant'}</p>
+                                    <p style="font-weight: 600; font-size: 0.9rem; margin:0;">Restaurant</p>
+                                    <p class="text-muted" style="font-size: 0.85rem; margin:0;">${order.restaurant?.address || 'Adresse restaurant'}</p>
                                 </div>
                             </div>
                             <div style="display: flex; align-items: flex-start; gap: 0.8rem;">
                                 <i class="fa-solid fa-location-dot" style="color: var(--primary); margin-top: 0.3rem;"></i>
                                 <div>
-                                    <p style="font-weight: 600; font-size: 0.9rem;">Destination</p>
-                                    <p class="text-muted" style="font-size: 0.85rem;">Client (Marcory)</p>
+                                    <p style="font-weight: 600; font-size: 0.9rem; margin:0;">Destination</p>
+                                    <p class="text-muted" style="font-size: 0.85rem; margin:0;">${order.deliveryAddress || 'Client (Abidjan)'}</p>
                                 </div>
                             </div>
                         </div>
                         <div style="display: flex; gap: 1rem;">
-                            <button class="btn btn-secondary btn-block" style="flex: 2;" onclick="acceptOrder(${order.id})">Accepter la livraison</button>
+                            <button class="btn btn-secondary btn-block" style="flex: 2; background:var(--secondary); color:white;" onclick="acceptOrder(${order.id})">Accepter la livraison</button>
                             <button class="btn btn-outline" style="flex: 1;">Détails</button>
                         </div>
                     </div>
@@ -371,15 +371,13 @@
 
         async function acceptOrder(orderId) {
             try {
-                const order = await api.acceptOrder(orderId);
+                const order = await api.deliveryAcceptOrder(orderId);
                 currentActiveOrder = order;
                 alert('Commande acceptée ! Le client peut maintenant vous suivre.');
                 loadOrders(); // Refresh list
 
-                // Update map with destination if initialized
-                if (map) {
-                    updateDestinationOnMap();
-                }
+                // Automatically switch to map view
+                document.getElementById('nav-map').click();
             } catch (error) {
                 alert(error.message);
             }
@@ -401,7 +399,7 @@
         function updateDestinationOnMap() {
             if (!map || !currentActiveOrder) return;
             
-            // For demo, if coordinates are not provided, we mock a destination in Abidjan
+            // In real app, order would have dest_lat/dest_lng
             const destLat = currentActiveOrder.latitude || 5.345317;
             const destLng = currentActiveOrder.longitude || -4.024429;
 
@@ -421,7 +419,6 @@
                 destinationMarker.bindPopup("<b>Destination Client</b>").openPopup();
             }
             
-            // Adjust bounds if we have both markers
             if (courierMarker) {
                 const group = new L.featureGroup([courierMarker, destinationMarker]);
                 map.fitBounds(group.getBounds(), { padding: [50, 50] });
@@ -435,15 +432,9 @@
                 watchId = navigator.geolocation.watchPosition((position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
-                    console.log("Position:", lat, lng);
                     
                     if (stompClient && stompClient.connected && currentActiveOrder) {
-                        stompClient.send("/app/update-location", {}, JSON.stringify({
-                            orderId: currentActiveOrder.id,
-                            lat: lat,
-                            lng: lng,
-                            status: 'OUT_FOR_DELIVERY'
-                        }));
+                        api.updateDeliveryLocation(currentActiveOrder.id, lat, lng);
                     }
 
                     if (map) {
@@ -462,12 +453,10 @@
                             }).addTo(map);
                             courierMarker.bindPopup("<b>Votre Position</b>").openPopup();
                         }
-                        // Adjust bounds if we have both markers
+                        
                         if (destinationMarker) {
                             const group = new L.featureGroup([courierMarker, destinationMarker]);
                             map.fitBounds(group.getBounds(), { padding: [50, 50] });
-                        } else {
-                            map.setView([lat, lng], 14);
                         }
                     }
 
