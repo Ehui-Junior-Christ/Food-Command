@@ -140,4 +140,15 @@ public class AuthController {
         }
         return authentication.getName();
     }
+
+    @GetMapping("/social-login/{provider}")
+    public void socialLogin(@org.springframework.web.bind.annotation.PathVariable String provider, 
+                          @org.springframework.web.bind.annotation.RequestParam("redirect_url") String redirectUrl, 
+                          jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
+        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("frontend_url", redirectUrl);
+        cookie.setPath("/");
+        cookie.setMaxAge(3600);
+        response.addCookie(cookie);
+        response.sendRedirect("/oauth2/authorization/" + provider.toLowerCase());
+    }
 }

@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
@@ -26,6 +27,9 @@ public class WebSecurityConfig {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+
+    // Use Spring Security's built-in session-based OAuth2 authorization request repository
+    // This is more reliable than cookie-based serialization which breaks in Spring Boot 3.x
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -67,9 +71,11 @@ public class WebSecurityConfig {
                 }))
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                // OAuth2 callback paths - must be public
+                                .requestMatchers("/oauth2/**", "/login/oauth2/**", "/login/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/auth/me").authenticated()
                                 .requestMatchers(HttpMethod.PUT, "/api/auth/me").authenticated()
                                 .requestMatchers("/api/auth/**").permitAll()
@@ -82,13 +88,23 @@ public class WebSecurityConfig {
                                 .requestMatchers("/ws-tracking/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/client/search").permitAll()
-                                 .requestMatchers("/api/client/**").hasRole("CLIENT")
+                                .requestMatchers("/api/client/**").hasRole("CLIENT")
                                 .requestMatchers("/api/delivery/**").hasAnyRole("DELIVERY", "COURIER")
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .authorizationRequestRepository(new HttpSessionOAuth2AuthorizationRequestRepository())
+                        )
                         .successHandler(oauth2LoginSuccessHandler)
+                        .failureHandler((request, response, exception) -> {
+                            System.err.println("[OAuth2 FAILURE] " + exception.getClass().getName() + ": " + exception.getMessage());
+                            exception.printStackTrace();
+                            String errorMsg = exception.getMessage();
+                            if (errorMsg == null) errorMsg = "unknown_error";
+                            response.sendRedirect("/pages/auth.html?error=" + java.net.URLEncoder.encode(errorMsg, "UTF-8"));
+                        })
                 );
 
         http.authenticationProvider(authenticationProvider());

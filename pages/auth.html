@@ -412,6 +412,15 @@
         let currentRole = 'CLIENT';
         let currentMode = 'login';
 
+        // Check for error in URL from OAuth2 failure
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const errorMsg = params.get('error');
+            if (errorMsg) {
+                alert("Erreur de connexion Google : " + errorMsg);
+            }
+        });
+
         function setMode(mode) {
             currentMode = mode;
             document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
@@ -524,7 +533,7 @@
                     sessionStorage.setItem('currentUser', JSON.stringify(data));
                     
                     // Redirection
-                    if (data.role === 'CLIENT') window.location.href = 'profile.html';
+                    if (data.role === 'CLIENT') window.location.href = '../index.html';
                     else if (data.role === 'RESTAURANT') window.location.href = 'admin.html';
                     else if (data.role === 'DELIVERY' || data.role === 'COURIER') window.location.href = 'delivery.html';
                     else if (data.role === 'ADMIN') window.location.href = 'super-admin.html';
@@ -539,8 +548,10 @@
         };
 
         function handleSocial(provider) {
-            const baseUrl = 'http://localhost:8080/oauth2/authorization/';
-            window.location.href = baseUrl + provider.toLowerCase();
+            // Always redirect through the backend server origin (same origin as OAuth callback)
+            const backendOrigin = 'http://localhost:8080';
+            const targetHomeUrl = backendOrigin + '/index.html';
+            window.location.href = `${backendOrigin}/api/auth/social-login/${provider.toLowerCase()}?redirect_url=${encodeURIComponent(targetHomeUrl)}`;
         }
 
         function handleForgot() {

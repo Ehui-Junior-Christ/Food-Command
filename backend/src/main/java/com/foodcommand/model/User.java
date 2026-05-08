@@ -26,6 +26,7 @@ public class User {
     private String fullName;
     private String phone;
     private String address;
+    private String vehiclePlate;
     private Integer loyaltyPoints = 0;
 
     @Lob

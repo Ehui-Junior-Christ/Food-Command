@@ -98,6 +98,12 @@ const api = {
         return await response.json();
     },
 
+    async getRestaurantMenu(id) {
+        const response = await this.request(`/restaurants/${id}/menu`);
+        if (!response.ok) return [];
+        return await response.json();
+    },
+
     async getRestaurantStats(restaurantId) {
         const response = await this.request(`/restaurants/${restaurantId}/stats`);
         if (!response.ok) throw new Error('Erreur stats');
@@ -157,6 +163,12 @@ const api = {
     async getMyOrders() {
         const response = await this.request('/orders/my-orders');
         if (!response.ok) throw new Error('Impossible de charger vos commandes');
+        return await response.json();
+    },
+
+    async cancelOrder(id) {
+        const response = await this.request(`/orders/${id}/cancel`, { method: 'POST' });
+        if (!response.ok) throw new Error(await readError(response, 'Impossible d annuler la commande'));
         return await response.json();
     },
 
@@ -349,23 +361,17 @@ const api = {
 
     // --- DELIVERY SPACE ---
     async getDeliveryAvailableOrders() {
-        const response = await this.request('/delivery/orders/available');
-        if (!response.ok) return [];
-        return response.json();
+        return this.getAvailableOrders();
     },
 
     async getMyDeliveries() {
-        const response = await this.request('/delivery/orders/my-deliveries');
+        const response = await this.request('/orders/my-deliveries');
         if (!response.ok) return [];
         return response.json();
     },
 
     async deliveryAcceptOrder(orderId) {
-        const response = await this.request(`/delivery/orders/${orderId}/accept`, {
-            method: 'POST'
-        });
-        if (!response.ok) throw new Error(await readError(response, 'Impossible d accepter cette commande'));
-        return response.json();
+        return this.acceptOrder(orderId);
     },
 
     async deliveryMarkAsDelivered(orderId) {
@@ -419,21 +425,41 @@ const api = {
     const token = url.searchParams.get('token');
     if (!token) return;
 
-    api.setAuthSession({ token, role: 'CLIENT' });
+    // Extract all OAuth user data from the redirect URL
+    const oauthRole = url.searchParams.get('oauth_role') || 'CLIENT';
+    const oauthEmail = url.searchParams.get('oauth_email') || '';
+    const oauthName = url.searchParams.get('oauth_name') || '';
+    const oauthId = url.searchParams.get('oauth_id') || '';
+
+    // Store the session immediately
+    api.setAuthSession({
+        token,
+        role: oauthRole,
+        email: oauthEmail,
+        fullName: oauthName,
+        id: oauthId
+    });
+
+    // Clean all OAuth params from URL
     url.searchParams.delete('token');
+    url.searchParams.delete('oauth_role');
+    url.searchParams.delete('oauth_email');
+    url.searchParams.delete('oauth_name');
+    url.searchParams.delete('oauth_id');
     window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
 
-    // If we are not already on index.html or root, redirect
-    if (!window.location.pathname.endsWith('index.html') && window.location.pathname !== '/') {
-        const homeUrl = window.location.origin && window.location.origin !== 'null'
-            ? `${window.location.origin}/index.html`
-            : 'index.html';
-        window.location.replace(homeUrl);
-    } else {
-        // If we are already on index.html, just force auth-check to run if possible,
-        // or let it run naturally since this script is evaluated before DOMContentLoaded
-        if (typeof initUserProfile === 'function') {
-            initUserProfile();
-        }
+    // Fetch the full profile asynchronously
+    api.getCurrentUser().catch(() => {});
+
+    // Redirect to correct page based on role (only if not already there)
+    const path = window.location.pathname;
+    if (oauthRole === 'RESTAURANT' && !path.includes('admin.html')) {
+        window.location.replace('/pages/admin.html');
+    } else if ((oauthRole === 'DELIVERY' || oauthRole === 'COURIER') && !path.includes('delivery.html')) {
+        window.location.replace('/pages/delivery.html');
+    } else if (oauthRole === 'ADMIN' && !path.includes('super-admin.html')) {
+        window.location.replace('/pages/super-admin.html');
     }
+    // CLIENT stays on index.html - auth-check.js will update the UI via DOMContentLoaded
 })();
+

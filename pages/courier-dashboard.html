@@ -7,164 +7,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/styles.css">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { background-color: #F8FAFC; }
-        .courier-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            min-height: 100vh;
-        }
-        .sidebar {
-            background: white;
-            border-right: 1px solid #E2E8F0;
-            padding: 2rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-        }
-        .main-view {
-            padding: 2rem 3rem;
-            max-width: 1200px;
-        }
-        .status-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #F1F5F9;
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            margin-bottom: 2rem;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
-        }
+        .courier-layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+        .sidebar { background: white; border-right: 1px solid #E2E8F0; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem; position: sticky; top: 0; height: 100vh; }
+        .main-view { padding: 2rem 3rem; max-width: 1200px; }
+        .status-toggle { display: flex; align-items: center; justify-content: space-between; background: #F1F5F9; padding: 1rem; border-radius: 15px; margin-bottom: 2rem; }
+        
+        .order-card { background: white; border-radius: 20px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #E2E8F0; margin-bottom: 1.5rem; transition: 0.3s; }
+        .order-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #F1F5F9; padding-bottom: 0.75rem; }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .stat-item { background: white; padding: 1.5rem; border-radius: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border-bottom: 4px solid #FF9F43; }
+        
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; border-radius: 12px; color: #64748B; font-weight: 500; text-decoration: none; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,159,67,0.1); color: #FF9F43; }
+        
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px; width: 18px;
-            left: 4px; bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--secondary); }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #FF9F43; }
         input:checked + .slider:before { transform: translateX(24px); }
 
-        .order-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid #E2E8F0;
-            margin-bottom: 1.5rem;
-            transition: transform 0.2s;
-        }
-        .order-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            border-bottom: 1px solid #F1F5F9;
-            padding-bottom: 0.75rem;
-        }
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
-        }
-        .stat-item {
-            background: white;
-            padding: 1.5rem;
-            border-radius: var(--radius-lg);
-            text-align: center;
-            box-shadow: var(--shadow-sm);
-            border-bottom: 4px solid var(--secondary);
-        }
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.8rem 1rem;
-            border-radius: var(--radius-md);
-            color: var(--text-muted);
-            font-weight: 500;
-            transition: var(--transition);
-        }
-        .nav-item:hover, .nav-item.active {
-            background: rgba(255,159,67,0.1);
-            color: var(--secondary);
-        }
-        .badge-live {
-            background: #E6FCF5;
-            color: #099268;
-            padding: 0.2rem 0.6rem;
-            border-radius: 2rem;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-        .badge-live::before {
-            content: '';
-            width: 8px; height: 8px;
-            background: #099268;
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 0.4; }
-            50% { opacity: 1; }
-            100% { opacity: 0.4; }
-        }
+        .badge-live { background: #E6FCF5; color: #099268; padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .badge-live::before { content: ''; width: 8px; height: 8px; background: #099268; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
     </style>
 </head>
 <body>
     <div class="courier-layout">
         <aside class="sidebar">
-            <a href="../index.html" class="logo">
-                <i class="fa-solid fa-utensils"></i> Food-Command
-            </a>
-            
-            <div class="user-profile-summary" style="text-align: center; margin: 1rem 0;">
-                <img src="https://ui-avatars.com/api/?name=Livreur&background=FF9F43&color=fff" id="courier-avatar" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem; border: 3px solid #F1F5F9;">
+            <a href="../index.html" class="logo"><i class="fa-solid fa-utensils"></i> Food-Command</a>
+            <div style="text-align: center; margin: 1rem 0;">
+                <img src="" id="courier-avatar" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem; border: 3px solid #F1F5F9; object-fit: cover;">
                 <h3 id="courier-name">Chargement...</h3>
-                <p class="text-muted" id="courier-status-text" style="font-size: 0.9rem;">Indisponible</p>
+                <p id="courier-status-text" style="font-size: 0.9rem; color: #64748B;">Indisponible</p>
             </div>
-
             <nav style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1;">
-                <a href="#" class="nav-item active" id="nav-dashboard"><i class="fa-solid fa-house"></i> Tableau de bord</a>
-                <a href="#" class="nav-item" id="nav-map"><i class="fa-solid fa-map-location-dot"></i> Carte & Itinéraire</a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-wallet"></i> Mes Gains</a>
-                <a href="#" class="nav-item"><i class="fa-solid fa-user-gear"></i> Paramètres</a>
+                <a href="#" class="nav-item active" onclick="switchView('dashboard')"><i class="fa-solid fa-house"></i> Tableau de bord</a>
+                <a href="#" class="nav-item" onclick="switchView('map')"><i class="fa-solid fa-map-location-dot"></i> Carte & Itinéraire</a>
+                <a href="#" class="nav-item" onclick="switchView('profile')"><i class="fa-solid fa-user-gear"></i> Mon Profil</a>
             </nav>
-
-            <a href="#" id="logout-btn" class="nav-item" style="color: var(--primary); margin-top: auto;">
-                <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
-            </a>
+            <a href="#" onclick="logout()" class="nav-item" style="color: #FF5A5F;"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
         </aside>
 
-        <main class="main-view" id="dashboard-view">
+        <main class="main-view" id="view-dashboard">
             <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
                 <div>
                     <h1>Bonjour, <span id="welcome-name">Livreur</span> !</h1>
@@ -180,309 +70,177 @@
             </header>
 
             <div class="stat-grid">
-                <div class="stat-item">
-                    <div class="text-muted" style="font-size: 0.9rem; margin-bottom: 0.5rem;">Livraisons aujourd'hui</div>
-                    <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">0</div>
-                </div>
-                <div class="stat-item">
-                    <div class="text-muted" style="font-size: 0.9rem; margin-bottom: 0.5rem;">Gains estimés</div>
-                    <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">0 FCFA</div>
-                </div>
-                <div class="stat-item">
-                    <div class="text-muted" style="font-size: 0.9rem; margin-bottom: 0.5rem;">Note globale</div>
-                    <div style="font-size: 2rem; font-weight: 700; color: var(--text-main);">4.9 <i class="fa-solid fa-star" style="font-size: 1.2rem; color: #FFD700;"></i></div>
-                </div>
+                <div class="stat-item"><div>Livraisons</div><div style="font-size: 2rem; font-weight: 700;">0</div></div>
+                <div class="stat-item"><div>Gains</div><div style="font-size: 2rem; font-weight: 700;">0 FCFA</div></div>
+                <div class="stat-item"><div>Note</div><div style="font-size: 2rem; font-weight: 700;">4.9 ★</div></div>
             </div>
 
-            <section id="available-orders">
+            <section>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <h2>Commandes disponibles</h2>
-                    <div class="badge-live" id="live-indicator" style="display: none;">Recherche en cours</div>
+                    <div class="badge-live" id="live-indicator" style="display: none;">En direct</div>
                 </div>
-                
                 <div id="orders-list">
-                    <div class="empty-state" style="text-align: center; padding: 4rem; background: white; border-radius: 20px; border: 2px dashed #E2E8F0;">
-                        <i class="fa-solid fa-motorcycle" style="font-size: 3.5rem; color: #CBD5E0; margin-bottom: 1.5rem;"></i>
+                    <div style="text-align: center; padding: 4rem; background: white; border-radius: 20px; border: 2px dashed #E2E8F0;">
+                        <i class="fa-solid fa-motorcycle" style="font-size: 3rem; color: #CBD5E0; margin-bottom: 1rem;"></i>
                         <h3>Vous êtes hors ligne</h3>
-                        <p class="text-muted">Activez votre statut pour commencer à recevoir des commandes à proximité.</p>
+                        <p class="text-muted">Activez votre statut pour voir les commandes.</p>
                     </div>
                 </div>
             </section>
         </main>
 
-        <main class="main-view" id="map-view" style="display: none;">
-            <header style="margin-bottom: 1.5rem;">
-                <h1>Carte & Itinéraire</h1>
-                <p class="text-muted">Suivez votre trajet vers la destination de livraison</p>
+        <main class="main-view" id="view-map" style="display: none;">
+            <header style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <h1>Itinéraire de livraison</h1>
+                <button id="btn-complete" class="btn btn-primary" style="display: none; background: #059669;" onclick="finishDelivery()">
+                    <i class="fa-solid fa-check"></i> Marquer comme Livré
+                </button>
             </header>
-            <div id="courier-map" style="height: 600px; width: 100%; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); z-index: 1;"></div>
+            <div id="map" style="height: 600px; border-radius: 20px; z-index: 1;"></div>
+        </main>
+
+        <main class="main-view" id="view-profile" style="display: none;">
+            <h1>Mon Profil</h1>
+            <p>Gestion du véhicule et des informations personnelles.</p>
         </main>
     </div>
 
     <script src="../js/api.js"></script>
-    <script src="../js/auth-check.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
     <script>
-        let stompClient = null;
-        let currentActiveOrder = null;
+        let map, courierMarker, destMarker, stompClient;
+        let activeOrder = null;
         let watchId = null;
-        let map = null;
-        let courierMarker = null;
-        let destinationMarker = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
             const user = await api.getCurrentUser();
-            if (!user || user.role !== 'COURIER') {
-                window.location.href = 'courier-login.html';
-                return;
-            }
+            if (!user || user.role !== 'COURIER') return window.location.href = 'auth.html';
 
             document.getElementById('courier-name').innerText = user.fullName;
             document.getElementById('welcome-name').innerText = user.fullName.split(' ')[0];
-            
-            const switchBtn = document.getElementById('online-switch');
-            const statusText = document.getElementById('courier-status-text');
-            const liveIndicator = document.getElementById('live-indicator');
-            
-            initWebSocket();
+            document.getElementById('courier-avatar').src = api.getProfileImageUrl(user);
 
-            switchBtn.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    statusText.innerText = 'En ligne - Prêt à livrer';
-                    statusText.style.color = 'var(--secondary)';
-                    liveIndicator.style.display = 'inline-flex';
-                    loadOrders();
+            const onlineSwitch = document.getElementById('online-switch');
+            onlineSwitch.addEventListener('change', (e) => {
+                const isOnline = e.target.checked;
+                document.getElementById('courier-status-text').innerText = isOnline ? 'En ligne' : 'Indisponible';
+                document.getElementById('live-indicator').style.display = isOnline ? 'flex' : 'none';
+                if (isOnline) {
+                    loadAvailableOrders();
                     startLocationTracking();
                 } else {
-                    statusText.innerText = 'Indisponible';
-                    statusText.style.color = 'var(--text-muted)';
-                    liveIndicator.style.display = 'none';
                     stopLocationTracking();
-                    document.getElementById('orders-list').innerHTML = `
-                        <div class="empty-state" style="text-align: center; padding: 4rem; background: white; border-radius: 20px; border: 2px dashed #E2E8F0;">
-                            <i class="fa-solid fa-motorcycle" style="font-size: 3.5rem; color: #CBD5E0; margin-bottom: 1.5rem;"></i>
-                            <h3>Vous êtes hors ligne</h3>
-                            <p class="text-muted">Activez votre statut pour commencer à recevoir des commandes à proximité.</p>
-                        </div>
-                    `;
+                    document.getElementById('orders-list').innerHTML = '<p style="text-align:center; padding:2rem;">Passez en ligne pour recevoir des commandes.</p>';
                 }
             });
 
-            document.getElementById('logout-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                api.clearAuthSession();
-                window.location.href = '../index.html';
-            });
-
-            // Tabs navigation logic
-            const navDashboard = document.getElementById('nav-dashboard');
-            const navMap = document.getElementById('nav-map');
-            const viewDashboard = document.getElementById('dashboard-view');
-            const viewMap = document.getElementById('map-view');
-
-            navDashboard.addEventListener('click', (e) => {
-                e.preventDefault();
-                navDashboard.classList.add('active');
-                navMap.classList.remove('active');
-                viewDashboard.style.display = 'block';
-                viewMap.style.display = 'none';
-            });
-
-            navMap.addEventListener('click', (e) => {
-                e.preventDefault();
-                navMap.classList.add('active');
-                navDashboard.classList.remove('active');
-                viewDashboard.style.display = 'none';
-                viewMap.style.display = 'block';
-                
-                if (!map) {
-                    initMap();
-                } else {
-                    map.invalidateSize();
-                }
-            });
+            initWebSocket();
+            
+            // Vérifier s'il y a une livraison déjà en cours
+            const activeDeliveries = await api.getMyDeliveries();
+            if (activeDeliveries.length > 0) {
+                activeOrder = activeDeliveries[0];
+                document.getElementById('courier-status-text').innerText = 'En livraison...';
+                document.getElementById('online-switch').checked = true;
+                switchView('map');
+                document.getElementById('btn-complete').style.display = 'block';
+                startLocationTracking();
+            }
         });
 
-        function initWebSocket() {
-            const socket = new SockJS('http://localhost:8080/ws-tracking');
-            stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Courier WebSocket Connected');
-            });
-        }
-
-        async function loadOrders() {
-            const ordersList = document.getElementById('orders-list');
-            ordersList.innerHTML = '<div style="text-align:center; padding: 2rem;"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><br><br>Recherche de commandes à proximité...</div>';
-            
+        async function loadAvailableOrders() {
+            const list = document.getElementById('orders-list');
+            list.innerHTML = '<p style="text-align:center;">Recherche en cours...</p>';
             try {
-                const orders = await api.getAvailableOrders();
+                const orders = await api.getDeliveryAvailableOrders();
                 if (orders.length === 0) {
-                    ordersList.innerHTML = `
-                        <div class="empty-state" style="text-align: center; padding: 4rem; background: white; border-radius: 20px;">
-                            <p class="text-muted">Aucune commande disponible pour le moment.</p>
-                        </div>
-                    `;
+                    list.innerHTML = '<p style="text-align:center; padding:2rem; color:#64748B;">Aucune commande disponible pour le moment.</p>';
                     return;
                 }
-
-                ordersList.innerHTML = orders.map(order => `
+                list.innerHTML = orders.map(o => `
                     <div class="order-card">
                         <div class="order-header">
-                            <div>
-                                <span class="text-muted" style="font-size: 0.8rem;">#FS-${order.id}</span>
-                                <h3 style="margin-top: 0.2rem;">${order.restaurant?.name || 'Restaurant'}</h3>
-                            </div>
-                            <div style="text-align: right;">
-                                <span class="badge" style="background: rgba(72,187,120,0.1); color: #2F855A; padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 700;">${order.totalAmount || 0} FCFA</span>
-                            </div>
+                            <div><strong>#${o.id} - ${o.restaurant.name}</strong></div>
+                            <div style="color:var(--primary); font-weight:700;">${o.totalAmount} FCFA</div>
                         </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <div style="display: flex; align-items: flex-start; gap: 0.8rem; margin-bottom: 0.8rem;">
-                                <i class="fa-solid fa-shop" style="color: var(--secondary); margin-top: 0.3rem;"></i>
-                                <div>
-                                    <p style="font-weight: 600; font-size: 0.9rem;">Restaurant</p>
-                                    <p class="text-muted" style="font-size: 0.85rem;">${order.restaurant?.address || 'Adresse restaurant'}</p>
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: flex-start; gap: 0.8rem;">
-                                <i class="fa-solid fa-location-dot" style="color: var(--primary); margin-top: 0.3rem;"></i>
-                                <div>
-                                    <p style="font-weight: 600; font-size: 0.9rem;">Destination</p>
-                                    <p class="text-muted" style="font-size: 0.85rem;">Client (Marcory)</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 1rem;">
-                            <button class="btn btn-secondary btn-block" style="flex: 2;" onclick="acceptOrder(${order.id})">Accepter la livraison</button>
-                            <button class="btn btn-outline" style="flex: 1;">Détails</button>
-                        </div>
+                        <p style="font-size:0.9rem; color:#64748B;"><i class="fa-solid fa-location-dot"></i> ${o.deliveryAddress}</p>
+                        <button class="btn btn-secondary btn-block mt-1" onclick="acceptOrder(${o.id})">Accepter la livraison</button>
                     </div>
                 `).join('');
-            } catch (error) {
-                console.error("Load orders error:", error);
-                ordersList.innerHTML = '<p class="text-danger">Erreur lors du chargement des commandes.</p>';
-            }
+            } catch (e) { list.innerHTML = '<p>Erreur lors du chargement.</p>'; }
         }
 
-        async function acceptOrder(orderId) {
+        async function acceptOrder(id) {
             try {
-                const order = await api.acceptOrder(orderId);
-                currentActiveOrder = order;
-                alert('Commande acceptée ! Le client peut maintenant vous suivre.');
-                loadOrders(); // Refresh list
+                const order = await api.deliveryAcceptOrder(id);
+                activeOrder = order;
+                alert("Commande acceptée !");
+                switchView('map');
+                document.getElementById('btn-complete').style.display = 'block';
+            } catch (e) { alert(e.message); }
+        }
 
-                // Update map with destination if initialized
-                if (map) {
-                    updateDestinationOnMap();
-                }
-            } catch (error) {
-                alert(error.message);
+        async function finishDelivery() {
+            if (!activeOrder) return;
+            try {
+                await api.deliveryMarkAsDelivered(activeOrder.id);
+                alert("Livraison terminée !");
+                activeOrder = null;
+                document.getElementById('btn-complete').style.display = 'none';
+                switchView('dashboard');
+                loadAvailableOrders();
+            } catch (e) { alert(e.message); }
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.main-view').forEach(v => v.style.display = 'none');
+            document.getElementById('view-' + view).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (view === 'map') {
+                initMap();
+                setTimeout(() => map.invalidateSize(), 200);
             }
         }
 
         function initMap() {
-            // Centered on Abidjan by default
-            map = L.map('courier-map').setView([5.359951, -4.008256], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap'
+            if (map) return;
+            map = L.map('map').setView([5.3484, -3.9783], 13);
+            L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], attribution: '© Google Maps'
             }).addTo(map);
-
-            if (currentActiveOrder) {
-                updateDestinationOnMap();
-            }
-        }
-
-        function updateDestinationOnMap() {
-            if (!map || !currentActiveOrder) return;
-            
-            // For demo, if coordinates are not provided, we mock a destination in Abidjan
-            const destLat = currentActiveOrder.latitude || 5.345317;
-            const destLng = currentActiveOrder.longitude || -4.024429;
-
-            if (destinationMarker) {
-                destinationMarker.setLatLng([destLat, destLng]);
-            } else {
-                destinationMarker = L.marker([destLat, destLng], {
-                    icon: L.icon({
-                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowSize: [41, 41]
-                    })
-                }).addTo(map);
-                destinationMarker.bindPopup("<b>Destination Client</b>").openPopup();
-            }
-            
-            // Adjust bounds if we have both markers
-            if (courierMarker) {
-                const group = new L.featureGroup([courierMarker, destinationMarker]);
-                map.fitBounds(group.getBounds(), { padding: [50, 50] });
-            } else {
-                map.setView([destLat, destLng], 14);
-            }
         }
 
         function startLocationTracking() {
-            if ("geolocation" in navigator) {
-                watchId = navigator.geolocation.watchPosition((position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    console.log("Position:", lat, lng);
-                    
-                    if (stompClient && stompClient.connected && currentActiveOrder) {
-                        stompClient.send("/app/update-location", {}, JSON.stringify({
-                            orderId: currentActiveOrder.id,
-                            lat: lat,
-                            lng: lng,
-                            status: 'OUT_FOR_DELIVERY'
-                        }));
-                    }
-
-                    if (map) {
-                        if (courierMarker) {
-                            courierMarker.setLatLng([lat, lng]);
-                        } else {
-                            courierMarker = L.marker([lat, lng], {
-                                icon: L.icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                })
-                            }).addTo(map);
-                            courierMarker.bindPopup("<b>Votre Position</b>").openPopup();
-                        }
-                        // Adjust bounds if we have both markers
-                        if (destinationMarker) {
-                            const group = new L.featureGroup([courierMarker, destinationMarker]);
-                            map.fitBounds(group.getBounds(), { padding: [50, 50] });
-                        } else {
-                            map.setView([lat, lng], 14);
-                        }
-                    }
-
-                }, (error) => {
-                    console.error("Geolocation Error:", error);
-                }, { enableHighAccuracy: true });
-            }
+            if (!navigator.geolocation) return;
+            watchId = navigator.geolocation.watchPosition(pos => {
+                const lat = pos.coords.latitude, lng = pos.coords.longitude;
+                if (stompClient && stompClient.connected && activeOrder) {
+                    stompClient.send("/app/update-location", {}, JSON.stringify({
+                        orderId: activeOrder.id, lat: lat, lng: lng, status: 'OUT_FOR_DELIVERY'
+                    }));
+                }
+                if (map) {
+                    if (!courierMarker) courierMarker = L.marker([lat, lng]).addTo(map);
+                    else courierMarker.setLatLng([lat, lng]);
+                }
+            }, null, { enableHighAccuracy: true });
         }
 
-        function stopLocationTracking() {
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-            }
+        function stopLocationTracking() { if(watchId) navigator.geolocation.clearWatch(watchId); }
+
+        function initWebSocket() {
+            const socket = new SockJS('http://localhost:8080/ws-tracking');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null;
+            stompClient.connect({}, () => {
+                stompClient.subscribe('/topic/available-orders', () => loadAvailableOrders());
+            });
         }
+
+        function logout() { api.clearAuthSession(); window.location.href = '../index.html'; }
     </script>
 </body>
 </html>

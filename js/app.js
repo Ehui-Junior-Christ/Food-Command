@@ -89,29 +89,58 @@ function initNavbarScroller() {
     });
 }
 
+function setSearchCategory(cat) {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.value = cat;
+        // Déclencher manuellement l'événement input pour lancer la recherche
+        searchInput.dispatchEvent(new Event('input'));
+        // Scroller doucement vers les résultats
+        const target = document.getElementById('restaurants') || document.getElementById('active-orders-section');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
 function initSearchLogic() {
     const searchInput = document.getElementById('search-input');
+    const locationInput = document.getElementById('location-input');
     const searchBtn = document.getElementById('btn-search');
 
     const triggerSearch = async () => {
         const query = (searchInput?.value || '').trim();
+        const locationQuery = (locationInput?.value || '').trim();
+        
+        if (!query && !locationQuery) {
+            renderRestaurants();
+            return;
+        }
+
         const grid = document.getElementById('restaurants-grid');
         if (!grid) return;
 
         try {
+            // On peut filtrer localement ou via l'API. Utilisons l'API smartSearch.
             const results = await api.smartSearch(query, userCoords?.lat, userCoords?.lng);
             
-            if (results.length === 0) {
+            // Filtrage supplémentaire côté client pour la localisation si saisie
+            const filteredResults = locationQuery 
+                ? results.filter(item => 
+                    (item.address && item.address.toLowerCase().includes(locationQuery.toLowerCase())) ||
+                    (item.name && item.name.toLowerCase().includes(locationQuery.toLowerCase()))
+                  )
+                : results;
+
+            if (filteredResults.length === 0) {
                 grid.innerHTML = `
                     <div id="no-results-msg" style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
                         <i class="fa-solid fa-magnifying-glass" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.2;"></i>
-                        <p>Aucun résultat pour "${query}". Essayez un autre mot-clé.</p>
+                        <p>Aucun résultat pour "${query}" ${locationQuery ? 'à ' + locationQuery : ''}.</p>
                     </div>
                 `;
                 return;
             }
 
-            grid.innerHTML = results.map(item => `
+            grid.innerHTML = filteredResults.map(item => `
                 <div class="restaurant-card" onclick="handleSearchClick(${JSON.stringify(item).replace(/"/g, '&quot;')})">
                     <div class="rest-img">
                         <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836'}" alt="${item.name}">
@@ -142,7 +171,16 @@ function initSearchLogic() {
             timer = setTimeout(triggerSearch, 500);
         });
     }
-    if (searchBtn) searchBtn.addEventListener('click', triggerSearch);
+    if (locationInput) {
+        locationInput.addEventListener('input', () => {
+            clearTimeout(timer);
+            timer = setTimeout(triggerSearch, 500);
+        });
+    }
+    if (searchBtn) searchBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        triggerSearch();
+    });
 }
 
 

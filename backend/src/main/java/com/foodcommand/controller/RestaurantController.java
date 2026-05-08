@@ -56,6 +56,11 @@ public class RestaurantController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{id}/menu")
+    public List<com.foodcommand.model.MenuItem> getRestaurantMenu(@PathVariable Long id) {
+        return menuItemRepository.findByRestaurantId(id);
+    }
+
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<Restaurant> getByOwner(@PathVariable Long ownerId) {
         return restaurantRepository.findByOwnerId(ownerId)

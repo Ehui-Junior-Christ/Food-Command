@@ -453,11 +453,21 @@
                             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Téléphone</label>
                             <input type="tel" id="profile-phone" style="width: 100%; padding: 0.8rem; border-radius: 12px; border: 2px solid #f1f5f9;" placeholder="+225...">
                         </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Véhicule</label>
-                            <input type="text" value="Moto" style="width: 100%; padding: 0.8rem; border-radius: 12px; border: 2px solid #f1f5f9;" disabled>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div class="form-group" style="flex: 1;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Type de Véhicule</label>
+                                <select id="profile-vehicle-type" style="width: 100%; padding: 0.8rem; border-radius: 12px; border: 2px solid #f1f5f9; background: white;">
+                                    <option value="Moto">Moto</option>
+                                    <option value="Vélo">Vélo</option>
+                                    <option value="Voiture">Voiture</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Matricule du Véhicule</label>
+                                <input type="text" id="profile-plate" style="width: 100%; padding: 0.8rem; border-radius: 12px; border: 2px solid #f1f5f9;" placeholder="Ex: AA-123-BB">
+                            </div>
                         </div>
-                        <button type="submit" class="btn-accept" style="width: 100%;">Enregistrer les modifications</button>
+                        <button type="submit" class="btn-accept" style="width: 100%; padding: 1rem; font-size: 1rem;">Enregistrer les modifications</button>
                     </form>
                 </div>
             </section>
@@ -597,6 +607,7 @@
             if(id === 'settings' && currentUser) {
                 document.getElementById('profile-name').value = currentUser.fullName || '';
                 document.getElementById('profile-phone').value = currentUser.phone || '';
+                document.getElementById('profile-plate').value = currentUser.vehiclePlate || '';
                 if(currentUser.profileImageUrl) {
                     document.getElementById('profile-edit-avatar').src = currentUser.profileImageUrl;
                     document.getElementById('profile-pic-url').value = currentUser.profileImageUrl;
@@ -630,10 +641,11 @@
                 const data = {
                     fullName: document.getElementById('profile-name').value,
                     phone: document.getElementById('profile-phone').value,
+                    vehiclePlate: document.getElementById('profile-plate').value,
                     profileImageUrl: document.getElementById('profile-pic-url').value || null
                 };
                 currentUser = await api.updateCurrentUser(data);
-                showSuccess("Profil mis à jour avec succès !");
+                alert("Profil mis à jour avec succès !");
                 document.getElementById('welcome-msg').innerText = `Salut, ${currentUser.fullName || 'Livreur'}`;
                 if(currentUser.profileImageUrl) {
                     document.getElementById('user-avatar').src = currentUser.profileImageUrl;
@@ -643,6 +655,16 @@
             } finally {
                 btn.innerHTML = 'Enregistrer les modifications';
             }
+        }
+
+        async function navigateToClient(orderId) {
+            try {
+                const order = await api.getOrder(orderId);
+                if(order) {
+                    const destination = order.deliveryAddress || `${order.destinationLat},${order.destinationLng}`;
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`, '_blank');
+                }
+            } catch(e) { alert("Erreur lors de la récupération de la destination."); }
         }
 
         function renderAvailable(orders) {
@@ -673,7 +695,10 @@
                             <span><i class="fa-solid fa-money-bill"></i> Gain: 1,000 FCFA</span>
                         </div>
                     </div>
-                    <button class="btn-accept" onclick="acceptOrder(${o.id})">Accepter</button>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-accept" onclick="acceptOrder(${o.id})">Accepter</button>
+                        <button class="btn" style="background:#f1f5f9; color:#64748b; border-radius:12px; padding:0.8rem 1.5rem;" onclick="refuseAvailableOrder(${o.id}, this)">Refuser</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -782,12 +807,15 @@
                             <i class="fa-solid fa-user"></i> Client: ${o.client?.fullName || 'Client'}
                         </div>
                         <div class="delivery-address" style="margin-top:5px;">
-                            <i class="fa-solid fa-location-dot"></i> ${o.client?.address || 'Adresse client'}
+                            <i class="fa-solid fa-location-dot"></i> ${o.deliveryAddress || 'Adresse non spécifiée'}
                         </div>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         <span class="badge badge-delivering">En livraison</span>
-                        <button class="btn-deliver" onclick="markDelivered(${o.id})">Valider Livraison</button>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-accept" style="background:#1e293b; padding:0.8rem;" onclick="navigateToClient(${o.id})"><i class="fa-solid fa-location-arrow"></i> Naviguer</button>
+                            <button class="btn-deliver" onclick="markDelivered(${o.id})">Valider Livraison</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -847,6 +875,13 @@
         function logout() {
             api.clearAuthSession();
             window.location.href = 'auth.html';
+        }
+        function refuseAvailableOrder(id, btn) {
+            const card = btn.closest('.order-card');
+            card.style.opacity = '0';
+            card.style.transform = 'translateX(-20px)';
+            card.style.transition = '0.3s';
+            setTimeout(() => card.remove(), 300);
         }
     </script>
 </body>

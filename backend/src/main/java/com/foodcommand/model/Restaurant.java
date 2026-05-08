@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,7 @@ public class Restaurant {
     @com.fasterxml.jackson.annotation.JsonIgnore
     private User owner;
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
-    private List<MenuItem> menu;
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private List<MenuItem> menu = new ArrayList<>();
 }

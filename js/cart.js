@@ -62,11 +62,11 @@ function addToCart(id, name, price, image, restaurantId, restaurantName) {
 }
 
 function updateQty(id, delta) {
-    const item = cart.find(i => i.id === id);
+    const item = cart.find(i => String(i.id) === String(id));
     if(item) {
         item.quantity += delta;
         if(item.quantity <= 0) {
-            cart = cart.filter(i => i.id !== id);
+            cart = cart.filter(i => String(i.id) !== String(id));
         }
         saveCart();
         updateCartUI();

@@ -39,28 +39,115 @@
         .stat-value { display: block; font-size: 1.2rem; font-weight: 800; color: var(--primary); font-family: 'Outfit'; }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
 
+        .nav-link-btn {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: none;
+            background: none;
+            border-radius: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .nav-link-btn i { font-size: 1.1rem; }
+        .nav-link-btn:hover { background: #f8fafc; color: var(--primary); }
+        .nav-link-btn.active { background: var(--primary); color: white; box-shadow: 0 10px 20px rgba(255, 90, 95, 0.2); }
+
         /* Main Content Style */
         .main-card {
             background: white;
-            border-radius: 25px;
+            border-radius: 30px;
             padding: 3rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+            border: 1px solid #f1f5f9;
         }
 
-        .tabs-nav { display: flex; gap: 2rem; border-bottom: 2px solid #f0f2f5; margin-bottom: 2.5rem; }
-        .tab-link { padding: 1rem 0; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; transition: 0.3s; }
-        .tab-link.active { color: var(--primary); }
-        .tab-link.active::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 3px; background: var(--primary); border-radius: 10px; }
+        .section-title { font-family: 'Outfit'; font-size: 1.6rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 12px; color: #1e293b; }
+        .section-title i { color: var(--primary); }
 
-        .section-title { font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; }
-        .section-title i { color: var(--primary); background: #fff5f5; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
-
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .address-card { background: white; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .address-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
+        .order-row { padding: 1.2rem; border: 1px solid #f1f5f9; border-radius: 15px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .order-row:hover { background: #fbfcfd; border-color: #e2e8f0; }
+        .nav-link-btn.live-track {
+            color: #22c55e;
+            border: 1px dashed rgba(34, 197, 94, 0.3);
+            background: rgba(34, 197, 94, 0.05);
+            position: relative;
+        }
+        .nav-link-btn.live-track::after {
+            content: '';
+            position: absolute;
+            right: 15px;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
+        }
+        /* Enhanced Tracking UI */
+        .progress-track {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 0;
+            transform: translateY(-50%);
+            border-radius: 10px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 1s ease-in-out;
+            box-shadow: 0 0 15px rgba(255, 90, 95, 0.4);
+        }
+        .step-mini {
+            position: relative;
+            z-index: 1;
+            background: white !important;
+            border: 2px solid #e2e8f0;
+            transition: 0.4s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .step-mini.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 90, 95, 0.2);
+            opacity: 1 !important;
+            transform: scale(1.1);
+        }
+        .step-mini.completed {
+            background: var(--primary) !important;
+            border-color: var(--primary);
+            color: white !important;
+            opacity: 1 !important;
+        }
+        .step-mini.completed i { color: white !important; }
         
-        /* Addresses & Orders Mockup */
-        .address-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 15px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
-        .order-row { padding: 1rem 0; border-bottom: 1px solid #f0f2f5; display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: #e6fffa; color: #00a699; }
+        .pulse-marker {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            animation: marker-pulse 1.5s infinite;
+        }
+        @keyframes marker-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 90, 95, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 90, 95, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 90, 95, 0); }
+        }
 
         @media (max-width: 992px) {
             .dashboard-container { grid-template-columns: 1fr; }
@@ -77,124 +164,175 @@
 
     <div class="profile-wrapper">
         <div class="dashboard-container">
-            <!-- Sidebar -->
+            <!-- Sidebar: Identité & Fidélité -->
             <div class="sidebar-card">
                 <div class="avatar-section">
                     <img id="profile-preview" src="https://ui-avatars.com/api/?name=User&background=FF5A5F&color=fff" alt="Profile">
                     <label for="avatar-input" class="edit-overlay"><i class="fa-solid fa-camera"></i></label>
                     <input type="file" id="avatar-input" hidden accept="image/*">
                 </div>
-                <h2 id="sidebar-name" style="font-family:'Outfit'; margin-bottom: 0.5rem;">Utilisateur</h2>
-                <p id="sidebar-email" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:0.5rem;"></p>
-                <p id="sidebar-address" style="color:var(--primary); font-size:0.8rem; font-weight:600; margin-bottom:1.5rem;"></p>
+                <h2 id="sidebar-name" style="font-family:'Outfit'; margin-bottom: 0.2rem;">Utilisateur</h2>
+                <p id="sidebar-email" style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.5rem;"></p>
                 
-                <button class="btn btn-primary btn-sm btn-block" style="border-radius:12px;" onclick="document.getElementById('avatar-input').click()">Changer la photo</button>
-
-                <div class="user-stats">
-                    <div class="stat-item">
-                        <span class="stat-value">12</span>
-                        <span class="stat-label">Commandes</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value" id="loyalty-points">0</span>
-                        <span class="stat-label">Points</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value" id="loyalty-reduction">0%</span>
-                        <span class="stat-label">Remise</span>
+                <div style="background: #fff5f5; padding: 1.2rem; border-radius: 20px; border: 1px solid rgba(255, 90, 95, 0.1); margin-bottom: 2rem;">
+                    <div style="font-size: 0.75rem; color: var(--primary); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Programme Fidélité</div>
+                    <div style="display: flex; justify-content: space-around; align-items: center;">
+                        <div class="stat-item">
+                            <span class="stat-value" id="loyalty-points">0</span>
+                            <span class="stat-label">Points</span>
+                        </div>
+                        <div style="width: 1px; height: 30px; background: rgba(255, 90, 95, 0.2);"></div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="loyalty-reduction">0%</span>
+                            <span class="stat-label">Réduction</span>
+                        </div>
                     </div>
                 </div>
 
+                <nav style="display: flex; flex-direction: column; gap: 0.5rem; text-align: left;">
+                    <button class="nav-link-btn active" id="nav-info" onclick="switchTab('info')">
+                        <i class="fa-solid fa-user-circle"></i> Mon Profil
+                    </button>
+                    <button class="nav-link-btn" id="nav-orders" onclick="switchTab('orders')">
+                        <i class="fa-solid fa-receipt"></i> Mes Commandes
+                    </button>
+                    <button class="nav-link-btn" id="nav-address" onclick="switchTab('address')">
+                        <i class="fa-solid fa-location-arrow"></i> Mes Adresses
+                    </button>
+                    <button class="nav-link-btn" id="nav-tracking" style="display:none; color: var(--primary);" onclick="switchTab('tracking')">
+                        <i class="fa-solid fa-person-biking"></i> Suivi Livraison
+                    </button>
+                </nav>
+
                 <hr style="margin: 2rem 0; border: none; border-top: 1px solid #eee;">
-                <button class="btn btn-outline btn-sm btn-block" style="color:red; border-color:rgba(255,0,0,0.2)" onclick="handleLogout()">
-                    <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+                <button class="btn btn-outline btn-sm btn-block" style="color:#ef4444; border-color:rgba(239, 68, 68, 0.2); border-radius: 12px;" onclick="handleLogout()">
+                    <i class="fa-solid fa-power-off"></i> Déconnexion
                 </button>
             </div>
 
-            <!-- Main Content -->
+            <!-- Main Content Area -->
             <div class="main-card">
-                <div class="tabs-nav">
-                    <div class="tab-link active" onclick="switchTab('info')">Informations</div>
-                    <div class="tab-link" onclick="switchTab('orders')">Commandes</div>
-                    <div class="tab-link" onclick="switchTab('address')">Adresses</div>
-                </div>
-
                 <!-- Tab: Personal Info -->
                 <div id="tab-info" class="tab-content">
-                    <h3 class="section-title"><i class="fa-solid fa-user"></i> Mon Profil</h3>
+                    <h3 class="section-title"><i class="fa-solid fa-id-card"></i> Mes Informations Personnelles</h3>
+                    <p style="color: var(--text-muted); margin-top: -1.5rem; margin-bottom: 2rem; font-size: 0.9rem;">Mettez à jour vos informations pour une meilleure expérience de livraison.</p>
+                    
                     <form id="profile-form">
-                        <div class="info-grid">
-                            <div class="input-group-custom">
-                                <label>Nom Complet</label>
-                                <input type="text" id="fullname" class="form-control" required>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div class="form-group">
+                                <label class="form-label">Nom Complet</label>
+                                <input type="text" id="fullname" class="form-control" placeholder="Votre nom" required style="border-radius: 12px; padding: 0.8rem 1.2rem; background: #f8fafc;">
                             </div>
-                            <div class="input-group-custom">
-                                <label>Téléphone</label>
-                                <input type="tel" id="phone" class="form-control">
+                            <div class="form-group">
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" id="phone" class="form-control" placeholder="+225..." style="border-radius: 12px; padding: 0.8rem 1.2rem; background: #f8fafc;">
                             </div>
                         </div>
-                        <div class="input-group-custom" style="margin-top: 1rem;">
-                            <label>Email (Non modifiable)</label>
-                            <input type="email" id="email" class="form-control" disabled>
+                        <div class="form-group" style="margin-bottom: 2rem;">
+                            <label class="form-label">Adresse Email</label>
+                            <input type="email" id="email" class="form-control" disabled style="border-radius: 12px; padding: 0.8rem 1.2rem; background: #f1f5f9; cursor: not-allowed; opacity: 0.7;">
                         </div>
-                        <button type="submit" class="btn btn-primary" id="save-btn" style="margin-top: 2rem;">
-                            <i class="fa-solid fa-check"></i> Enregistrer les modifications
+                        <button type="submit" class="btn btn-primary" id="save-btn" style="padding: 1rem 2rem; border-radius: 15px; font-weight: 700; width: fit-content;">
+                            <i class="fa-solid fa-floppy-disk"></i> Enregistrer les changements
                         </button>
                     </form>
                 </div>
 
-                <!-- Tab: Orders (Mock) -->
+                <!-- Tab: Orders -->
                 <div id="tab-orders" class="tab-content" style="display:none;">
-                    <h3 class="section-title"><i class="fa-solid fa-bag-shopping"></i> Dernières Commandes</h3>
-                    <div class="order-row">
-                        <div>
-                            <strong>#FC-9842</strong><br>
-                            <span style="font-size:0.85rem; color:var(--text-muted);">Aujourd'hui, 12:45 • Burger King</span>
-                        </div>
-                        <span class="status-badge">Livré</span>
-                        <span style="font-weight:700;">8 500 FCFA</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <h3 class="section-title" style="margin: 0;"><i class="fa-solid fa-clock-rotate-left"></i> Historique des Commandes</h3>
                     </div>
-                    <div class="order-row">
-                        <div>
-                            <strong>#FC-9831</strong><br>
-                            <span style="font-size:0.85rem; color:var(--text-muted);">Hier, 20:15 • Pizza Hut</span>
+                    <div id="orders-list-content">
+                        <!-- Content will be injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Tab: Live Tracking -->
+                <div id="tab-tracking" class="tab-content" style="display:none;">
+                    <h3 class="section-title"><i class="fa-solid fa-location-dot"></i> Suivi de votre Commande</h3>
+                    <div id="tracking-container" style="border-radius: 25px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <div id="map" style="height: 350px; width: 100%; z-index: 1;"></div>
+                        
+                        <div style="padding: 2rem; background: white;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                                <div>
+                                    <h4 id="track-order-id" style="margin:0; font-family: 'Outfit'; font-size: 1.2rem;">Commande #...</h4>
+                                    <p style="margin: 5px 0 0; font-size: 0.85rem; color: var(--text-muted);">Suivi en temps réel par satellite</p>
+                                </div>
+                                <span id="track-status-pill" class="status-badge" style="padding: 8px 16px; font-size: 0.85rem;">EN COURS</span>
+                            </div>
+
+                            <!-- Stepper Visuel Premium -->
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 3rem; position: relative; padding: 0 5px;">
+                                <div class="progress-track">
+                                    <div class="progress-bar-fill" id="track-progress-bar" style="width: 0%;"></div>
+                                </div>
+                                <div class="step-mini" id="mini-step-PENDING" style="padding: 1rem; border-radius: 18px; opacity: 0.5;">
+                                    <i class="fa-solid fa-receipt" style="font-size: 1.2rem; color: var(--primary); margin-bottom: 5px;"></i><br><strong style="font-size:0.7rem">Reçue</strong>
+                                </div>
+                                <div class="step-mini" id="mini-step-PREPARING" style="padding: 1rem; border-radius: 18px; opacity: 0.5;">
+                                    <i class="fa-solid fa-utensils" style="font-size: 1.2rem; color: var(--primary); margin-bottom: 5px;"></i><br><strong style="font-size:0.7rem">Cuisine</strong>
+                                </div>
+                                <div class="step-mini" id="mini-step-OUT_FOR_DELIVERY" style="padding: 1rem; border-radius: 18px; opacity: 0.5;">
+                                    <i class="fa-solid fa-motorcycle" style="font-size: 1.2rem; color: var(--primary); margin-bottom: 5px;"></i><br><strong style="font-size:0.7rem">Route</strong>
+                                </div>
+                                <div class="step-mini" id="mini-step-DELIVERED" style="padding: 1rem; border-radius: 18px; opacity: 0.5;">
+                                    <i class="fa-solid fa-house-flag" style="font-size: 1.2rem; color: var(--primary); margin-bottom: 5px;"></i><br><strong style="font-size:0.7rem">Arrivée</strong>
+                                </div>
+                            </div>
+
+                            <div id="profile-courier-info" style="display: none; background: #f8fafc; padding: 1.5rem; border-radius: 20px; border: 1px solid #e2e8f0; align-items: center; gap: 1.5rem;">
+                                <img id="profile-courier-avatar" src="" style="width: 65px; height: 65px; border-radius: 18px; object-fit: cover; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                                <div style="flex: 1;">
+                                    <div id="courier-name-info" style="font-weight: 700; font-size: 1.1rem; margin-bottom: 5px;">Nom du Livreur</div>
+                                    <div style="display: flex; gap: 0.8rem;">
+                                        <span id="courier-plate-info" style="font-size: 0.75rem; background: white; padding: 4px 10px; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600;">MATRICULE: ...</span>
+                                        <a href="#" id="courier-phone-link" style="font-size: 0.75rem; color: #22c55e; font-weight: 700; text-decoration: none;"><i class="fa-solid fa-phone"></i> Appeler</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button id="btn-cancel-order" class="btn btn-outline btn-block" style="margin-top: 1.5rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.2); padding: 1rem; border-radius: 15px;" onclick="cancelMyOrder()">
+                                <i class="fa-solid fa-xmark"></i> Annuler ma commande
+                            </button>
                         </div>
-                        <span class="status-badge">Livré</span>
-                        <span style="font-weight:700;">12 000 FCFA</span>
                     </div>
                 </div>
 
                 <!-- Tab: Addresses -->
                 <div id="tab-address" class="tab-content" style="display:none;">
-                    <h3 class="section-title"><i class="fa-solid fa-location-dot"></i> Mes Adresses de Livraison</h3>
-                    
-                    <!-- Liste des adresses -->
-                    <div id="address-list"></div>
+                    <h3 class="section-title"><i class="fa-solid fa-map-pin"></i> Mes Lieux de Livraison</h3>
+                    <div id="address-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                        <!-- Content will be injected by JS -->
+                    </div>
 
-                    <hr style="margin: 2rem 0;">
-
-                    <!-- Formulaire d'ajout -->
-                    <h4 style="margin-bottom:1rem; font-family:'Outfit';">Ajouter une nouvelle adresse</h4>
-                    <form id="address-form" style="background:#f8fafc; padding:1.5rem; border-radius:15px;">
-                        <div class="info-grid">
-                            <div class="input-group-custom">
-                                <label>Label (Ex: Maison, Travail)</label>
-                                <input type="text" id="addr-label" class="form-control" placeholder="Maison" required>
+                    <div style="background: #f8fafc; padding: 2rem; border-radius: 20px; border: 1px dashed #e2e8f0;">
+                        <h4 style="margin-bottom: 1.5rem; font-family: 'Outfit';">Ajouter un nouveau lieu</h4>
+                        <form id="address-form">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                <div class="form-group">
+                                    <label class="form-label">Nom du lieu (Maison, Bureau...)</label>
+                                    <input type="text" id="addr-label" class="form-control" placeholder="Maison" required style="border-radius: 10px;">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Ville</label>
+                                    <input type="text" id="addr-city" class="form-control" placeholder="Abidjan" required style="border-radius: 10px;">
+                                </div>
                             </div>
-                            <div class="input-group-custom">
-                                <label>Ville</label>
-                                <input type="text" id="addr-city" class="form-control" placeholder="Abidjan" required>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label class="form-label">Adresse détaillée</label>
+                                <input type="text" id="addr-full" class="form-control" placeholder="Quartier, rue, immeuble..." required style="border-radius: 10px;">
                             </div>
-                        </div>
-                        <div class="input-group-custom">
-                            <label>Adresse complète</label>
-                            <input type="text" id="addr-full" class="form-control" placeholder="Rue, Quartier, Bâtiment..." required>
-                        </div>
-                        <button type="submit" class="btn btn-secondary btn-sm">
-                            <i class="fa-solid fa-plus"></i> Enregistrer cette adresse
-                        </button>
-                    </form>
+                            <button type="submit" class="btn btn-primary btn-sm" style="border-radius: 10px; padding: 0.8rem 1.5rem;">
+                                <i class="fa-solid fa-plus"></i> Ajouter l'adresse
+                            </button>
+                        </form>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
     </div>
 
     <footer class="footer">
@@ -238,15 +376,35 @@
         </div>
     </footer>
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="../js/api.js"></script>
     <script>
         let base64Image = null;
 
+        let map, courierMarker, clientMarker;
+        let activeOrderId = null;
+
         function switchTab(tab) {
+            // Cacher tous les contenus
             document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-            document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
-            document.getElementById('tab-' + tab).style.display = 'block';
-            event.target.classList.add('active');
+            // Désactiver tous les boutons de navigation
+            document.querySelectorAll('.nav-link-btn').forEach(l => l.classList.remove('active'));
+            
+            // Afficher le contenu demandé
+            const targetContent = document.getElementById('tab-' + tab);
+            if (targetContent) targetContent.style.display = 'block';
+            
+            // Activer le bouton correspondant
+            const targetBtn = document.getElementById('nav-' + tab);
+            if (targetBtn) targetBtn.classList.add('active');
+
+            // Si on switch sur le tracking, on rafraîchit la map
+            if (tab === 'tracking' && map) {
+                setTimeout(() => map.invalidateSize(), 100);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -273,7 +431,7 @@
             document.getElementById('profile-preview').src = avatarImg;
 
             // CHARGEMENT ULTRA-RAPIDE (En parallèle)
-            Promise.all([loadUserOrders(), loadUserAddresses()]);
+            Promise.all([loadUserOrders(), loadUserAddresses(), checkForActiveOrder()]);
 
             // Gestion de l'onglet via URL
             const urlParams = new URLSearchParams(window.location.search);
@@ -456,6 +614,178 @@
                     loadUserAddresses();
                 } catch (e) { alert(e.message); }
             }
+        }
+
+        async function checkForActiveOrder() {
+            try {
+                const orders = await api.getClientOrders();
+                const activeOrder = orders.find(o => ['PENDING', 'ACCEPTED', 'PREPARING', 'OUT_FOR_DELIVERY'].includes(o.status));
+                
+                if (activeOrder) {
+                    activeOrderId = activeOrder.id;
+                    const trackBtn = document.getElementById('nav-tracking');
+                    trackBtn.style.display = 'flex';
+                    trackBtn.classList.add('live-track');
+                    
+                    updateTrackingUI(activeOrder);
+                    initTrackingMap(activeOrder);
+                    initTrackingWebSocket(activeOrder.id);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function handleCancelOrder() {
+            if (!activeTrackingOrderId) return;
+            if (!confirm("Êtes-vous sûr de vouloir annuler cette commande ?")) return;
+            
+            try {
+                await api.cancelOrder(activeTrackingOrderId);
+                showToast("Commande annulée avec succès");
+                
+                // Rafraîchir l'interface
+                await loadActiveOrders();
+                // Si plus de commande en cours, masquer l'onglet suivi
+                const currentOrders = await api.getActiveOrders();
+                if (currentOrders.length === 0) {
+                    document.getElementById('nav-suivi').style.display = 'none';
+                    switchTab('profil');
+                } else {
+                    updateTrackingUI(currentOrders[0]);
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        function initTrackingMap(order) {
+            if (map) return;
+            const defaultLat = 5.3484;
+            const defaultLng = -3.9783;
+
+            map = L.map('map').setView([defaultLat, defaultLng], 14);
+            
+            // Utilisation des serveurs Google Maps pour plus de précision
+            L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '© Google Maps'
+            }).addTo(map);
+
+            const courierIcon = L.divIcon({
+                className: 'courier-icon',
+                html: '<div style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.2);"><i class="fa-solid fa-motorcycle"></i></div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            const clientIcon = L.divIcon({
+                className: 'client-icon',
+                html: '<div style="background: #1e293b; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white;"><i class="fa-solid fa-house"></i></div>',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+
+            clientMarker = L.marker([defaultLat, defaultLng], {icon: clientIcon}).addTo(map);
+
+            if (order.courierLat && order.courierLng) {
+                courierMarker = L.marker([order.courierLat, order.courierLng], {icon: courierIcon}).addTo(map);
+                map.setView([order.courierLat, order.courierLng]);
+            }
+        }
+
+        function initTrackingWebSocket(orderId) {
+            const socket = new SockJS('http://localhost:8080/ws-tracking');
+            const stompClient = Stomp.over(socket);
+            stompClient.debug = null;
+
+            stompClient.connect({}, function (frame) {
+                stompClient.subscribe('/topic/order/' + orderId, function (message) {
+                    const update = JSON.parse(message.body);
+                    updateTrackingUI(update);
+                    if (update.courierLat && update.courierLng) {
+                        moveCourier(update.courierLat, update.courierLng);
+                    }
+                });
+            });
+        }
+
+        function moveCourier(lat, lng) {
+            if (!courierMarker) {
+                const courierIcon = L.divIcon({
+                    className: 'courier-icon',
+                    html: '<div style="background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.2);"><i class="fa-solid fa-motorcycle"></i></div>',
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+                courierMarker = L.marker([lat, lng], {icon: courierIcon}).addTo(map);
+            } else {
+                courierMarker.setLatLng([lat, lng]);
+            }
+            if (document.getElementById('tab-tracking').style.display !== 'none') {
+                map.panTo([lat, lng]);
+            }
+        }
+
+        function updateTrackingUI(order) {
+            if (!order) return;
+            
+            document.getElementById('track-order-id').innerText = `Commande #${order.id}`;
+            const statusPill = document.getElementById('track-status-pill');
+            statusPill.innerText = order.status;
+            
+            // Gestion du Stepper & Barre de progression
+            const steps = ['PENDING', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+            const currentIndex = steps.indexOf(order.status);
+            const progressPercent = currentIndex === 0 ? 0 : (currentIndex / (steps.length - 1)) * 100;
+            
+            const progressBar = document.getElementById('track-progress-bar');
+            if (progressBar) progressBar.style.width = `${progressPercent}%`;
+
+            steps.forEach((step, idx) => {
+                const el = document.getElementById(`mini-step-${step}`);
+                if (el) {
+                    el.classList.remove('active', 'completed');
+                    if (idx < currentIndex) el.classList.add('completed');
+                    else if (idx === currentIndex) el.classList.add('active');
+                }
+            });
+
+            // Infos Livreur
+            const courierInfo = document.getElementById('profile-courier-info');
+            if (order.courier) {
+                courierInfo.style.display = 'flex';
+                const avatar = document.getElementById('profile-courier-avatar');
+                const name = document.getElementById('courier-name-info');
+                const plate = document.getElementById('courier-plate-info');
+                const link = document.getElementById('courier-phone-link');
+
+                if (avatar) avatar.src = api.getProfileImageUrl(order.courier);
+                if (name) name.innerText = order.courier.fullName || 'Livreur assigné';
+                if (plate) plate.innerText = `MATRICULE: ${order.courier.vehicleId || 'N/A'}`;
+                if (link) link.href = `tel:${order.courier.phone || ''}`;
+            } else {
+                if (courierInfo) courierInfo.style.display = 'none';
+            }
+
+            if (order.status === 'PENDING') {
+                document.getElementById('btn-cancel-order').style.display = 'block';
+            } else {
+                document.getElementById('btn-cancel-order').style.display = 'none';
+            }
+
+            if (order.status === 'CANCELLED') {
+                document.getElementById('track-status-pill').innerText = 'Annulée';
+                document.getElementById('track-status-pill').style.background = '#ef4444';
+            }
+        }
+
+        async function cancelMyOrder() {
+            if (!confirm("Êtes-vous sûr de vouloir annuler cette commande ?")) return;
+            try {
+                await api.request(`/orders/${activeOrderId}/cancel`, { method: 'POST' });
+                alert("Commande annulée.");
+                location.reload();
+            } catch (e) { alert(e.message); }
         }
 
         function handleLogout() {

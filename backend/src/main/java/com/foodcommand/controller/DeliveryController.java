@@ -28,8 +28,16 @@ public class DeliveryController {
     private SimpMessagingTemplate messagingTemplate;
 
     private User getCurrentUser() {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof org.springframework.security.oauth2.core.user.OAuth2User) {
+            email = ((org.springframework.security.oauth2.core.user.OAuth2User) principal).getAttribute("email");
+        } else {
+            email = principal.toString();
+        }
+        return userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found: " + email));
     }
 
     @GetMapping("/orders/available")

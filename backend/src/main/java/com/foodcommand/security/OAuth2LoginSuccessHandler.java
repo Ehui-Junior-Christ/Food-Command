@@ -19,17 +19,21 @@ import java.io.IOException;
 @Component
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(OAuth2LoginSuccessHandler.class);
+
     @Autowired
     private JwtUtils jwtUtils;
 
     @Autowired
     private UserRepository userRepository;
 
-    @Value("${app.frontend.url:http://127.0.0.1:5500}")
+    @Value("${app.frontend.url:http://localhost:8080}")
     private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        logger.info("=== OAuth2 Login SUCCESS ===");
+        
         org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken authToken = 
                 (org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) authentication;
         String registrationId = authToken.getAuthorizedClientRegistrationId();
@@ -40,6 +44,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String name = oAuth2User.getAttribute("name");
         String picture = oAuth2User.getAttribute("picture");
         String providerId = oAuth2User.getName(); // Usually the sub or id
+
+        logger.info("OAuth2 provider: {}, email: {}, name: {}", registrationId, email, name);
 
         // Specific mapping for Facebook
         if ("facebook".equals(registrationId)) {
@@ -54,6 +60,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
 
         if (email == null) {
+            logger.error("Email not found from OAuth2 provider: {}", registrationId);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Email not found from " + registrationId);
             return;
         }
@@ -62,6 +69,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         User user = userRepository.findByEmail(email).orElse(null);
         if (user == null) {
+            logger.info("Creating new user from OAuth2: {}", email);
             user = User.builder()
                     .email(email)
                     .fullName(name)
@@ -94,14 +102,39 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
 
         String token = jwtUtils.generateJwtToken(authentication);
-        String normalizedFrontendUrl = frontendUrl.endsWith("/")
-                ? frontendUrl.substring(0, frontendUrl.length() - 1)
-                : frontendUrl;
+        
+        // Always redirect to the backend-served frontend (same origin as OAuth callback)
+        String targetUrlStr = frontendUrl.endsWith("/")
+                ? frontendUrl + "index.html"
+                : frontendUrl + "/index.html";
+        
+        // Check if frontend set a redirect cookie
+        if (request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("frontend_url".equals(cookie.getName())) {
+                    String cookieVal = cookie.getValue();
+                    if (cookieVal != null && !cookieVal.isEmpty()) {
+                        targetUrlStr = cookieVal;
+                    }
+                    // Clear the cookie after use
+                    jakarta.servlet.http.Cookie clearCookie = new jakarta.servlet.http.Cookie("frontend_url", "");
+                    clearCookie.setPath("/");
+                    clearCookie.setMaxAge(0);
+                    response.addCookie(clearCookie);
+                    break;
+                }
+            }
+        }
 
-        String targetUrl = UriComponentsBuilder.fromUriString(normalizedFrontendUrl + "/index.html")
+        String targetUrl = UriComponentsBuilder.fromUriString(targetUrlStr)
                 .queryParam("token", token)
+                .queryParam("oauth_role", user.getRole().name())
+                .queryParam("oauth_email", user.getEmail())
+                .queryParam("oauth_name", user.getFullName() != null ? user.getFullName() : "")
+                .queryParam("oauth_id", user.getId())
                 .build().toUriString();
 
+        logger.info("OAuth2 redirecting to: {}", targetUrl);
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 

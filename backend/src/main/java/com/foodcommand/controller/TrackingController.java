@@ -1,6 +1,6 @@
 package com.foodcommand.controller;
 
-import com.foodcommand.dto.TrackingUpdate;
+import com.foodcommand.dto.CourierLocationUpdate;
 import com.foodcommand.model.Order;
 import com.foodcommand.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +18,22 @@ public class TrackingController {
     @Autowired
     private OrderRepository orderRepository;
 
+    /**
+     * Reçoit la position du livreur et la diffuse au client via /topic/order/{id}
+     */
     @MessageMapping("/update-location")
-    public void updateLocation(@Payload TrackingUpdate update) {
-        // Mettre à jour l'ordre dans la base de données (optionnel pour la performance, mais mieux pour la persistance)
-        Order order = orderRepository.findById(update.getOrderId()).orElse(null);
-        if (order != null) {
-            if (update.getLat() != null) order.setCourierLat(update.getLat());
-            if (update.getLng() != null) order.setCourierLng(update.getLng());
-            if (update.getStatus() != null) order.setStatus(update.getStatus());
+    public void updateLocation(@Payload CourierLocationUpdate update) {
+        // Optionnel : Mettre à jour la base de données pour persister la dernière position connue
+        orderRepository.findById(update.getOrderId()).ifPresent(order -> {
+            order.setCourierLat(update.getLat());
+            order.setCourierLng(update.getLng());
+            if (update.getStatus() != null) {
+                order.setStatus(update.getStatus());
+            }
             orderRepository.save(order);
-        }
+        });
 
-        // Diffuser la mise à jour aux abonnés de cet ordre
+        // Diffuser la mise à jour à tous les abonnés de cette commande (Client + Restaurant)
         messagingTemplate.convertAndSend("/topic/order/" + update.getOrderId(), update);
     }
 }

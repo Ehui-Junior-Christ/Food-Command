@@ -6,6 +6,8 @@
     <title>Passage de Commande | Food-Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
         .checkout-container {
@@ -147,9 +149,16 @@
         <div class="checkout-left">
             <div class="checkout-section">
                 <h2 class="section-title"><i class="fa-solid fa-location-dot"></i> Adresse de Livraison</h2>
-                <div class="form-group">
+                <div class="form-group" style="position: relative;">
                     <label class="form-label">Adresse Complète</label>
-                    <input type="text" class="form-control" placeholder="Ex: Cocody Angré, 8ème Tranche..." value="Cocody Angré, 8ème Tranche">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="delivery-address-input" class="form-control" style="flex: 1;" placeholder="Ex: Cocody Angré, 8ème Tranche..." value="Cocody Angré, 8ème Tranche">
+                        <button type="button" id="btn-get-location" class="btn" style="background: #f1f5f9; color: var(--primary); border: 2px solid var(--primary); border-radius: 12px; padding: 0 1rem; white-space: nowrap;" onclick="getClientLocation()">
+                            <i class="fa-solid fa-location-crosshairs"></i> Ma Position
+                        </button>
+                    </div>
+                    <p id="location-status" style="font-size: 0.75rem; color: #059669; margin-top: 5px; display: none;"><i class="fa-solid fa-circle-check"></i> Position GPS capturée avec succès !</p>
+                    <div id="location-preview-map" style="height: 200px; border-radius: 15px; margin-top: 10px; display: none; border: 1px solid #E2E8F0;"></div>
                 </div>
                 <div class="grid-2">
                     <div class="form-group">
@@ -282,9 +291,64 @@
             totalEl.textContent = `${subtotal > 0 ? (subtotal + 1000 - discount).toLocaleString() : 0} FCFA`;
         });
 
+        let userLat = null;
+        let userLng = null;
+
+        let previewMap = null;
+        function getClientLocation() {
+            const btn = document.getElementById('btn-get-location');
+            const status = document.getElementById('location-status');
+            const mapDiv = document.getElementById('location-preview-map');
+            
+            if ("geolocation" in navigator) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Localisation...';
+                
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        userLat = pos.coords.latitude;
+                        userLng = pos.coords.longitude;
+                        
+                        btn.disabled = false;
+                        btn.style.background = '#dcfce7';
+                        btn.style.color = '#166534';
+                        btn.style.borderColor = '#166534';
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> Position Capturée';
+                        
+                        status.style.display = 'block';
+                        status.innerHTML = `<i class="fa-solid fa-circle-check"></i> Précision: ±${Math.round(pos.coords.accuracy)}m. Vérifiez sur la carte ci-dessous.`;
+                        
+                        // Afficher la mini carte de confirmation avec Google Maps Tiles
+                        mapDiv.style.display = 'block';
+                        if (!previewMap) {
+                            previewMap = L.map('location-preview-map', { zoomControl: false }).setView([userLat, userLng], 16);
+                            L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                                maxZoom: 20,
+                                subdomains:['mt0','mt1','mt2','mt3'],
+                                attribution: '© Google Maps'
+                            }).addTo(previewMap);
+                            L.marker([userLat, userLng]).addTo(previewMap);
+                        } else {
+                            previewMap.setView([userLat, userLng], 16);
+                        }
+                    },
+                    (err) => {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Ma Position';
+                        alert("Erreur de géolocalisation. Veuillez autoriser l'accès GPS.");
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                alert("La géolocalisation n'est pas supportée.");
+            }
+        }
+
         async function confirmOrder() {
             if (cart.length === 0) return alert('Votre panier est vide !');
             
+            const deliveryAddress = document.getElementById('delivery-address-input').value;
+            if(!deliveryAddress) return alert("Veuillez saisir une adresse de livraison.");
             const token = sessionStorage.getItem('user_token');
             if (!token) {
                 alert('Veuillez vous connecter pour passer commande.');
@@ -299,20 +363,32 @@
             
             try {
                 // On récupère le restaurant ID du premier élément du panier
-                const restaurantId = cart[0].restaurantId;
+                const firstItem = cart[0];
+                const restaurantId = parseInt(firstItem.restaurantId);
+                
+                if (isNaN(restaurantId)) {
+                    throw new Error("ID du restaurant invalide dans le panier");
+                }
 
                 const orderData = {
-                    restaurant: { id: parseInt(restaurantId) },
+                    restaurant: { id: restaurantId },
                     totalAmount: subtotal + 1000 - discount,
                     status: 'PENDING',
-                    items: cart.map(item => ({
-                        menuItem: { id: parseInt(item.id) },
-                        quantity: item.quantity,
-                        price: item.price
-                    }))
+                    deliveryAddress: deliveryAddress,
+                    destinationLat: userLat,
+                    destinationLng: userLng,
+                    items: cart.map(item => {
+                        const mId = parseInt(item.id);
+                        if (isNaN(mId)) throw new Error(`ID du plat "${item.name}" invalide`);
+                        return {
+                            menuItem: { id: mId },
+                            quantity: item.quantity,
+                            price: item.price
+                        };
+                    })
                 };
                 
-                console.log("Sending order data:", orderData);
+                console.log("Envoi de la commande :", orderData);
                 const savedOrder = await api.placeOrder(orderData);
                 
                 // Vider le panier après succès
@@ -325,8 +401,8 @@
                     window.location.href = `tracking.html?id=${savedOrder.id}`;
                 }, 1500);
             } catch (error) {
-                console.error("Order error:", error);
-                alert('Désolé, une erreur est survenue : ' + error.message);
+                console.error("Erreur commande :", error);
+                alert('Erreur : ' + (error.message || 'Impossible de passer la commande'));
                 btn.disabled = false;
                 btn.innerText = originalText;
                 btn.style.background = '';
