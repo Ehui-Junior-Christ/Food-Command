@@ -137,7 +137,7 @@ public class OrderController {
     @GetMapping("/my-deliveries")
     public List<Order> getMyDeliveries() {
         return orderRepository.findByCourier(getCurrentUser()).stream()
-                .filter(o -> "OUT_FOR_DELIVERY".equals(o.getStatus()))
+                .filter(o -> "OUT_FOR_DELIVERY".equals(o.getStatus()) || "DELIVERED".equals(o.getStatus()))
                 .toList();
     }
 

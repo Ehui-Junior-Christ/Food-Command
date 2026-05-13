@@ -34,10 +34,10 @@ public class ClientSearchController {
         String query = keyword.trim().toLowerCase();
         List<SearchResultDto> results = new ArrayList<>();
 
-        // 1. Recherche Restaurants
         List<Restaurant> restaurants = restaurantRepository.findAll().stream()
                 .filter(r -> r.getName().toLowerCase().contains(query) || 
-                            (r.getDescription() != null && r.getDescription().toLowerCase().contains(query)))
+                            (r.getDescription() != null && r.getDescription().toLowerCase().contains(query)) ||
+                            (r.getAddress() != null && r.getAddress().toLowerCase().contains(query)))
                 .collect(Collectors.toList());
 
         for (Restaurant r : restaurants) {
@@ -53,13 +53,14 @@ public class ClientSearchController {
                     .imageUrl(r.getImageUrl())
                     .rating(r.getRating())
                     .distance(distance)
+                    .address(r.getAddress())
                     .build());
         }
 
-        // 2. Recherche Plats (Menu Items)
         List<MenuItem> items = menuItemRepository.findAll().stream()
                 .filter(i -> i.getName().toLowerCase().contains(query) || 
-                            (i.getDescription() != null && i.getDescription().toLowerCase().contains(query)))
+                            (i.getDescription() != null && i.getDescription().toLowerCase().contains(query)) ||
+                            (i.getCategory() != null && i.getCategory().toLowerCase().contains(query)))
                 .collect(Collectors.toList());
 
         for (MenuItem i : items) {
@@ -79,6 +80,7 @@ public class ClientSearchController {
                     .restaurantName(r != null ? r.getName() : null)
                     .restaurantId(r != null ? r.getId() : null)
                     .distance(distance)
+                    .address(r != null ? r.getAddress() : null)
                     .build());
         }
 

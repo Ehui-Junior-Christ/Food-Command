@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* Suggestions Style */
+        /* Suggestions Style (Vertical List) */
         .search-suggestions {
             position: absolute;
             top: 100%;
@@ -26,6 +26,10 @@
             display: none;
             border: 1px solid rgba(0,0,0,0.05);
         }
+        .search-suggestions::-webkit-scrollbar { width: 6px; }
+        .search-suggestions::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; }
+        .search-suggestions::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
         .suggestion-item {
             padding: 15px 20px;
             display: flex;
@@ -47,12 +51,158 @@
             align-items: center;
             justify-content: center;
             font-size: 1.3rem;
+            flex-shrink: 0;
         }
+        .suggestion-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        .suggestion-info { flex: 1; }
         .suggestion-info h4 { margin: 0; font-size: 1rem; font-family: 'Outfit'; color: var(--text-main); }
         .suggestion-info p { margin: 2px 0 0; font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Splash Screen Styles */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(26, 28, 35, 0.95), rgba(45, 55, 72, 0.95)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1920') center/cover;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .splash-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 3rem;
+            max-width: 900px;
+            width: 90%;
+            text-align: center;
+            color: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUpFade 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .splash-title {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        .splash-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 3rem;
+        }
+        .splash-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .splash-step {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s;
+        }
+        .splash-step:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .step-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), #FF8A8E);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1.5rem;
+            color: white;
+            box-shadow: 0 10px 20px rgba(255, 90, 95, 0.3);
+        }
+        .splash-step h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        .splash-step p {
+            font-size: 0.95rem;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+        @media (max-width: 768px) {
+            .splash-steps { grid-template-columns: 1fr; gap: 1rem; }
+            .splash-step { padding: 1.5rem 1rem; }
+            .splash-title { font-size: 2rem; }
+            .splash-content { padding: 2rem 1.5rem; }
+        }
     </style>
 </head>
 <body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <h1 class="splash-title">Bienvenue sur <span class="text-gradient">Food-Command</span></h1>
+            <p class="splash-subtitle">La meilleure expérience de livraison de repas à Abidjan.</p>
+            
+            <div class="splash-steps">
+                <div class="splash-step">
+                    <div class="step-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <h3>1. Trouvez</h3>
+                    <p>Découvrez les meilleurs restaurants autour de vous.</p>
+                </div>
+                <div class="splash-step">
+                    <div class="step-icon"><i class="fa-solid fa-burger"></i></div>
+                    <h3>2. Commandez</h3>
+                    <p>Choisissez vos plats et payez en toute sécurité.</p>
+                </div>
+                <div class="splash-step">
+                    <div class="step-icon"><i class="fa-solid fa-motorcycle"></i></div>
+                    <h3>3. Savourez</h3>
+                    <p>Suivez votre livraison en temps réel jusqu'à votre porte.</p>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-block" style="font-size: 1.2rem; padding: 1rem; border-radius: 50px; margin-top: 2rem; border: none; cursor: pointer;" onclick="dismissSplash()">Commencer l'expérience <i class="fa-solid fa-arrow-right" style="margin-left: 10px;"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // Vérifier si le splash screen a déjà été vu sur ce navigateur
+        if (localStorage.getItem('food_command_splash_seen') === 'true') {
+            document.getElementById('splash-screen').style.display = 'none';
+        }
+
+        function dismissSplash() {
+            // Enregistrer dans le localStorage pour ne plus l'afficher
+            localStorage.setItem('food_command_splash_seen', 'true');
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            splash.style.visibility = 'hidden';
+            
+            // Rediriger vers la page de connexion après l'animation
+            setTimeout(() => {
+                splash.style.display = 'none';
+                window.location.href = 'pages/auth.html';
+            }, 500);
+        }
+    </script>
+
     <!-- Navbar -->
     <nav class="navbar">
         <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">
@@ -65,8 +215,8 @@
         </div>
         <div class="nav-actions">
             <!-- Bouton Connexion -->
-            <button class="btn btn-outline btn-nav hide-mobile" id="btn-login" onclick="window.location.href='pages/auth.html'">
-                <i class="fa-regular fa-user"></i> <span>Connexion</span>
+            <button class="btn btn-outline btn-nav" id="btn-login" onclick="window.location.href='pages/auth.html'">
+                <i class="fa-regular fa-user"></i> <span class="hide-mobile">Connexion</span>
             </button>
             
             <!-- Bloc Profil -->
@@ -162,14 +312,14 @@
     </section>
 
     <!-- Section Partenaires / SaaS -->
-    <section class="saas-features reveal" style="background: linear-gradient(135deg, #1A202C, #2D3748); padding: 5rem 5%; color: white; border-radius: 40px; margin: 4rem 5%; overflow: hidden;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1400px; margin: 0 auto;">
+    <section class="saas-features reveal">
+        <div class="saas-container">
             <div class="saas-content">
                 <span style="background: rgba(255, 90, 95, 0.2); color: #FF5A5F; padding: 0.5rem 1.2rem; border-radius: 30px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Espace Restaurateur</span>
                 <h2 style="font-size: 3rem; font-family: 'Outfit'; margin: 1.5rem 0; line-height: 1.1;">Développez votre activité avec l'IA.</h2>
                 <p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 2.5rem; line-height: 1.6;">Rejoignez Food-Command et profitez de nos outils technologiques avancés pour booster vos ventes et simplifier votre gestion quotidienne.</p>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+                <div class="saas-features-grid">
                     <div style="display: flex; gap: 15px;">
                         <i class="fa-solid fa-wand-magic-sparkles" style="color: #FFD700; font-size: 1.5rem;"></i>
                         <div>
@@ -214,12 +364,7 @@
         </div>
     </section>
 
-    <style>
-        @media (max-width: 992px) {
-            .saas-features div { grid-template-columns: 1fr !important; gap: 2rem !important; }
-            .saas-features h2 { font-size: 2rem !important; }
-        }
-    </style>
+
 
     <section class="restaurants-section reveal" id="restaurants">
         <div class="section-header">

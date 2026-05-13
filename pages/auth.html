@@ -270,6 +270,37 @@
             .auth-card { width: 450px; }
             .auth-content { padding: 3rem 2rem; }
         }
+        @media (max-width: 992px) {
+            .auth-card {
+                flex-direction: column;
+                width: 500px;
+                min-height: auto;
+            }
+            .auth-image {
+                display: none;
+            }
+            .auth-content {
+                padding: 3rem 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .auth-wrapper {
+                padding: 1rem;
+            }
+            .auth-card {
+                border-radius: 20px;
+            }
+            .auth-content {
+                padding: 2.5rem 1.5rem;
+            }
+            .auth-image h2 {
+                font-size: 2rem;
+            }
+            .role-tabs {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -403,6 +434,49 @@
                 <div style="text-align:center; margin-top:1rem; font-size:0.75rem; color:#cbd5e1;">
                     Accès admin discret ? Appuyez sur <span style="cursor:pointer;" onclick="toggleAdminTab()">Shift+A</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-modal" class="overlay" style="display: none; align-items: center; justify-content: center; z-index: 10000;">
+        <div class="auth-card" style="width: 400px; min-height: auto; padding: 2.5rem; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-family:'Outfit'; font-size:1.5rem; margin:0;">Réinitialisation</h3>
+                <i class="fa-solid fa-xmark" style="cursor:pointer; color:#64748b;" onclick="closeForgotModal()"></i>
+            </div>
+
+            <!-- Step 1: Enter Email -->
+            <div id="forgot-step-1">
+                <p style="color:#64748b; font-size:0.9rem; margin-bottom:1.5rem;">Entrez votre email pour recevoir un code OTP de vérification.</p>
+                <div class="form-group">
+                    <label>Votre Email</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="forgot-email" class="form-input" placeholder="nom@exemple.com">
+                    </div>
+                </div>
+                <button class="btn-auth" id="btn-send-otp" onclick="sendOtp()">Envoyer le code</button>
+            </div>
+
+            <!-- Step 2: Enter OTP & New Password -->
+            <div id="forgot-step-2" style="display: none;">
+                <p style="color:#64748b; font-size:0.9rem; margin-bottom:1.5rem;">Un code à 6 chiffres a été envoyé à votre email. Entrez-le avec votre nouveau mot de passe.</p>
+                <div class="form-group">
+                    <label>Code OTP (6 chiffres)</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="text" id="reset-otp" class="form-input" placeholder="123456" maxlength="6">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nouveau mot de passe</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="reset-new-pass" class="form-input" placeholder="••••••••">
+                    </div>
+                </div>
+                <button class="btn-auth" id="btn-reset-pass" onclick="performReset()">Réinitialiser le mot de passe</button>
             </div>
         </div>
     </div>
@@ -548,15 +622,73 @@
         };
 
         function handleSocial(provider) {
-            // Always redirect through the backend server origin (same origin as OAuth callback)
-            const backendOrigin = 'http://localhost:8080';
-            const targetHomeUrl = backendOrigin + '/index.html';
+            // Utilise l'URL du backend configurée dans API_BASE_URL (en enlevant le suffixe /api)
+            const backendOrigin = API_BASE_URL.replace('/api', '');
+            const targetHomeUrl = window.location.origin + '/index.html';
             window.location.href = `${backendOrigin}/api/auth/social-login/${provider.toLowerCase()}?redirect_url=${encodeURIComponent(targetHomeUrl)}`;
         }
 
         function handleForgot() {
-            alert("Un lien de réinitialisation vous sera envoyé si l'email existe.");
+            const modal = document.getElementById('forgot-modal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function closeForgotModal() {
+            const modal = document.getElementById('forgot-modal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('forgot-step-1').style.display = 'block';
+                document.getElementById('forgot-step-2').style.display = 'none';
+            }, 300);
+        }
+
+        async function sendOtp() {
+            const email = document.getElementById('forgot-email').value;
+            if (!email) return alert("Veuillez entrer votre email.");
+
+            const btn = document.getElementById('btn-send-otp');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Envoi...';
+
+            try {
+                await api.forgotPassword(email);
+                alert("Un code OTP a été envoyé à votre email.");
+                document.getElementById('forgot-step-1').style.display = 'none';
+                document.getElementById('forgot-step-2').style.display = 'block';
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Envoyer le code";
+            }
+        }
+
+        async function performReset() {
+            const email = document.getElementById('forgot-email').value;
+            const otp = document.getElementById('reset-otp').value;
+            const newPassword = document.getElementById('reset-new-pass').value;
+
+            if (!otp || !newPassword) return alert("Veuillez remplir tous les champs.");
+            if (otp.length !== 6) return alert("Le code OTP doit contenir 6 chiffres.");
+
+            const btn = document.getElementById('btn-reset-pass');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Réinitialisation...';
+
+            try {
+                await api.resetPassword({ email, otp, newPassword });
+                alert("Votre mot de passe a été réinitialisé avec succès. Connectez-vous maintenant.");
+                closeForgotModal();
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Réinitialiser le mot de passe";
+            }
         }
     </script>
+
 </body>
 </html>

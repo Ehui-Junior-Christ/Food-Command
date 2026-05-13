@@ -1,10 +1,12 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = resolveApiBaseUrl();
 
 function resolveApiBaseUrl() {
-    if (window.location.protocol.startsWith('http') && window.location.port === '8080') {
-        return `${window.location.origin}/api`;
+    // Si on est en local
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:8080/api';
     }
-    return 'http://localhost:8080/api';
+    // SI ON EST EN PRODUCTION : Remplacez par l'URL que Render vous donnera
+    return 'https://votre-backend-kazani.onrender.com/api';
 }
 
 async function readError(response, fallbackMessage) {
@@ -417,6 +419,24 @@ const api = {
         const response = await this.request(`/admin/restaurants/${id}`, { method: 'DELETE' });
         if (!response.ok) throw new Error('Erreur suppression restaurant');
         return true;
+    },
+
+    async forgotPassword(email) {
+        const response = await this.request('/auth/forgot-password', {
+            method: 'POST',
+            body: JSON.stringify({ email })
+        });
+        if (!response.ok) throw new Error(await readError(response, 'Impossible d\'envoyer le code OTP'));
+        return response;
+    },
+
+    async resetPassword(data) {
+        const response = await this.request('/auth/reset-password', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) throw new Error(await readError(response, 'Impossible de réinitialiser le mot de passe'));
+        return response;
     }
 };
 

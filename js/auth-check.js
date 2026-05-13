@@ -183,3 +183,35 @@ function checkRoleAccess() {
         window.location.href = path.includes('/pages/') ? 'auth.html' : 'pages/auth.html';
     }
 }
+
+// Global mobile menu functionality
+window.toggleMobileMenu = function() {
+    const navLinks = document.querySelector('.nav-links');
+    const overlay = document.getElementById('overlay');
+    const navbar = document.querySelector('.navbar');
+    if (navLinks) navLinks.classList.toggle('active');
+    if (overlay) {
+        overlay.classList.toggle('active');
+        if(navLinks && navLinks.classList.contains('active')) {
+            overlay.style.zIndex = '1000';
+        } else {
+            overlay.style.zIndex = '';
+        }
+    }
+    if (navbar) navbar.classList.toggle('mobile-menu-open');
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('overlay');
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            const navLinks = document.querySelector('.nav-links');
+            const navbar = document.querySelector('.navbar');
+            if (navLinks && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                overlay.classList.remove('active');
+                if (navbar) navbar.classList.remove('mobile-menu-open');
+            }
+        });
+    }
+});

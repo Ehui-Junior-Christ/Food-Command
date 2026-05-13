@@ -121,7 +121,9 @@
             <i class="fa-solid fa-utensils"></i> Food-Command
         </a>
         <div class="nav-actions">
-            <button class="btn btn-outline" id="btn-login" onclick="window.location.href='auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
+            <button class="btn btn-outline btn-nav" id="btn-login" onclick="window.location.href='auth.html'">
+                <i class="fa-regular fa-user"></i> <span class="hide-mobile">Connexion</span>
+            </button>
             
             <!-- Bloc Profil -->
             <div id="user-profile-container" class="user-profile-nav" style="display: none;">
@@ -142,6 +144,17 @@
                     <a href="#" id="btn-logout" class="text-primary"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
                 </div>
             </div>
+
+            <!-- Panier -->
+            <button class="btn btn-cart-nav" id="cart-trigger">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-badge">0</span>
+            </button>
+
+            <!-- Menu Mobile -->
+            <button class="btn btn-outline btn-nav mobile-menu-btn" onclick="if(window.toggleMobileMenu) window.toggleMobileMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
     </nav>
 
@@ -214,6 +227,14 @@
                 </div>
                 <div id="checkout-items"></div>
                 
+                <div class="promo-code-section" style="margin-top: 1.5rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="promo-code-input" class="form-control" placeholder="Code promo (ex: BURGER20)" style="flex: 1;">
+                        <button class="btn btn-outline" style="padding: 0 1rem;" onclick="applyPromoCode()">Appliquer</button>
+                    </div>
+                    <div id="promo-message" style="font-size: 0.85rem; margin-top: 0.5rem; display: none;"></div>
+                </div>
+
                 <div class="summary-totals">
                     <div class="total-row">
                         <span>Sous-total</span>
@@ -246,11 +267,91 @@
     <script>
         let subtotal = 0;
         let discount = 0;
+        let promoDiscount = 0;
+        let appliedPromo = null;
+
+        function updateTotals() {
+            const totalEl = document.getElementById('checkout-total');
+            const promoRow = document.getElementById('checkout-promo-row');
+            
+            if (promoDiscount > 0) {
+                if(!promoRow) {
+                    const row = document.createElement('div');
+                    row.id = 'checkout-promo-row';
+                    row.className = 'total-row';
+                    row.style.color = '#059669';
+                    row.style.fontWeight = '700';
+                    row.innerHTML = `<span>Promo (${appliedPromo})</span><span id="checkout-promo-val">-${promoDiscount.toLocaleString()} FCFA</span>`;
+                    
+                    const grandTotal = document.querySelector('.total-row.grand-total');
+                    grandTotal.parentNode.insertBefore(row, grandTotal);
+                } else {
+                    document.getElementById('checkout-promo-val').textContent = `-${promoDiscount.toLocaleString()} FCFA`;
+                    promoRow.querySelector('span').textContent = `Promo (${appliedPromo})`;
+                }
+            } else if (promoRow) {
+                promoRow.remove();
+            }
+            
+            const finalTotal = subtotal > 0 ? (subtotal + 1000 - discount - promoDiscount) : 0;
+            totalEl.textContent = `${Math.max(0, finalTotal).toLocaleString()} FCFA`;
+        }
+
+        async function applyPromoCode() {
+            const input = document.getElementById('promo-code-input').value.trim().toUpperCase();
+            const msgEl = document.getElementById('promo-message');
+            
+            if(!input) {
+                msgEl.style.display = 'none';
+                return;
+            }
+
+            const user = await api.getLocalUser();
+            const userKey = user ? user.email : 'guest';
+            const usedPromos = JSON.parse(localStorage.getItem('used_promos_' + userKey)) || [];
+
+            if (usedPromos.includes(input)) {
+                msgEl.style.color = '#DC2626';
+                msgEl.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Vous avez déjà utilisé ce code promo !';
+                msgEl.style.display = 'block';
+                return;
+            }
+
+            promoDiscount = 0;
+            appliedPromo = null;
+
+            if (input === 'BURGER20') {
+                promoDiscount = Math.round(subtotal * 0.20);
+                appliedPromo = 'BURGER20';
+                msgEl.style.color = '#059669';
+                msgEl.innerHTML = '<i class="fa-solid fa-check"></i> Code appliqué ! -20% sur la commande.';
+            } else if (input === 'FREEDEL') {
+                if (subtotal >= 10000) {
+                    promoDiscount = 1000;
+                    appliedPromo = 'FREEDEL';
+                    msgEl.style.color = '#059669';
+                    msgEl.innerHTML = '<i class="fa-solid fa-check"></i> Code appliqué ! Livraison offerte.';
+                } else {
+                    msgEl.style.color = '#DC2626';
+                    msgEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Le montant minimum pour FREEDEL est 10 000 FCFA.';
+                }
+            } else if (input === 'BOWL50') {
+                promoDiscount = Math.round(subtotal * 0.50);
+                appliedPromo = 'BOWL50';
+                msgEl.style.color = '#059669';
+                msgEl.innerHTML = '<i class="fa-solid fa-check"></i> Code appliqué ! -50% sur votre commande healthy.';
+            } else {
+                msgEl.style.color = '#DC2626';
+                msgEl.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Code promo invalide ou expiré.';
+            }
+            
+            msgEl.style.display = 'block';
+            updateTotals();
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             const checkoutItemsContainer = document.getElementById('checkout-items');
             const subTotalEl = document.getElementById('checkout-subtotal');
-            const totalEl = document.getElementById('checkout-total');
             
             if(cart.length === 0) {
                 checkoutItemsContainer.innerHTML = '<p class="text-muted">Votre panier est vide.</p>';
@@ -272,9 +373,9 @@
             
             subTotalEl.textContent = `${subtotal.toLocaleString()} FCFA`;
             
-            // Calcul réduction
+            // Calcul réduction fidélité
             try {
-                const user = await api.getLocalUser(); // Utilise le cache local d'abord
+                const user = await api.getLocalUser();
                 if (user && subtotal > 0) {
                     const fullUser = await api.getCurrentUser();
                     if (fullUser && fullUser.loyaltyPoints >= 100) {
@@ -288,7 +389,7 @@
                 }
             } catch (e) {}
 
-            totalEl.textContent = `${subtotal > 0 ? (subtotal + 1000 - discount).toLocaleString() : 0} FCFA`;
+            updateTotals();
         });
 
         let userLat = null;
@@ -372,7 +473,7 @@
 
                 const orderData = {
                     restaurant: { id: restaurantId },
-                    totalAmount: subtotal + 1000 - discount,
+                    totalAmount: Math.max(0, subtotal + 1000 - discount - promoDiscount),
                     status: 'PENDING',
                     deliveryAddress: deliveryAddress,
                     destinationLat: userLat,
@@ -391,6 +492,17 @@
                 console.log("Envoi de la commande :", orderData);
                 const savedOrder = await api.placeOrder(orderData);
                 
+                // SAVE PROMO USAGE
+                if (appliedPromo) {
+                    const user = await api.getLocalUser();
+                    const userKey = user ? user.email : 'guest';
+                    const usedPromos = JSON.parse(localStorage.getItem('used_promos_' + userKey)) || [];
+                    if (!usedPromos.includes(appliedPromo)) {
+                        usedPromos.push(appliedPromo);
+                        localStorage.setItem('used_promos_' + userKey, JSON.stringify(usedPromos));
+                    }
+                }
+
                 // Vider le panier après succès
                 sessionStorage.removeItem('food_saas_cart');
                 

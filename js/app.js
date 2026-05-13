@@ -47,11 +47,11 @@ function initSearchSuggestions() {
                     suggestionBox.innerHTML = results.slice(0, 8).map(item => `
                         <div class="suggestion-item" onclick="handleSearchClick(${JSON.stringify(item).replace(/"/g, '&quot;')})">
                             <div class="suggestion-icon">
-                                <i class="fa-solid ${item.type === 'RESTAURANT' ? 'fa-shop' : 'fa-utensils'}"></i>
+                                ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}">` : `<i class="fa-solid ${item.type === 'RESTAURANT' ? 'fa-shop' : 'fa-utensils'}"></i>`}
                             </div>
                             <div class="suggestion-info">
                                 <h4>${item.name}</h4>
-                                <p>${item.type === 'RESTAURANT' ? (item.description || 'Restaurant partenaire') : ('Plat chez ' + item.restaurantName)}</p>
+                                <p>${item.type === 'RESTAURANT' ? (item.description || 'Restaurant') : (item.restaurantName || 'Plat')}</p>
                             </div>
                             ${item.distance ? `<div class="suggestion-meta">${item.distance} km</div>` : ''}
                         </div>
@@ -265,26 +265,7 @@ function simulateAIGeneration() {
     }
 }
 
-function toggleMobileMenu() {
-    const navLinks = document.querySelector('.nav-links');
-    const overlay = document.getElementById('overlay');
-    if (navLinks) navLinks.classList.toggle('active');
-    if (overlay) overlay.classList.toggle('active');
-}
 
-// Close mobile menu when clicking overlay
-document.addEventListener('DOMContentLoaded', () => {
-    const overlay = document.getElementById('overlay');
-    if (overlay) {
-        overlay.addEventListener('click', () => {
-            const navLinks = document.querySelector('.nav-links');
-            if (navLinks && navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
-                overlay.classList.remove('active');
-            }
-        });
-    }
-});
 // Scroll Reveal Animation
 function initScrollReveal() {
     const reveals = document.querySelectorAll('.reveal');

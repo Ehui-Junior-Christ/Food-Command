@@ -91,7 +91,9 @@
             <a href="offers.html" class="active">Offres</a>
         </div>
         <div class="nav-actions">
-            <button class="btn btn-outline" id="btn-login" onclick="window.location.href='auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
+            <button class="btn btn-outline btn-nav" id="btn-login" onclick="window.location.href='auth.html'">
+                <i class="fa-regular fa-user"></i> <span class="hide-mobile">Connexion</span>
+            </button>
             
             <!-- Bloc Profil -->
             <div id="user-profile-container" class="user-profile-nav" style="display: none;">
@@ -113,9 +115,14 @@
                 </div>
             </div>
 
-            <button class="btn btn-cart">
+            <button class="btn btn-cart-nav" id="cart-trigger">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span class="cart-badge">0</span>
+            </button>
+
+            <!-- Menu Mobile -->
+            <button class="btn btn-outline btn-nav mobile-menu-btn" onclick="if(window.toggleMobileMenu) window.toggleMobileMenu()">
+                <i class="fa-solid fa-bars"></i>
             </button>
         </div>
     </nav>

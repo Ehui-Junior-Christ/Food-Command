@@ -20,7 +20,14 @@ function initCartSidebar() {
 
     cartBtns.forEach(btn => btn.addEventListener('click', toggleCart));
     if(closeBtn) closeBtn.addEventListener('click', toggleCart);
-    if(overlay) overlay.addEventListener('click', toggleCart);
+    if(overlay) {
+        overlay.addEventListener('click', (e) => {
+            if (sidebar && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            }
+        });
+    }
 }
 
 function addToCart(id, name, price, image, restaurantId, restaurantName) {
