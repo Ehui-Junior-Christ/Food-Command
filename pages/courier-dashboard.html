@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Livreur | Food-Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { background-color: #F8FAFC; }
+        .courier-layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+        .sidebar { background: white; border-right: 1px solid #E2E8F0; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2rem; position: sticky; top: 0; height: 100vh; }
+        .main-view { padding: 2rem 3rem; max-width: 1200px; }
+        .status-toggle { display: flex; align-items: center; justify-content: space-between; background: #F1F5F9; padding: 1rem; border-radius: 15px; margin-bottom: 2rem; }
+        
+        .order-card { background: white; border-radius: 20px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #E2E8F0; margin-bottom: 1.5rem; transition: 0.3s; }
+        .order-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #F1F5F9; padding-bottom: 0.75rem; }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
+        .stat-item { background: white; padding: 1.5rem; border-radius: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border-bottom: 4px solid #FF9F43; }
+        
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; border-radius: 12px; color: #64748B; font-weight: 500; text-decoration: none; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,159,67,0.1); color: #FF9F43; }
+        
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #FF9F43; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .badge-live { background: #E6FCF5; color: #099268; padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .badge-live::before { content: ''; width: 8px; height: 8px; background: #099268; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+    </style>
+</head>
+<body>
+    <div class="courier-layout">
+        <aside class="sidebar">
+            <a href="../index.html" class="logo"><i class="fa-solid fa-utensils"></i> Food-Command</a>
+            <div style="text-align: center; margin: 1rem 0;">
+                <img src="" id="courier-avatar" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem; border: 3px solid #F1F5F9; object-fit: cover;">
+                <h3 id="courier-name">Chargement...</h3>
+                <p id="courier-status-text" style="font-size: 0.9rem; color: #64748B;">Indisponible</p>
+            </div>
+            <nav style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1;">
+                <a href="#" class="nav-item active" onclick="switchView('dashboard')"><i class="fa-solid fa-house"></i> Tableau de bord</a>
+                <a href="#" class="nav-item" onclick="switchView('map')"><i class="fa-solid fa-map-location-dot"></i> Carte & Itinéraire</a>
+                <a href="#" class="nav-item" onclick="switchView('profile')"><i class="fa-solid fa-user-gear"></i> Mon Profil</a>
+            </nav>
+            <a href="#" onclick="logout()" class="nav-item" style="color: #FF5A5F;"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+        </aside>
+
+        <main class="main-view" id="view-dashboard">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+                <div>
+                    <h1>Bonjour, <span id="welcome-name">Livreur</span> !</h1>
+                    <p class="text-muted">Prêt pour vos livraisons du jour ?</p>
+                </div>
+                <div class="status-toggle">
+                    <span style="font-weight: 600; margin-right: 1rem;">Service en ligne</span>
+                    <label class="switch">
+                        <input type="checkbox" id="online-switch">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </header>
+
+            <div class="stat-grid">
+                <div class="stat-item"><div>Livraisons</div><div style="font-size: 2rem; font-weight: 700;">0</div></div>
+                <div class="stat-item"><div>Gains</div><div style="font-size: 2rem; font-weight: 700;">0 FCFA</div></div>
+                <div class="stat-item"><div>Note</div><div style="font-size: 2rem; font-weight: 700;">4.9 ★</div></div>
+            </div>
+
+            <section>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>Commandes disponibles</h2>
+                    <div class="badge-live" id="live-indicator" style="display: none;">En direct</div>
+                </div>
+                <div id="orders-list">
+                    <div style="text-align: center; padding: 4rem; background: white; border-radius: 20px; border: 2px dashed #E2E8F0;">
+                        <i class="fa-solid fa-motorcycle" style="font-size: 3rem; color: #CBD5E0; margin-bottom: 1rem;"></i>
+                        <h3>Vous êtes hors ligne</h3>
+                        <p class="text-muted">Activez votre statut pour voir les commandes.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <main class="main-view" id="view-map" style="display: none;">
+            <header style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <h1>Itinéraire de livraison</h1>
+                <button id="btn-complete" class="btn btn-primary" style="display: none; background: #059669;" onclick="finishDelivery()">
+                    <i class="fa-solid fa-check"></i> Marquer comme Livré
+                </button>
+            </header>
+            <div id="map" style="height: 600px; border-radius: 20px; z-index: 1;"></div>
+        </main>
+
+        <main class="main-view" id="view-profile" style="display: none;">
+            <h1>Mon Profil</h1>
+            <p>Gestion du véhicule et des informations personnelles.</p>
+        </main>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script>
+        let map, courierMarker, destMarker, stompClient;
+        let activeOrder = null;
+        let watchId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await api.getCurrentUser();
+            if (!user || user.role !== 'COURIER') return window.location.href = 'auth.html';
+
+            document.getElementById('courier-name').innerText = user.fullName;
+            document.getElementById('welcome-name').innerText = user.fullName.split(' ')[0];
+            document.getElementById('courier-avatar').src = api.getProfileImageUrl(user);
+
+            const onlineSwitch = document.getElementById('online-switch');
+            onlineSwitch.addEventListener('change', (e) => {
+                const isOnline = e.target.checked;
+                document.getElementById('courier-status-text').innerText = isOnline ? 'En ligne' : 'Indisponible';
+                document.getElementById('live-indicator').style.display = isOnline ? 'flex' : 'none';
+                if (isOnline) {
+                    loadAvailableOrders();
+                    startLocationTracking();
+                } else {
+                    stopLocationTracking();
+                    document.getElementById('orders-list').innerHTML = '<p style="text-align:center; padding:2rem;">Passez en ligne pour recevoir des commandes.</p>';
+                }
+            });
+
+            initWebSocket();
+            
+            // Vérifier s'il y a une livraison déjà en cours
+            const activeDeliveries = await api.getMyDeliveries();
+            if (activeDeliveries.length > 0) {
+                activeOrder = activeDeliveries[0];
+                document.getElementById('courier-status-text').innerText = 'En livraison...';
+                document.getElementById('online-switch').checked = true;
+                switchView('map');
+                document.getElementById('btn-complete').style.display = 'block';
+                startLocationTracking();
+            }
+        });
+
+        async function loadAvailableOrders() {
+            const list = document.getElementById('orders-list');
+            list.innerHTML = '<p style="text-align:center;">Recherche en cours...</p>';
+            try {
+                const orders = await api.getDeliveryAvailableOrders();
+                if (orders.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; padding:2rem; color:#64748B;">Aucune commande disponible pour le moment.</p>';
+                    return;
+                }
+                list.innerHTML = orders.map(o => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div><strong>#${o.id} - ${o.restaurant.name}</strong></div>
+                            <div style="color:var(--primary); font-weight:700;">${o.totalAmount} FCFA</div>
+                        </div>
+                        <p style="font-size:0.9rem; color:#64748B;"><i class="fa-solid fa-location-dot"></i> ${o.deliveryAddress}</p>
+                        <button class="btn btn-secondary btn-block mt-1" onclick="acceptOrder(${o.id})">Accepter la livraison</button>
+                    </div>
+                `).join('');
+            } catch (e) { list.innerHTML = '<p>Erreur lors du chargement.</p>'; }
+        }
+
+        async function acceptOrder(id) {
+            try {
+                const order = await api.deliveryAcceptOrder(id);
+                activeOrder = order;
+                alert("Commande acceptée !");
+                switchView('map');
+                document.getElementById('btn-complete').style.display = 'block';
+            } catch (e) { alert(e.message); }
+        }
+
+        async function finishDelivery() {
+            if (!activeOrder) return;
+            try {
+                await api.deliveryMarkAsDelivered(activeOrder.id);
+                alert("Livraison terminée !");
+                activeOrder = null;
+                document.getElementById('btn-complete').style.display = 'none';
+                switchView('dashboard');
+                loadAvailableOrders();
+            } catch (e) { alert(e.message); }
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.main-view').forEach(v => v.style.display = 'none');
+            document.getElementById('view-' + view).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (view === 'map') {
+                initMap();
+                setTimeout(() => map.invalidateSize(), 200);
+            }
+        }
+
+        function initMap() {
+            if (map) return;
+            map = L.map('map').setView([5.3484, -3.9783], 13);
+            L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'], attribution: '© Google Maps'
+            }).addTo(map);
+        }
+
+        function startLocationTracking() {
+            if (!navigator.geolocation) return;
+            watchId = navigator.geolocation.watchPosition(pos => {
+                const lat = pos.coords.latitude, lng = pos.coords.longitude;
+                if (stompClient && stompClient.connected && activeOrder) {
+                    stompClient.send("/app/update-location", {}, JSON.stringify({
+                        orderId: activeOrder.id, lat: lat, lng: lng, status: 'OUT_FOR_DELIVERY'
+                    }));
+                }
+                if (map) {
+                    if (!courierMarker) courierMarker = L.marker([lat, lng]).addTo(map);
+                    else courierMarker.setLatLng([lat, lng]);
+                }
+            }, null, { enableHighAccuracy: true });
+        }
+
+        function stopLocationTracking() { if(watchId) navigator.geolocation.clearWatch(watchId); }
+
+        function initWebSocket() {
+            const socket = new SockJS('http://localhost:8080/ws-tracking');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null;
+            stompClient.connect({}, () => {
+                stompClient.subscribe('/topic/available-orders', () => loadAvailableOrders());
+            });
+        }
+
+        function logout() { api.clearAuthSession(); window.location.href = '../index.html'; }
+    </script>
+</body>
+</html>

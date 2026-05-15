@@ -8,25 +8,247 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Suggestions Style (Vertical List) */
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            z-index: 1000;
+            margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .search-suggestions::-webkit-scrollbar { width: 6px; }
+        .search-suggestions::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; }
+        .search-suggestions::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        .suggestion-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { background: #f8fafc; }
+        .suggestion-icon {
+            width: 45px;
+            height: 45px;
+            background: #fff5f5;
+            color: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .suggestion-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        .suggestion-info { flex: 1; }
+        .suggestion-info h4 { margin: 0; font-size: 1rem; font-family: 'Outfit'; color: var(--text-main); }
+        .suggestion-info p { margin: 2px 0 0; font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Splash Screen Styles */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(26, 28, 35, 0.95), rgba(45, 55, 72, 0.95)), url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1920') center/cover;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .splash-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 3rem;
+            max-width: 900px;
+            width: 90%;
+            text-align: center;
+            color: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUpFade 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .splash-title {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        .splash-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 3rem;
+        }
+        .splash-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .splash-step {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s;
+        }
+        .splash-step:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .step-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), #FF8A8E);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1.5rem;
+            color: white;
+            box-shadow: 0 10px 20px rgba(255, 90, 95, 0.3);
+        }
+        .splash-step h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        .splash-step p {
+            font-size: 0.95rem;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+        @media (max-width: 768px) {
+            .splash-steps { grid-template-columns: 1fr; gap: 1rem; }
+            .splash-step { padding: 1.5rem 1rem; }
+            .splash-title { font-size: 2rem; }
+            .splash-content { padding: 2rem 1.5rem; }
+        }
+    </style>
 </head>
 <body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <h1 class="splash-title">Bienvenue sur <span class="text-gradient">Food-Command</span></h1>
+            <p class="splash-subtitle">La meilleure expérience de livraison de repas à Abidjan.</p>
+            
+            <div class="splash-steps">
+                <div class="splash-step">
+                    <div class="step-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <h3>1. Trouvez</h3>
+                    <p>Découvrez les meilleurs restaurants autour de vous.</p>
+                </div>
+                <div class="splash-step">
+                    <div class="step-icon"><i class="fa-solid fa-burger"></i></div>
+                    <h3>2. Commandez</h3>
+                    <p>Choisissez vos plats et payez en toute sécurité.</p>
+                </div>
+                <div class="splash-step">
+                    <div class="step-icon"><i class="fa-solid fa-motorcycle"></i></div>
+                    <h3>3. Savourez</h3>
+                    <p>Suivez votre livraison en temps réel jusqu'à votre porte.</p>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-block" style="font-size: 1.2rem; padding: 1rem; border-radius: 50px; margin-top: 2rem; border: none; cursor: pointer;" onclick="dismissSplash()">Commencer l'expérience <i class="fa-solid fa-arrow-right" style="margin-left: 10px;"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // Vérifier si le splash screen a déjà été vu sur ce navigateur
+        if (localStorage.getItem('food_command_splash_seen') === 'true') {
+            document.getElementById('splash-screen').style.display = 'none';
+        }
+
+        function dismissSplash() {
+            // Enregistrer dans le localStorage pour ne plus l'afficher
+            localStorage.setItem('food_command_splash_seen', 'true');
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            splash.style.visibility = 'hidden';
+            
+            // Rediriger vers la page de connexion après l'animation
+            setTimeout(() => {
+                splash.style.display = 'none';
+                window.location.href = 'pages/auth.html';
+            }, 500);
+        }
+    </script>
+
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="logo">
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor:pointer">
             <i class="fa-solid fa-utensils"></i> Food-Command
         </div>
         <div class="nav-links">
             <a href="index.html" class="active">Accueil</a>
-            <a href="pages/restaurant.html">Restaurants</a>
+            <a href="pages/restaurants.html">Restaurants</a>
             <a href="pages/offers.html">Offres</a>
         </div>
         <div class="nav-actions">
-            <button class="btn btn-outline hide-mobile" id="btn-login" onclick="window.location.href='pages/auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
-            <button class="btn btn-cart">
+            <!-- Bouton Connexion -->
+            <button class="btn btn-outline btn-nav" id="btn-login" onclick="window.location.href='pages/auth.html'">
+                <i class="fa-regular fa-user"></i> <span class="hide-mobile">Connexion</span>
+            </button>
+            
+            <!-- Bloc Profil -->
+            <div id="user-profile-container" class="user-profile-nav" style="display: none;">
+                <div class="user-info" id="user-profile-trigger">
+                    <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=FF5A5F&color=fff" alt="Profile" class="nav-avatar">
+                    <span id="user-name-nav" class="hide-mobile">Profil</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i>
+                </div>
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="dropdown-header">
+                        <strong id="dropdown-full-name">Utilisateur</strong>
+                        <span id="dropdown-email">email@exemple.com</span>
+                    </div>
+                    <hr>
+                    <a href="pages/profile.html"><i class="fa-solid fa-user-gear"></i> Mon Profil</a>
+                    <a href="pages/profile.html?tab=orders"><i class="fa-solid fa-box"></i> Mes Commandes</a>
+                    <hr>
+                    <a href="#" id="btn-logout" class="text-primary"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+                </div>
+            </div>
+
+            <!-- Panier -->
+            <button class="btn btn-cart-nav" id="cart-trigger">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span class="cart-badge">0</span>
             </button>
-            <button class="btn btn-outline mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('active')"><i class="fa-solid fa-bars"></i></button>
+
+            <!-- Menu Mobile -->
+            <button class="btn btn-outline btn-nav mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
     </nav>
 
@@ -37,23 +259,26 @@
             <p>Découvrez les meilleurs restaurants de la ville. Suivi en temps réel et paiement sécurisé.</p>
             
             <!-- Search & Filtering -->
-            <div class="search-bar">
+            <div class="search-bar" style="position: relative;">
                 <div class="search-input-group">
                     <i class="fa-solid fa-location-dot"></i>
-                    <input type="text" placeholder="Entrez votre adresse..." id="location-input">
+                    <input type="text" placeholder="Quartier ou commune" id="location-input">
                 </div>
                 <div class="search-input-group">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Restaurant, plat..." id="search-input">
+                    <input type="text" placeholder="Restaurant ou plat" id="search-input" autocomplete="off">
                 </div>
                 <button class="btn btn-primary" id="btn-search">Rechercher</button>
+                
+                <!-- Suggestions Dropdown -->
+                <div id="search-suggestions" class="search-suggestions"></div>
             </div>
             
             <div class="quick-filters">
-                <span class="filter-pill"><i class="fa-solid fa-pizza-slice"></i> Pizza</span>
-                <span class="filter-pill"><i class="fa-solid fa-burger"></i> Burger</span>
-                <span class="filter-pill"><i class="fa-solid fa-bowl-rice"></i> Africain</span>
-                <span class="filter-pill"><i class="fa-solid fa-leaf"></i> Végétarien</span>
+                <span class="filter-pill" onclick="setSearchCategory('Pizza')"><i class="fa-solid fa-pizza-slice"></i> Pizza</span>
+                <span class="filter-pill" onclick="setSearchCategory('Burger')"><i class="fa-solid fa-burger"></i> Burger</span>
+                <span class="filter-pill" onclick="setSearchCategory('Africain')"><i class="fa-solid fa-bowl-rice"></i> Africain</span>
+                <span class="filter-pill" onclick="setSearchCategory('Végétarien')"><i class="fa-solid fa-leaf"></i> Végétarien</span>
             </div>
         </div>
         <div class="hero-image-container">
@@ -67,152 +292,146 @@
         </div>
     </header>
 
-    <!-- Categories Section -->
-    <section class="categories-section">
+    <!-- Active Orders (Visible if logged in and has orders) -->
+    <section id="active-orders-section" class="active-orders-section" style="display: none; padding: 2rem 5% 0;">
+        <div class="section-header">
+            <h2>Commandes en cours</h2>
+        </div>
+        <div id="active-orders-grid" class="active-orders-grid">
+            <!-- Dynamically populated -->
+        </div>
+    </section>
+
+    <!-- Rest of the content -->
+    <section class="categories-section reveal">
         <div class="section-header">
             <h2>Catégories Populaires</h2>
             <a href="pages/restaurant.html" class="view-all">Voir tout <i class="fa-solid fa-arrow-right"></i></a>
         </div>
-        <div class="categories-grid" id="categories-grid">
-            <!-- Categories injected here -->
-        </div>
+        <div class="categories-grid" id="categories-grid"></div>
     </section>
 
-    <!-- Promotions Section -->
-    <section class="promotions-section" style="background-color: white; padding: 4rem 5%;">
-        <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-            <h2>Promotions du Jour</h2>
-            <a href="pages/offers.html" class="view-all">Toutes les offres <i class="fa-solid fa-arrow-right"></i></a>
-        </div>
-        <div class="promo-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:2rem; max-width:1400px; margin:0 auto;">
-            <div class="promo-card" style="background: linear-gradient(135deg, #FF5A5F, #FF8A8E); border-radius: var(--radius-md); padding: 2rem; color: white; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.3s;" onclick="window.location.href='pages/offers.html'" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                <div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-family: 'Outfit';">Folie des Burgers</h3>
-                    <p style="opacity: 0.9;">-20% avec le code BURGER20</p>
-                </div>
-                <i class="fa-solid fa-burger" style="font-size: 3rem; opacity: 0.8;"></i>
-            </div>
-            <div class="promo-card" style="background: linear-gradient(135deg, #00A699, #00D1C1); border-radius: var(--radius-md); padding: 2rem; color: white; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.3s;" onclick="window.location.href='pages/offers.html'" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                <div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem; font-family: 'Outfit';">Livraison Offerte</h3>
-                    <p style="opacity: 0.9;">Dès 10 000 FCFA d'achat</p>
-                </div>
-                <i class="fa-solid fa-motorcycle" style="font-size: 3rem; opacity: 0.8;"></i>
-            </div>
-        </div>
-    </section>
-
-    <!-- Restaurants Section -->
-    <section class="restaurants-section">
-        <div class="section-header">
-            <h2>Restaurants Recommandés</h2>
-            <div class="filter-dropdowns">
-                <select class="filter-select">
-                    <option>Trier par</option>
-                    <option>Note</option>
-                    <option>Temps de livraison</option>
-                </select>
-            </div>
-        </div>
-        <div class="restaurants-grid" id="restaurants-grid">
-            <!-- Restaurant cards injected via JS -->
-        </div>
-    </section>
-
-    <!-- SaaS Features Section -->
-    <section class="saas-features">
-        <div class="saas-content">
-            <h2>Vous êtes un restaurant ?</h2>
-            <p>Rejoignez notre plateforme et augmentez vos revenus. Gérez vos menus, générez des images de plats avec l'IA et suivez vos performances en temps réel.</p>
-            <ul class="feature-list">
-                <li><i class="fa-solid fa-check text-primary"></i> Visibilité accrue à Abidjan</li>
-                <li><i class="fa-solid fa-check text-primary"></i> Générateur d'images par IA inclus</li>
-                <li><i class="fa-solid fa-check text-primary"></i> Paiements sécurisés via Stripe</li>
-            </ul>
-            <button class="btn btn-secondary" onclick="window.location.href='pages/partner-register.html'">Devenir Partenaire</button>
-        </div>
-        <div class="saas-illustration">
-            <div class="glass-card mockup-card">
-                <div class="mockup-header">
-                    <i class="fa-solid fa-wand-magic-sparkles text-gradient"></i> Génération IA
-                </div>
-                <div class="mockup-body">
-                    <div class="prompt-box">"Poulet braisé savoureux avec alloco"</div>
-                    <button class="btn btn-primary btn-sm mt-2">Générer l'image</button>
-                    <div class="generated-placeholder mt-2" id="ai-demo-img">
-                        <i class="fa-regular fa-image"></i>
+    <!-- Section Partenaires / SaaS -->
+    <section class="saas-features reveal">
+        <div class="saas-container">
+            <div class="saas-content">
+                <span style="background: rgba(255, 90, 95, 0.2); color: #FF5A5F; padding: 0.5rem 1.2rem; border-radius: 30px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Espace Restaurateur</span>
+                <h2 style="font-size: 3rem; font-family: 'Outfit'; margin: 1.5rem 0; line-height: 1.1;">Développez votre activité avec l'IA.</h2>
+                <p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 2.5rem; line-height: 1.6;">Rejoignez Food-Command et profitez de nos outils technologiques avancés pour booster vos ventes et simplifier votre gestion quotidienne.</p>
+                
+                <div class="saas-features-grid">
+                    <div style="display: flex; gap: 15px;">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="color: #FFD700; font-size: 1.5rem;"></i>
+                        <div>
+                            <h4 style="margin-bottom: 5px;">Génération IA</h4>
+                            <p style="font-size: 0.85rem; opacity: 0.7;">Créez des photos pro pour vos menus en un clic.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <i class="fa-solid fa-chart-line" style="color: #00D1C1; font-size: 1.5rem;"></i>
+                        <div>
+                            <h4 style="margin-bottom: 5px;">Analyses Pro</h4>
+                            <p style="font-size: 0.85rem; opacity: 0.7;">Suivez vos performances et vos revenus en temps réel.</p>
+                        </div>
                     </div>
                 </div>
+
+                <button class="btn btn-primary btn-nav" onclick="window.location.href='pages/partner-register.html'">Devenir Partenaire</button>
+            </div>
+
+            <!-- Démo Visuelle IA -->
+            <div class="saas-visual" style="position: relative;">
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 2rem; backdrop-filter: blur(20px);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <div style="display: flex; gap: 10px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #FF5F56;"></div>
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #FFBD2E;"></div>
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #27C93F;"></div>
+                        </div>
+                        <span style="font-size: 0.8rem; opacity: 0.5;">Générateur d'images IA v2.0</span>
+                    </div>
+                    <div id="ai-demo-container" style="background: #000; border-radius: 20px; aspect-ratio: 16/9; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7bb7445?q=80&w=800" alt="Dish Preview" id="ai-demo-img" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.5s;">
+                        <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; background: rgba(0,0,0,0.7); padding: 1rem; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
+                            <p id="ai-typing-text" style="font-family: monospace; font-size: 0.9rem; margin: 0;"></p>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline btn-block" style="margin-top: 1.5rem; border-color: rgba(255,255,255,0.2); color: white;" onclick="runAIDemo()">
+                        <i class="fa-solid fa-play" style="margin-right: 10px;"></i> Lancer la démo IA
+                    </button>
+                </div>
             </div>
         </div>
+    </section>
+
+
+
+    <section class="restaurants-section reveal" id="restaurants">
+        <div class="section-header">
+            <h2>Restaurants Recommandés</h2>
+        </div>
+        <div class="restaurants-grid" id="restaurants-grid"></div>
     </section>
 
     <footer class="footer">
         <div class="footer-grid">
             <div class="footer-col">
-                <div class="logo" style="margin-bottom: 1rem;"><i class="fa-solid fa-utensils"></i> Food-Command</div>
-                <p>La meilleure expérience de livraison de repas à Abidjan. Rapide, fiable et délicieux.</p>
-                <div class="social-links mt-2">
+                <div class="logo" style="margin-bottom: 1.5rem;">
+                    <i class="fa-solid fa-utensils"></i> Food-Command
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">La meilleure plateforme de livraison de repas à Abidjan. Qualité premium et rapidité garantie.</p>
+                <div class="social-links">
                     <a href="#"><i class="fa-brands fa-facebook"></i></a>
                     <a href="#"><i class="fa-brands fa-instagram"></i></a>
                     <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
                 </div>
             </div>
             <div class="footer-col">
-                <h3>Liens Utiles</h3>
-                <a href="pages/about.html">À propos</a>
-                <a href="pages/restaurant.html">Restaurants</a>
-                <a href="pages/offers.html">Offres</a>
+                <h3>Explorer</h3>
+                <a href="index.html">Accueil</a>
+                <a href="pages/restaurants.html">Restaurants</a>
+                <a href="pages/offers.html">Offres Spéciales</a>
+                <a href="pages/about.html">À Propos</a>
+            </div>
+            <div class="footer-col">
+                <h3>Partenariat</h3>
+                <a href="pages/partner-register.html">Devenir Partenaire</a>
                 <a href="pages/courier.html">Devenir Livreur</a>
+                <a href="pages/admin.html">Espace Admin</a>
+                <a href="#">Solutions Entreprise</a>
             </div>
             <div class="footer-col">
-                <h3>Espace Utilisateur</h3>
-                <a href="pages/auth.html">Connexion / Inscription</a>
-                <a href="pages/profile.html">Mon profil</a>
-                <a href="#">Mes commandes</a>
-            </div>
-            <div class="footer-col">
-                <h3>Partenaires</h3>
-                <a href="pages/partner-register.html">Portail Partenaire</a>
-                <a href="pages/partner-register.html">Ajouter votre restaurant</a>
-                <a href="pages/admin.html">Génération IA</a>
+                <h3>Aide & Support</h3>
+                <a href="#">Centre d'aide</a>
+                <a href="mailto:contact@foodcommand.ci">Nous contacter</a>
+                <a href="#">FAQ</a>
+                <a href="#">Confidentialité</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 Food-Command Abidjan. Tous droits réservés.</p>
+            <p>&copy; 2026 Food-Command. Tous droits réservés. Design by EHUI Junior Christ</p>
         </div>
     </footer>
 
-    <!-- Cart Sidebar -->
-    <div class="cart-sidebar" id="cart-sidebar">
+    <!-- Cart Sidebar Overlay -->
+    <div id="overlay" class="overlay"></div>
+    <div id="cart-sidebar" class="cart-sidebar">
         <div class="cart-header">
-            <h2>Votre Panier</h2>
-            <button class="close-btn" id="close-cart"><i class="fa-solid fa-xmark"></i></button>
+            <h3>Votre Panier</h3>
+            <button id="close-cart" class="btn-close"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div class="cart-items" id="cart-items">
-            <!-- Items injected via JS -->
-        </div>
+        <div id="cart-items" class="cart-items"></div>
         <div class="cart-footer">
-            <div class="cart-summary" style="margin-bottom: 1rem;">
-                <div class="summary-row">
-                    <span>Sous-total</span>
-                    <span id="cart-subtotal">0 FCFA</span>
-                </div>
-                <div class="summary-row">
-                    <span>Frais de livraison estimé</span>
-                    <span>1 000 FCFA</span>
-                </div>
-                <div class="summary-row total" style="display:flex; justify-content:space-between; font-weight:bold; margin-top:0.5rem; padding-top:0.5rem; border-top:1px dashed #CBD5E0;">
-                    <span>Total</span>
-                    <span id="cart-total">0 FCFA</span>
-                </div>
-            </div>
-            <button class="btn btn-primary btn-block" id="btn-checkout" onclick="window.location.href='pages/checkout.html'">Commander</button>
+            <div class="summary-row"><span>Sous-total</span> <span id="cart-subtotal">0 FCFA</span></div>
+            <div class="summary-row"><span>Frais de livraison</span> <span id="cart-delivery">1 000 FCFA</span></div>
+            <div class="summary-row total"><span>Total</span> <span id="cart-total">0 FCFA</span></div>
+            <button class="btn btn-primary btn-block" style="margin-top:1.5rem">Passer à la caisse</button>
         </div>
     </div>
-    <div class="overlay" id="overlay"></div>
 
     <script src="js/api.js"></script>
+    <script src="js/auth-check.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/app.js"></script>
 </body>

@@ -8,154 +8,349 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/styles.css">
     <style>
+        :root {
+            --primary: #FF5A5F;
+            --primary-dark: #E34A4F;
+            --secondary: #FF9F43;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+        }
+
+        body {
+            background: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
+        }
+
+        /* PREMIUM HERO SECTION */
         .rest-hero {
-            height: 350px;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1200&auto=format&fit=crop') center/cover;
+            height: 450px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
             display: flex;
             align-items: flex-end;
-            padding: 3rem 5%;
-            color: white;
-            margin-top: 70px;
+            padding: 4rem 5%;
+            margin-top: 0;
+            clip-path: ellipse(150% 100% at 50% 0%);
         }
+
+        .rest-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.2) 60%, transparent 100%);
+        }
+
+        .rest-hero-info {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .rest-hero-info h1 {
-            font-size: 3rem;
+            font-size: 4rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
             color: white;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
-        .menu-layout {
+
+        .rest-badge-group {
             display: flex;
-            gap: 3rem;
-            padding: 3rem 5%;
-            max-width: 1400px;
-            margin: 0 auto;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
+
+        .hero-badge {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* MENU LAYOUT */
+        .menu-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 3rem;
+            padding: 4rem 5%;
+            max-width: 1400px;
+            margin: -60px auto 0;
+            position: relative;
+            z-index: 20;
+        }
+
         .menu-categories {
-            width: 250px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 1.5rem;
             position: sticky;
             top: 100px;
             height: fit-content;
-            background: white;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            padding: 1rem 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
         }
+
+        .cat-title {
+            font-family: 'Outfit';
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            color: var(--text-main);
+        }
+
         .cat-link {
-            display: block;
-            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem 1.2rem;
             color: var(--text-muted);
             font-weight: 500;
-            border-left: 3px solid transparent;
-            transition: var(--transition);
-        }
-        .cat-link:hover, .cat-link.active {
-            color: var(--primary);
-            border-left-color: var(--primary);
-            background: var(--bg-light);
-        }
-        .menu-content {
-            flex: 1;
-        }
-        .menu-section {
-            margin-bottom: 3rem;
-        }
-        .menu-section-title {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #E2E8F0;
-        }
-        .dish-card {
-            display: flex;
-            gap: 1.5rem;
-            background: white;
-            padding: 1.5rem;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 1.5rem;
-            transition: var(--transition);
-        }
-        .dish-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-3px);
-        }
-        .dish-info {
-            flex: 1;
-        }
-        .dish-title {
-            font-size: 1.2rem;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
             margin-bottom: 0.5rem;
         }
-        .dish-desc {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+
+        .cat-link i { font-size: 1.1rem; opacity: 0.7; }
+
+        .cat-link:hover, .cat-link.active {
+            color: var(--primary);
+            background: white;
+            box-shadow: 0 10px 20px rgba(255, 90, 95, 0.1);
+            transform: translateX(5px);
+        }
+
+        .cat-link.active i { opacity: 1; }
+
+        /* DISH CARDS */
+        .menu-section-title {
+            font-family: 'Outfit';
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, #E2E8F0, transparent);
+        }
+
+        .dish-card {
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 24px;
+            border: 1px solid #F1F5F9;
+            margin-bottom: 2rem;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
             overflow: hidden;
         }
+
+        .dish-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+            border-color: rgba(255, 90, 95, 0.2);
+        }
+
+        .dish-title {
+            font-family: 'Outfit';
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--text-main);
+        }
+
+        .dish-desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
         .dish-price-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 2rem;
         }
+
         .dish-price {
-            font-weight: 700;
+            font-size: 1.4rem;
+            font-weight: 800;
             color: var(--primary);
-            font-size: 1.2rem;
+            font-family: 'Outfit';
         }
+
+        .btn-add-cart {
+            background: var(--text-main);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add-cart:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 90, 95, 0.3);
+        }
+
+        .dish-img-wrapper {
+            position: relative;
+            height: 180px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
         .dish-img {
-            width: 140px;
-            height: 140px;
-            border-radius: var(--radius-sm);
+            width: 100%;
+            height: 100%;
             object-fit: cover;
+            transition: transform 0.6s ease;
         }
-        @media (max-width: 768px) {
-            .menu-layout { flex-direction: column; }
-            .menu-categories { width: 100%; position: static; display: flex; overflow-x: auto; padding: 0;}
-            .cat-link { white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
-            .cat-link.active { border-bottom-color: var(--primary); }
-            .dish-card { flex-direction: column-reverse; }
-            .dish-img { width: 100%; height: 200px; }
+
+        .dish-card:hover .dish-img {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 992px) {
+            .menu-layout { grid-template-columns: 1fr; margin-top: 2rem; }
+            .menu-categories { display: none; }
+            .rest-hero-info h1 { font-size: 2.5rem; }
+        }
+
+        @media (max-width: 576px) {
+            .dish-card { grid-template-columns: 1fr; }
+            .dish-img-wrapper { order: -1; height: 200px; }
+        }
+        /* RESPONSIVE */
+        @media (max-width: 992px) {
+            .menu-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                margin-top: -30px;
+            }
+            .menu-categories {
+                position: static;
+                display: flex;
+                overflow-x: auto;
+                padding-bottom: 1rem;
+                gap: 10px;
+                scrollbar-width: none;
+            }
+            .menu-categories::-webkit-scrollbar { display: none; }
+            .category-btn { margin-bottom: 0; white-space: nowrap; }
+            .rest-hero-info h1 { font-size: 2.5rem; }
+        }
+
+        @media (max-width: 576px) {
+            .dishes-grid { grid-template-columns: 1fr; }
+            .rest-hero { height: 350px; padding: 2rem 5%; }
+            .rest-hero-info h1 { font-size: 2rem; }
+            .hero-badge { font-size: 0.8rem; padding: 0.4rem 0.8rem; }
         }
     </style>
 </head>
 <body>
     <nav class="navbar scrolled">
         <a href="../index.html" class="logo">
-            <i class="fa-solid fa-utensils"></i> Food-Command
+            <i class="fa-solid fa-fire-flame-curved"></i> Food-Command
         </a>
         <div class="nav-links">
             <a href="../index.html">Accueil</a>
-            <a href="restaurant.html" class="active">Restaurants</a>
+            <a href="restaurants.html" class="active">Restaurants</a>
             <a href="offers.html">Offres</a>
         </div>
         <div class="nav-actions">
-            <button class="btn btn-outline hide-mobile" onclick="window.location.href='auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
-            <button class="btn btn-cart">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="cart-badge">0</span>
+            <!-- Bouton Connexion -->
+            <button class="btn btn-outline btn-nav hide-mobile" id="btn-login" onclick="window.location.href='auth.html'">
+                <i class="fa-regular fa-user"></i> <span>Connexion</span>
             </button>
-            <button class="btn btn-outline mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('active')"><i class="fa-solid fa-bars"></i></button>
+            
+            <!-- Bloc Profil -->
+            <div id="user-profile-container" class="user-profile-nav" style="display: none;">
+                <div class="user-info" id="user-profile-trigger">
+                    <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=FF5A5F&color=fff" alt="Profile" class="nav-avatar">
+                    <span id="user-name-nav" class="hide-mobile">Profil</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem;"></i>
+                </div>
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="dropdown-header">
+                        <strong id="dropdown-full-name">Utilisateur</strong>
+                        <span id="dropdown-email">email@exemple.com</span>
+                    </div>
+                    <hr>
+                    <a href="profile.html"><i class="fa-solid fa-user-gear"></i> Mon Profil</a>
+                    <a href="profile.html?tab=orders"><i class="fa-solid fa-box"></i> Mes Commandes</a>
+                    <hr>
+                    <a href="#" id="btn-logout" class="text-primary"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+                </div>
+            </div>
+
+            <!-- Panier -->
+            <button class="btn btn-cart-nav" id="cart-trigger" style="background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 12px; position: relative;">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-badge" style="position: absolute; top: -5px; right: -5px; background: var(--text-main); color: white; border: 2px solid white;">0</span>
+            </button>
+
+            <!-- Menu Mobile -->
+            <button class="btn btn-outline btn-nav mobile-menu-btn" onclick="if(window.toggleMobileMenu) window.toggleMobileMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </div>
     </nav>
 
-    <div class="rest-hero">
+    <div class="rest-hero" style="background-image: url('https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1200')">
         <div class="rest-hero-info">
-            <h1>Burger Palace</h1>
-            <div class="rest-meta" style="color:white; font-size:1.1rem;">
-                <span><i class="fa-solid fa-star" style="color:#FFD700"></i> 4.8 (245 avis)</span>
-                <span style="margin-left:1rem;"><i class="fa-regular fa-clock"></i> 20-30 min</span>
-                <span style="margin-left:1rem;"><i class="fa-solid fa-motorcycle"></i> Livraison: 500 FCFA</span>
+            <h1 id="rest-name-display">Burger Palace</h1>
+            <div class="rest-badge-group">
+                <div class="hero-badge" id="rest-rating-display"><i class="fa-solid fa-star" style="color:#FFD700"></i> 4.8 (500+ avis)</div>
+                <div class="hero-badge"><i class="fa-regular fa-clock"></i> 20-35 min</div>
+                <div class="hero-badge"><i class="fa-solid fa-motorcycle"></i> Livraison Gratuite</div>
             </div>
         </div>
     </div>
 
     <div class="menu-layout">
         <aside class="menu-categories">
-            <a href="#populaire" class="cat-link active">Populaire</a>
-            <a href="#burgers" class="cat-link">Burgers Premium</a>
-            <a href="#accompagnements" class="cat-link">Accompagnements</a>
+            <h3 class="cat-title">Catégories</h3>
+            <a href="#populaire" class="cat-link active"><i class="fa-solid fa-fire"></i> Populaire</a>
+            <a href="#burgers" class="cat-link"><i class="fa-solid fa-burger"></i> Burgers Premium</a>
+            <a href="#accompagnements" class="cat-link"><i class="fa-solid fa-fries"></i> Accompagnements</a>
+            <a href="#boissons" class="cat-link"><i class="fa-solid fa-glass-water"></i> Boissons</a>
         </aside>
         
         <main class="menu-content">
@@ -168,10 +363,14 @@
                         <p class="dish-desc">Double steak haché de bœuf premium, double cheddar affiné, cornichons, oignons caramélisés, sauce secrète, pain brioché artisanal toasté.</p>
                         <div class="dish-price-row">
                             <span class="dish-price">4 500 FCFA</span>
-                            <button class="btn btn-outline btn-sm" onclick="addToCart('d1', 'Le Smash Classic', 4500, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400&auto=format&fit=crop')"><i class="fa-solid fa-plus"></i> Ajouter</button>
+                            <button class="btn-add-cart" onclick="addToCart(101, 'Le Smash Classic', 4500, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400', 1, 'Burger Palace')">
+                                <i class="fa-solid fa-plus"></i> Ajouter
+                            </button>
                         </div>
                     </div>
-                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400&auto=format&fit=crop" class="dish-img" alt="Smash Classic">
+                    <div class="dish-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=400" class="dish-img" alt="Smash Classic">
+                    </div>
                 </div>
 
                 <div class="dish-card">
@@ -180,10 +379,14 @@
                         <p class="dish-desc">Frites croustillantes maison, huile de truffe noire, parmesan fraîchement râpé et persil. Servies avec sauce aïoli.</p>
                         <div class="dish-price-row">
                             <span class="dish-price">2 500 FCFA</span>
-                            <button class="btn btn-outline btn-sm" onclick="addToCart('d2', 'Frites Truffées Parmesan', 2500, 'https://images.unsplash.com/photo-1576107232684-1279f390859f?q=80&w=400&auto=format&fit=crop')"><i class="fa-solid fa-plus"></i> Ajouter</button>
+                            <button class="btn-add-cart" onclick="addToCart(102, 'Frites Truffées Parmesan', 2500, 'https://images.unsplash.com/photo-1576107232684-1279f390859f?q=80&w=400', 1, 'Burger Palace')">
+                                <i class="fa-solid fa-plus"></i> Ajouter
+                            </button>
                         </div>
                     </div>
-                    <img src="https://images.unsplash.com/photo-1576107232684-1279f390859f?q=80&w=400&auto=format&fit=crop" class="dish-img" alt="Frites">
+                    <div class="dish-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1576107232684-1279f390859f?q=80&w=400" class="dish-img" alt="Frites">
+                    </div>
                 </div>
             </div>
 
@@ -196,10 +399,14 @@
                         <p class="dish-desc">Steak de bœuf, bacon croustillant, onion rings, cheddar fondu, sauce barbecue maison, salade.</p>
                         <div class="dish-price-row">
                             <span class="dish-price">5 500 FCFA</span>
-                            <button class="btn btn-outline btn-sm" onclick="addToCart('d3', 'Le BBQ Bacon', 5500, 'https://images.unsplash.com/photo-1594212691516-724f74d083e9?q=80&w=400&auto=format&fit=crop')"><i class="fa-solid fa-plus"></i> Ajouter</button>
+                            <button class="btn-add-cart" onclick="addToCart(103, 'Le BBQ Bacon', 5500, 'https://images.unsplash.com/photo-1594212691516-724f74d083e9?q=80&w=400', 1, 'Burger Palace')">
+                                <i class="fa-solid fa-plus"></i> Ajouter
+                            </button>
                         </div>
                     </div>
-                    <img src="https://images.unsplash.com/photo-1594212691516-724f74d083e9?q=80&w=400&auto=format&fit=crop" class="dish-img" alt="BBQ Bacon">
+                    <div class="dish-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1594212691516-724f74d083e9?q=80&w=400" class="dish-img" alt="BBQ Bacon">
+                    </div>
                 </div>
             </div>
         </main>
@@ -208,32 +415,152 @@
     <!-- Cart Sidebar -->
     <div class="cart-sidebar" id="cart-sidebar">
         <div class="cart-header">
-            <h2>Votre Panier</h2>
-            <button class="close-btn" id="close-cart"><i class="fa-solid fa-xmark"></i></button>
+            <h3>Votre Panier</h3>
+            <button id="close-cart" class="btn-close"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="cart-items" id="cart-items">
             <!-- Items injected via JS -->
         </div>
         <div class="cart-footer">
-            <div class="cart-summary" style="margin-bottom: 1rem;">
-                <div class="summary-row">
-                    <span>Sous-total</span>
-                    <span id="cart-subtotal">0 FCFA</span>
-                </div>
-                <div class="summary-row">
-                    <span>Frais de livraison estimé</span>
-                    <span>1 000 FCFA</span>
-                </div>
-                <div class="summary-row total" style="display:flex; justify-content:space-between; font-weight:bold; margin-top:0.5rem; padding-top:0.5rem; border-top:1px dashed #CBD5E0;">
-                    <span>Total</span>
-                    <span id="cart-total">0 FCFA</span>
-                </div>
+            <div class="summary-row">
+                <span>Sous-total</span>
+                <span id="cart-subtotal">0 FCFA</span>
             </div>
-            <button class="btn btn-primary btn-block" id="btn-checkout" onclick="window.location.href='checkout.html'">Commander</button>
+            <div class="summary-row">
+                <span>Frais de livraison</span>
+                <span id="cart-delivery">0 FCFA</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total</span>
+                <span id="cart-total">0 FCFA</span>
+            </div>
+            <button class="btn btn-primary btn-block" style="margin-top: 1.5rem;" id="btn-checkout">Passer à la caisse</button>
         </div>
     </div>
     <div class="overlay" id="overlay"></div>
 
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo" style="margin-bottom: 1.5rem;">
+                    <i class="fa-solid fa-utensils"></i> Food-Command
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">La meilleure plateforme de livraison de repas à Abidjan. Qualité premium et rapidité garantie.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Explorer</h3>
+                <a href="../index.html">Accueil</a>
+                <a href="restaurants.html">Restaurants</a>
+                <a href="offers.html">Offres Spéciales</a>
+                <a href="about.html">À Propos</a>
+            </div>
+            <div class="footer-col">
+                <h3>Partenariat</h3>
+                <a href="partner-register.html">Devenir Partenaire</a>
+                <a href="courier.html">Devenir Livreur</a>
+                <a href="admin.html">Espace Admin</a>
+                <a href="#">Solutions Entreprise</a>
+            </div>
+            <div class="footer-col">
+                <h3>Aide & Support</h3>
+                <a href="#">Centre d'aide</a>
+                <a href="#">Nous contacter</a>
+                <a href="#">FAQ</a>
+                <a href="#">Confidentialité</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Food-Command. Tous droits réservés. Design by EHUI Junior Christ</p>
+        </div>
+    </footer>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth-check.js"></script>
     <script src="../js/cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('id');
+            const isPreview = urlParams.get('preview') === 'true';
+            
+            if (!restaurantId) {
+                console.log("Mode démo statique");
+                return;
+            }
+
+            if (isPreview) {
+                document.querySelector('.navbar').style.display = 'none';
+                document.querySelector('.footer').style.display = 'none';
+                document.querySelector('.rest-hero').style.marginTop = '0';
+                
+                const previewBanner = document.createElement('div');
+                previewBanner.style.background = '#FF5A5F';
+                previewBanner.style.color = 'white';
+                previewBanner.style.textAlign = 'center';
+                previewBanner.style.padding = '10px';
+                previewBanner.style.fontWeight = 'bold';
+                previewBanner.style.position = 'fixed';
+                previewBanner.style.top = '0';
+                previewBanner.style.width = '100%';
+                previewBanner.style.zIndex = '9999';
+                previewBanner.innerHTML = '<i class="fa-solid fa-eye"></i> Mode Aperçu - C\'est ainsi que les clients verront votre restaurant.';
+                document.body.prepend(previewBanner);
+            }
+            
+            try {
+                const rest = await api.getRestaurant(restaurantId);
+                if (!rest) return;
+                
+                const menu = await api.getRestaurantMenu(restaurantId);
+                
+                // Mise à jour de l'en-tête
+                document.getElementById('rest-name-display').innerText = rest.name;
+                document.title = `Menu - ${rest.name} | Food-Command`;
+                if(rest.imageUrl) {
+                    document.querySelector('.rest-hero').style.backgroundImage = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('${rest.imageUrl}')`;
+                }
+                
+                document.getElementById('rest-rating-display').innerHTML = `<i class="fa-solid fa-star" style="color:#FFD700"></i> ${rest.rating || '4.5'} (Nouvel établissement)`;
+                
+                // Rendu du menu
+                const menuContent = document.querySelector('.menu-content');
+                if (menu && menu.length > 0) {
+                    menuContent.innerHTML = `
+                        <div class="menu-section">
+                            <h2 class="menu-section-title">Notre Carte</h2>
+                            ${menu.map(item => `
+                                <div class="dish-card">
+                                    <div class="dish-info">
+                                        <h3 class="dish-title">${item.name}</h3>
+                                        <p class="dish-desc">${item.description || 'Préparé avec des ingrédients frais et locaux.'}</p>
+                                        <div class="dish-price-row">
+                                            <span class="dish-price">${item.price.toLocaleString()} FCFA</span>
+                                            <button class="btn-add-cart" onclick="addToCart(${item.id}, '${item.name}', ${item.price}, '${item.imageUrl || ''}', ${rest.id}, '${rest.name.replace(/'/g, "\\'")}')">
+                                                <i class="fa-solid fa-plus"></i> Ajouter
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="dish-img-wrapper">
+                                        <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c'}" class="dish-img" alt="${item.name}">
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    menuContent.innerHTML = '<p class="text-muted" style="text-align:center; padding:5rem;">Ce restaurant n\'a pas encore de menu en ligne.</p>';
+                }
+                
+            } catch (error) {
+                console.error("Error loading restaurant:", error);
+            }
+        });
+    </script>
 </body>
 </html>

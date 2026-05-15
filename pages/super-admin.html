@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration Centrale | Food-Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        :root {
+            --admin-sidebar: #0f172a;
+            --admin-accent: #3b82f6;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            background: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: var(--admin-sidebar);
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+        }
+
+        .sidebar-logo {
+            font-family: 'Outfit';
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 3rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.8rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: var(--admin-accent);
+            color: white;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem 3rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .header h1 {
+            font-family: 'Outfit';
+            font-size: 1.8rem;
+            color: #1e293b;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #f1f5f9;
+        }
+
+        .stat-card .label {
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Outfit';
+            color: #1e293b;
+            margin-top: 5px;
+        }
+
+        /* TABLE SECTION */
+        .content-panel {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid #f1f5f9;
+            display: none;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .modern-table th {
+            text-align: left;
+            padding: 1rem;
+            color: #64748b;
+            font-weight: 600;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .modern-table td {
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .modern-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-admin { background: #dcfce7; color: #15803d; }
+        .badge-user { background: #e0f2fe; color: #0369a1; }
+        .badge-resto { background: #fef9c3; color: #a16207; }
+
+        .btn-action {
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+            color: #64748b;
+            transition: 0.2s;
+        }
+
+        .btn-action:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .btn-delete:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <a href="../index.html" class="sidebar-logo">
+            <i class="fa-solid fa-shield-halved" style="color: var(--admin-accent);"></i>
+            Food-Command
+        </a>
+
+        <nav class="nav-menu">
+            <div class="nav-item">
+                <a class="nav-link active" onclick="showPanel('dashboard', this)">
+                    <i class="fa-solid fa-chart-pie"></i> Vue d'ensemble
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showPanel('restaurants', this)">
+                    <i class="fa-solid fa-shop"></i> Restaurants
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showPanel('users', this)">
+                    <i class="fa-solid fa-users"></i> Utilisateurs
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showPanel('orders', this)">
+                    <i class="fa-solid fa-receipt"></i> Commandes Globales
+                </a>
+            </div>
+            <div class="nav-item">
+                <a class="nav-link" onclick="showPanel('config', this)">
+                    <i class="fa-solid fa-gears"></i> Paramètres
+                </a>
+            </div>
+        </nav>
+
+        <div style="padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);">
+            <a href="#" onclick="logout()" class="nav-link" style="color: #ef4444;">
+                <i class="fa-solid fa-power-off"></i> Déconnexion
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h1>Console d'Administration</h1>
+                <p style="color: #64748b; font-size: 0.9rem;">Bienvenue, Administrateur Suprême</p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="btn btn-outline" style="border-radius: 12px;"><i class="fa-solid fa-bell"></i></button>
+                <img src="https://ui-avatars.com/api/?name=Admin&background=0f172a&color=fff" style="width: 45px; border-radius: 14px;">
+            </div>
+        </header>
+
+        <!-- DASHBOARD PANEL -->
+        <section id="panel-dashboard" class="content-panel active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">Restaurants</div>
+                    <div class="value" id="stat-restaurants">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Utilisateurs</div>
+                    <div class="value" id="stat-users">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Commandes</div>
+                    <div class="value" id="stat-orders">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Revenus (FCFA)</div>
+                    <div class="value" id="stat-revenue">0</div>
+                </div>
+            </div>
+
+            <div class="glass-card" style="padding: 2rem; border-radius: 24px;">
+                <h3 style="margin-bottom: 1.5rem; font-family: 'Outfit';">Activités Récentes</h3>
+                <div id="recent-activities">
+                    <p class="text-muted">Chargement des données du réseau...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESTAURANTS PANEL -->
+        <section id="panel-restaurants" class="content-panel">
+            <div class="panel-header">
+                <h2>Gestion des Partenaires</h2>
+                <button class="btn btn-primary" onclick="alert('Fonctionnalité en cours de déploiement')"><i class="fa-solid fa-plus"></i> Nouveau Restaurant</button>
+            </div>
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Adresse</th>
+                        <th>Note</th>
+                        <th>Propriétaire</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="restaurants-table-body">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- USERS PANEL -->
+        <section id="panel-users" class="content-panel">
+            <div class="panel-header">
+                <h2>Comptes Utilisateurs</h2>
+            </div>
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Points</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- ORDERS PANEL -->
+        <section id="panel-orders" class="content-panel">
+            <div class="panel-header">
+                <h2>Flux de Commandes Global</h2>
+            </div>
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Client</th>
+                        <th>Restaurant</th>
+                        <th>Total</th>
+                        <th>Statut</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table-body">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script>
+        function showPanel(panelId, btn) {
+            document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            document.getElementById('panel-' + panelId).classList.add('active');
+            if(btn) btn.classList.add('active');
+
+            if(panelId === 'dashboard') loadStats();
+            if(panelId === 'restaurants') loadRestaurants();
+            if(panelId === 'users') loadUsers();
+            if(panelId === 'orders') loadOrders();
+        }
+
+        async function loadStats() {
+            try {
+                const stats = await api.getAdminStats();
+                document.getElementById('stat-restaurants').innerText = stats.totalRestaurants;
+                document.getElementById('stat-users').innerText = stats.totalUsers;
+                document.getElementById('stat-orders').innerText = stats.totalOrders;
+                document.getElementById('stat-revenue').innerText = stats.totalRevenue.toLocaleString();
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadRestaurants() {
+            try {
+                const list = await api.getAllAdminRestaurants();
+                const tbody = document.getElementById('restaurants-table-body');
+                tbody.innerHTML = list.map(r => `
+                    <tr>
+                        <td>#${r.id}</td>
+                        <td><strong>${r.name}</strong></td>
+                        <td>${r.address || 'N/A'}</td>
+                        <td><i class="fa-solid fa-star" style="color:#f59e0b"></i> ${r.rating || '0.0'}</td>
+                        <td>${r.owner ? r.owner.fullName : 'N/A'}</td>
+                        <td>
+                            <button class="btn-action" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="btn-action btn-delete" onclick="deleteResto(${r.id})" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadUsers() {
+            try {
+                const list = await api.getAllAdminUsers();
+                const tbody = document.getElementById('users-table-body');
+                tbody.innerHTML = list.map(u => `
+                    <tr>
+                        <td>#${u.id}</td>
+                        <td>${u.fullName}</td>
+                        <td>${u.email}</td>
+                        <td><span class="badge ${u.role === 'ADMIN' ? 'badge-admin' : (u.role === 'RESTAURANT' ? 'badge-resto' : 'badge-user')}">${u.role}</span></td>
+                        <td>${u.loyaltyPoints || 0} pts</td>
+                        <td>
+                            <button class="btn-action"><i class="fa-solid fa-user-pen"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function loadOrders() {
+            try {
+                const list = await api.getAllAdminOrders();
+                const tbody = document.getElementById('orders-table-body');
+                tbody.innerHTML = list.map(o => `
+                    <tr>
+                        <td>#${o.id}</td>
+                        <td>${o.client ? o.client.fullName : 'N/A'}</td>
+                        <td>${o.restaurant ? o.restaurant.name : 'N/A'}</td>
+                        <td><strong>${o.totalAmount.toLocaleString()} FCFA</strong></td>
+                        <td><span class="badge badge-user">${o.status}</span></td>
+                        <td>${new Date(o.orderDate).toLocaleDateString()}</td>
+                    </tr>
+                `).join('');
+            } catch (e) { console.error(e); }
+        }
+
+        async function deleteResto(id) {
+            if(confirm('Supprimer ce restaurant et toutes ses données ?')) {
+                try {
+                    await api.adminDeleteRestaurant(id);
+                    loadRestaurants();
+                } catch (e) { alert(e.message); }
+            }
+        }
+
+        function logout() {
+            api.clearAuthSession();
+            window.location.href = 'auth.html';
+        }
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            const role = sessionStorage.getItem('user_role');
+            if(role !== 'ADMIN') {
+                window.location.href = '../index.html';
+                return;
+            }
+            loadStats();
+        });
+    </script>
+</body>
+</html>

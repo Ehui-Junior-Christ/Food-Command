@@ -3,217 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suivi de Commande | Food-Command</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Suivi en temps réel | Food-Command</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
     <style>
-        .tracking-container {
-            max-width: 800px;
-            margin: 100px auto 4rem;
-            padding: 0 5%;
+        :root {
+            --primary: #FF5A5F;
+            --secondary: #1E293B;
+            --accent: #22C55E;
+            --glass: rgba(255, 255, 255, 0.9);
         }
-        .map-placeholder {
-            width: 100%;
-            height: 300px;
-            background: #E2E8F0;
-            border-radius: var(--radius-lg);
-            margin-bottom: 2rem;
-            overflow: hidden;
-            position: relative;
-            box-shadow: var(--shadow-md);
-        }
-        .map-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.8;
-        }
-        .map-overlay {
+
+        body, html { height: 100%; margin: 0; font-family: 'Inter', sans-serif; background: #f8fafc; }
+
+        #map { 
             position: absolute;
-            bottom: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            border-radius: 2rem;
-            font-weight: 600;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .pulse-dot {
-            width: 12px;
-            height: 12px;
-            background: var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(255, 90, 95, 0.7);
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 90, 95, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 90, 95, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 90, 95, 0); }
-        }
-        .tracking-details {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 2.5rem;
-            box-shadow: var(--shadow-md);
-        }
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid #E2E8F0;
-            padding-bottom: 1rem;
-        }
-        .eta-title { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.25rem; }
-        .eta-time { font-size: 2rem; font-weight: 700; color: var(--text-main); font-family: 'Outfit'; }
-        
-        .timeline {
-            position: relative;
-            padding-left: 2rem;
-        }
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 7px;
-            top: 0;
-            height: 100%;
-            width: 2px;
-            background: #E2E8F0;
-        }
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-        }
-        .timeline-item:last-child { margin-bottom: 0; }
-        .timeline-dot {
-            position: absolute;
-            left: -2rem;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: white;
-            border: 2px solid #CBD5E0;
-            z-index: 2;
-        }
-        .timeline-item.active .timeline-dot {
-            border-color: var(--primary);
-            background: var(--primary);
-        }
-        .timeline-item.completed .timeline-dot {
-            border-color: var(--secondary);
-            background: var(--secondary);
-        }
-        .timeline-item.completed::after {
-            content: '';
-            position: absolute;
-            left: -1.75rem;
-            top: 1rem;
-            height: calc(100% + 1rem);
-            width: 2px;
-            background: var(--secondary);
+            top: 0; bottom: 0; left: 0; right: 0;
             z-index: 1;
         }
-        .timeline-content h4 {
-            margin-bottom: 0.25rem;
-            color: var(--text-main);
-        }
-        .timeline-content p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-        .timeline-time {
+
+        .header-floating {
             position: absolute;
-            right: 0;
-            top: 0;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 500;
+            top: 25px;
+            left: 25px;
+            z-index: 1000;
         }
+
+        .btn-round {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            color: var(--secondary);
+            text-decoration: none;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+        .tracking-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 550px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 35px;
+            padding: 2rem;
+            z-index: 1000;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+            border: 1px solid white;
+        }
+
+        .order-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+        .order-info h2 { font-family: 'Outfit'; font-size: 1.4rem; margin: 0; color: var(--secondary); }
+        .status-badge { background: #f0fdf4; color: #16a34a; padding: 6px 14px; border-radius: 50px; font-size: 0.7rem; font-weight: 800; }
+
+        /* STEPPER */
+        .stepper { position: relative; display: flex; justify-content: space-between; margin: 2rem 0; padding: 0 10px; }
+        .stepper-line { position: absolute; top: 20px; left: 40px; right: 40px; height: 4px; background: #E2E8F0; z-index: 0; }
+        .stepper-line-fill { height: 100%; background: var(--primary); width: 0%; transition: 1s; box-shadow: 0 0 10px var(--primary); }
+        .step { display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 1; width: 60px; }
+        .step-circle { width: 40px; height: 40px; background: white; border: 3px solid #E2E8F0; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #94A3B8; transition: 0.4s; }
+        .step.active .step-circle { border-color: var(--primary); color: var(--primary); transform: scale(1.1); }
+        .step.completed .step-circle { background: var(--primary); border-color: var(--primary); color: white; }
+        .step-label { font-size: 0.65rem; font-weight: 700; color: #64748B; text-align: center; }
+
+        .courier-card { display: none; background: #F8FAFC; padding: 1rem; border-radius: 20px; align-items: center; gap: 1rem; border: 1px solid #E2E8F0; margin-top: 1rem; }
+        .courier-avatar { width: 50px; height: 50px; border-radius: 15px; object-fit: cover; }
+        .btn-call { margin-left: auto; width: 40px; height: 40px; border-radius: 12px; background: white; border: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: center; color: var(--accent); }
     </style>
 </head>
 <body>
-    <nav class="navbar scrolled" style="display:flex; justify-content:space-between;">
-        <a href="../index.html" class="logo">
-            <i class="fa-solid fa-utensils"></i> Food-Command
-        </a>
-        <a href="../index.html" style="color:var(--text-muted); font-weight:500;"><i class="fa-solid fa-home"></i> Accueil</a>
-    </nav>
+    <div id="map"></div>
 
-    <div class="tracking-container">
-        <!-- Map Visualization -->
-        <div class="map-placeholder">
-            <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop" alt="Map Route">
-            <div class="map-overlay">
-                <div class="pulse-dot"></div>
-                Le livreur est en route
+    <div class="header-floating">
+        <a href="profile.html" class="btn-round"><i class="fa-solid fa-arrow-left"></i></a>
+    </div>
+
+    <div class="tracking-panel">
+        <div class="order-info">
+            <div>
+                <h2 id="order-title">Commande #...</h2>
+                <p id="time-estimate" style="margin:5px 0 0; font-size:0.8rem; color:#64748B;">Arrivée estimée : 15-20 min</p>
             </div>
+            <div class="status-badge" id="order-status">EN COURS</div>
         </div>
 
-        <div class="tracking-details">
-            <div class="header-row">
-                <div>
-                    <h2 style="font-size: 1.5rem;">Commande #FS-8492</h2>
-                    <p class="text-muted">Burger Palace</p>
-                </div>
-                <div style="text-align: right;">
-                    <div class="eta-title">Heure d'arrivée estimée</div>
-                    <div class="eta-time">20:45</div>
-                </div>
+        <div class="stepper">
+            <div class="stepper-line"><div class="stepper-line-fill" id="progress-fill"></div></div>
+            <div class="step" id="step-PENDING"><div class="step-circle"><i class="fa-solid fa-receipt"></i></div><span class="step-label">Reçue</span></div>
+            <div class="step" id="step-PREPARING"><div class="step-circle"><i class="fa-solid fa-utensils"></i></div><span class="step-label">Cuisine</span></div>
+            <div class="step" id="step-OUT_FOR_DELIVERY"><div class="step-circle"><i class="fa-solid fa-motorcycle"></i></div><span class="step-label">Route</span></div>
+            <div class="step" id="step-DELIVERED"><div class="step-circle"><i class="fa-solid fa-house-flag"></i></div><span class="step-label">Arrivée</span></div>
+        </div>
+
+        <div class="courier-card" id="courier-card">
+            <img id="courier-img" src="" class="courier-avatar">
+            <div style="flex: 1;">
+                <h4 id="courier-name" style="margin: 0; font-size: 1rem;">Livreur</h4>
+                <p id="courier-meta" style="margin: 0; font-size: 0.75rem; color: #64748B;">Matricule: ...</p>
             </div>
-
-            <!-- Visual Timeline -->
-            <div class="timeline">
-                <div class="timeline-item completed">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-time">20:15</div>
-                    <div class="timeline-content">
-                        <h4>Commande Confirmée</h4>
-                        <p>Le restaurant a accepté votre commande.</p>
-                    </div>
-                </div>
-                
-                <div class="timeline-item completed">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-time">20:20</div>
-                    <div class="timeline-content">
-                        <h4>En préparation</h4>
-                        <p>Vos plats sont en train d'être préparés avec soin.</p>
-                    </div>
-                </div>
-
-                <div class="timeline-item active">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-time">20:30</div>
-                    <div class="timeline-content">
-                        <h4>En cours de livraison</h4>
-                        <p>Marc est en route avec votre commande.</p>
-                        <div class="courier-info mt-2" style="display:flex; gap:1rem; align-items:center; background:#F7F9FC; padding:1rem; border-radius:8px;">
-                            <img src="https://ui-avatars.com/api/?name=Marc+D&background=0D8ABC&color=fff" alt="Livreur" style="border-radius:50%; width:40px; height:40px;">
-                            <div style="flex:1;">
-                                <div style="font-weight:600;">Marc D.</div>
-                                <div style="font-size:0.8rem; color:var(--text-muted);"><i class="fa-solid fa-star" style="color:#FFD700"></i> 4.9 Livreur Pro</div>
-                            </div>
-                            <button class="btn btn-outline btn-sm" style="border-radius:50%; width:40px; height:40px; padding:0;"><i class="fa-solid fa-phone"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <h4 style="color:var(--text-muted);">Livrée</h4>
-                        <p>Bon appétit !</p>
-                    </div>
-                </div>
-            </div>
+            <a href="#" id="courier-phone" class="btn-call"><i class="fa-solid fa-phone"></i></a>
         </div>
     </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+        let map, courierMarker, clientMarker;
+
+        if (!orderId) window.location.href = '../index.html';
+
+        async function init() {
+            try {
+                const order = await api.getOrder(orderId);
+                initMap(order);
+                updateUI(order);
+                connectWebSocket();
+            } catch (e) { console.error(e); }
+        }
+
+        function initMap(order) {
+            const destLat = order.destinationLat || 5.3484;
+            const destLng = order.destinationLng || -3.9783;
+
+            map = L.map('map', { zoomControl: false }).setView([destLat, destLng], 15);
+            
+            // Serveur de tuiles Google Maps
+            L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3'],
+                attribution: '© Google Maps'
+            }).addTo(map);
+
+            const clientIcon = L.divIcon({
+                className: 'custom-icon',
+                html: '<div style="background: #1e293b; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.2);"><i class="fa-solid fa-house-user"></i></div>',
+                iconSize: [30, 30], iconAnchor: [15, 15]
+            });
+            clientMarker = L.marker([destLat, destLng], { icon: clientIcon }).addTo(map);
+
+            if (order.courierLat && order.courierLng) updateCourierMarker(order.courierLat, order.courierLng);
+        }
+
+        function updateCourierMarker(lat, lng) {
+            const courierIcon = L.divIcon({
+                className: 'pulse-icon',
+                html: '<div style="background: var(--primary); width: 20px; height: 20px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px var(--primary); animation: pulse 1.5s infinite;"></div>',
+                iconSize: [20, 20], iconAnchor: [10, 10]
+            });
+
+            if (!courierMarker) courierMarker = L.marker([lat, lng], { icon: courierIcon }).addTo(map);
+            else courierMarker.setLatLng([lat, lng]);
+
+            const bounds = L.latLngBounds([clientMarker.getLatLng(), courierMarker.getLatLng()]);
+            map.fitBounds(bounds, { padding: [100, 100] });
+        }
+
+        function connectWebSocket() {
+            const socket = new SockJS('http://localhost:8080/ws-tracking');
+            const stomp = Stomp.over(socket);
+            stomp.debug = null;
+            stomp.connect({}, () => {
+                stomp.subscribe('/topic/order/' + orderId, (msg) => {
+                    const update = JSON.parse(msg.body);
+                    updateUI(update);
+                    if (update.courierLat && update.courierLng) updateCourierMarker(update.courierLat, update.courierLng);
+                });
+            });
+        }
+
+        function updateUI(order) {
+            document.getElementById('order-title').innerText = `Commande #${order.id}`;
+            const steps = ['PENDING', 'PREPARING', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+            const idx = steps.indexOf(order.status);
+            document.getElementById('progress-fill').style.width = `${idx === 0 ? 0 : (idx / 3) * 100}%`;
+
+            steps.forEach((s, i) => {
+                const el = document.getElementById(`step-${s}`);
+                if (el) { el.classList.remove('active', 'completed'); if (i < idx) el.classList.add('completed'); else if (i === idx) el.classList.add('active'); }
+            });
+
+            if (order.courier) {
+                document.getElementById('courier-card').style.display = 'flex';
+                document.getElementById('courier-img').src = api.getProfileImageUrl(order.courier);
+                document.getElementById('courier-name').innerText = order.courier.fullName;
+                document.getElementById('courier-phone').href = `tel:${order.courier.phone || ''}`;
+            }
+        }
+        init();
+    </script>
+    <style>
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 90, 95, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 90, 95, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 90, 95, 0); } }
+    </style>
 </body>
 </html>

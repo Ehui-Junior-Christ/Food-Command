@@ -87,14 +87,42 @@
         </a>
         <div class="nav-links">
             <a href="../index.html">Accueil</a>
-            <a href="restaurant.html">Restaurants</a>
+            <a href="restaurants.html">Restaurants</a>
             <a href="offers.html" class="active">Offres</a>
         </div>
         <div class="nav-actions">
-            <button class="btn btn-outline" onclick="window.location.href='auth.html'"><i class="fa-regular fa-user"></i> Connexion</button>
-            <button class="btn btn-cart">
+            <button class="btn btn-outline btn-nav" id="btn-login" onclick="window.location.href='auth.html'">
+                <i class="fa-regular fa-user"></i> <span class="hide-mobile">Connexion</span>
+            </button>
+            
+            <!-- Bloc Profil -->
+            <div id="user-profile-container" class="user-profile-nav" style="display: none;">
+                <div class="user-info" id="user-profile-trigger" role="button" tabindex="0">
+                    <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=FF5A5F&color=fff" alt="Profile" class="nav-avatar">
+                    <span id="user-name-nav" class="hide-mobile">Mon Profil</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="profile-dropdown" id="profile-dropdown">
+                    <div class="dropdown-header">
+                        <strong id="dropdown-full-name">Utilisateur</strong>
+                        <span id="dropdown-email">email@exemple.com</span>
+                    </div>
+                    <hr>
+                    <a href="profile.html"><i class="fa-solid fa-user-gear"></i> Mon Profil</a>
+                    <a href="#"><i class="fa-solid fa-box"></i> Mes Commandes</a>
+                    <hr>
+                    <a href="#" id="btn-logout" class="text-primary"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a>
+                </div>
+            </div>
+
+            <button class="btn btn-cart-nav" id="cart-trigger">
                 <i class="fa-solid fa-cart-shopping"></i>
                 <span class="cart-badge">0</span>
+            </button>
+
+            <!-- Menu Mobile -->
+            <button class="btn btn-outline btn-nav mobile-menu-btn" onclick="if(window.toggleMobileMenu) window.toggleMobileMenu()">
+                <i class="fa-solid fa-bars"></i>
             </button>
         </div>
     </nav>
@@ -159,6 +187,49 @@
     </div>
     <div class="overlay" id="overlay"></div>
 
+    <script src="../js/cart.js"></script>
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo" style="margin-bottom: 1.5rem;">
+                    <i class="fa-solid fa-utensils"></i> Food-Command
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">La meilleure plateforme de livraison de repas à Abidjan. Qualité premium et rapidité garantie.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Explorer</h3>
+                <a href="../index.html">Accueil</a>
+                <a href="restaurants.html">Restaurants</a>
+                <a href="offers.html">Offres Spéciales</a>
+                <a href="about.html">À Propos</a>
+            </div>
+            <div class="footer-col">
+                <h3>Partenariat</h3>
+                <a href="partner-register.html">Devenir Partenaire</a>
+                <a href="courier.html">Devenir Livreur</a>
+                <a href="admin.html">Espace Admin</a>
+                <a href="#">Solutions Entreprise</a>
+            </div>
+            <div class="footer-col">
+                <h3>Aide & Support</h3>
+                <a href="#">Centre d'aide</a>
+                <a href="#">Nous contacter</a>
+                <a href="#">FAQ</a>
+                <a href="#">Confidentialité</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Food-Command. Tous droits réservés. Design by EHUI Junior Christ</p>
+        </div>
+    </footer>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth-check.js"></script>
     <script src="../js/cart.js"></script>
 </body>
 </html>

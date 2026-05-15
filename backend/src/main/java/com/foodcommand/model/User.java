@@ -26,7 +26,18 @@ public class User {
     private String fullName;
     private String phone;
     private String address;
+    private String vehiclePlate;
+    private Integer loyaltyPoints = 0;
+
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider = AuthProvider.LOCAL;
+
+    private String providerId;
 }

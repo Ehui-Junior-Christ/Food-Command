@@ -85,32 +85,133 @@
 
     <section class="apply-section" id="apply">
         <div class="apply-card">
-            <h2 style="margin-bottom: 2rem;">Postulez en 2 minutes</h2>
-            <form onsubmit="event.preventDefault(); alert('Merci pour votre candidature ! Notre équipe recrutement vous contactera très prochainement.'); window.location.href='../index.html';">
-                <div class="form-group" style="text-align: left;">
-                    <label class="form-label">Nom complet</label>
-                    <input type="text" class="form-control" placeholder="Ex: Marc Koffi" required>
+            <h2 style="margin-bottom: 1rem; font-family: 'Outfit';">Rejoignez l'équipe</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Créez votre compte livreur pour commencer à recevoir des commandes.</p>
+            
+            <form id="courier-register-form">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group" style="text-align: left;">
+                        <label class="form-label">Nom complet</label>
+                        <input type="text" id="fullname" class="form-control" placeholder="Marc Koffi" required>
+                    </div>
+                    <div class="form-group" style="text-align: left;">
+                        <label class="form-label">Téléphone</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="+225 01..." required>
+                    </div>
                 </div>
+
                 <div class="form-group" style="text-align: left;">
-                    <label class="form-label">Numéro de téléphone</label>
-                    <input type="tel" class="form-control" placeholder="+225 0102030405" required>
+                    <label class="form-label">Adresse Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="marc@email.com" required>
                 </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group" style="text-align: left;">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="text-align: left;">
+                        <label class="form-label">Matricule Véhicule</label>
+                        <input type="text" id="vehiclePlate" class="form-control" placeholder="AA-000-BB" required>
+                    </div>
+                </div>
+
                 <div class="form-group" style="text-align: left;">
                     <label class="form-label">Type de véhicule</label>
-                    <select class="form-control" required>
+                    <select id="vehicleType" class="form-control" required>
                         <option>Moto / Scooter</option>
                         <option>Vélo</option>
                         <option>Voiture</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block mt-2">Envoyer ma candidature</button>
+
+                <button type="submit" class="btn btn-primary btn-block mt-2">
+                    <i class="fa-solid fa-paper-plane"></i> Créer mon compte livreur
+                </button>
             </form>
+            <p style="margin-top: 1.5rem; font-size: 0.9rem;">
+                Déjà livreur ? <a href="auth.html" style="color: var(--primary); font-weight: 700;">Connectez-vous ici</a>
+            </p>
         </div>
     </section>
 
+    <script src="../js/api.js"></script>
+    <script>
+        document.getElementById('courier-register-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Création...';
+            
+            const userData = {
+                fullName: document.getElementById('fullname').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                phone: document.getElementById('phone').value,
+                vehiclePlate: document.getElementById('vehiclePlate').value,
+                role: 'COURIER'
+            };
+
+            try {
+                // On utilise l'API de register classique mais avec le rôle COURIER
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    alert('Compte livreur créé avec succès ! Connectez-vous.');
+                    window.location.href = 'auth.html';
+                } else {
+                    const err = await response.json();
+                    alert('Erreur: ' + (err.message || 'Email déjà utilisé'));
+                }
+            } catch (error) {
+                alert('Erreur de connexion au serveur');
+            } finally {
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Créer mon compte livreur';
+            }
+        };
+    </script>
+
     <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo" style="margin-bottom: 1.5rem;">
+                    <i class="fa-solid fa-utensils"></i> Food-Command
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">La meilleure plateforme de livraison de repas à Abidjan. Qualité premium et rapidité garantie.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Explorer</h3>
+                <a href="../index.html">Accueil</a>
+                <a href="restaurant.html">Restaurants</a>
+                <a href="offers.html">Offres Spéciales</a>
+                <a href="about.html">À Propos</a>
+            </div>
+            <div class="footer-col">
+                <h3>Partenariat</h3>
+                <a href="partner-register.html">Devenir Partenaire</a>
+                <a href="courier.html">Devenir Livreur</a>
+                <a href="admin.html">Espace Admin</a>
+                <a href="#">Solutions Entreprise</a>
+            </div>
+            <div class="footer-col">
+                <h3>Aide & Support</h3>
+                <a href="#">Centre d'aide</a>
+                <a href="mailto:contact@foodcommand.ci">Nous contacter</a>
+                <a href="#">FAQ</a>
+                <a href="#">Confidentialité</a>
+            </div>
+        </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 Food-Command Abidjan. Tous droits réservés.</p>
+            <p>&copy; 2026 Food-Command. Tous droits réservés. Design by EHUI Junior Christ</p>
         </div>
     </footer>
 </body>

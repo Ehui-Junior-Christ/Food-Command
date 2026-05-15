@@ -20,16 +20,27 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id")
     private User client;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderItem> items;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "courier_id")
+    private User courier;
+
+    private Double courierLat;
+    private Double courierLng;
+    
+    private Double destinationLat;
+    private Double destinationLng;
+    private String deliveryAddress;
 
     private Double totalAmount;
     private String status; // PENDING, ACCEPTED, PREPARING, OUT_FOR_DELIVERY, DELIVERED, CANCELLED
